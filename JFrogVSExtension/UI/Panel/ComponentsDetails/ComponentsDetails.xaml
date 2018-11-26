@@ -1,0 +1,57 @@
+﻿<UserControl x:Class="JFrogVSExtension.ComponentsDetails.ComponentsDetails"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vsp="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+             xmlns:BindListToTextBlock="clr-namespace:JFrogVSExtension.ComponentsDetails"
+             mc:Ignorable="d" 
+             Background="{DynamicResource {x:Static vsp:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
+             Foreground="{DynamicResource {x:Static vsp:EnvironmentColors.ToolWindowTextBrushKey}}">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static vsp:EnvironmentColors.ToolWindowTextBrushKey}}"/>
+            <Setter Property="Padding" Value="8,0,0,0"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.Resources>
+            <BindListToTextBlock:ListToStringConverter x:Key="ListToStringConverter" />
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Border  BorderBrush="{DynamicResource {x:Static vsp:EnvironmentColors.BrandedUIBorderBrushKey}}" BorderThickness="0,0,0,1">
+                <TextBlock Text="Components Details" Padding="3"/>
+            </Border>
+        </Grid>
+        <Border  Grid.Row="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="20px"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:"/>
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Path=SelectedComponent.Name}" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Version:"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Path=SelectedComponent.Version}"/>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Type:"/>
+                <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding Path=SelectedComponent.Type}" />
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Licenses:"/>
+                <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding Path=SelectedComponent.Licenses, Converter={StaticResource ListToStringConverter}}" />
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Top Severity:"/>
+                <TextBlock Grid.Row="4" Grid.Column="2" Text="{Binding Path=SelectedComponent.TopSeverity}" />
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

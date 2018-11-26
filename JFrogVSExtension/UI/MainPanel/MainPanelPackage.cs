@@ -1,0 +1,180 @@
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
+using JFrogVSExtension.HttpClient;
+using JFrogVSExtension.Logger;
+using JFrogVSExtension.OptionsMenu;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+namespace JFrogVSExtension
+{
+    /// <summary>
+    /// This is the class that implements the package exposed by this assembly.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The minimum requirement for a class to be considered a valid package for Visual Studio
+    /// is to implement the IVsPackage interface and register itself with the shell.
+    /// This package uses the helper classes defined inside the Managed Package Framework (MPF)
+    /// to do it: it derives from the Package class that provides the implementation of the
+    /// IVsPackage interface and uses the registration attributes defined in the framework to
+    /// register itself and its components with the shell. These attributes tell the pkgdef creation
+    /// utility what data to put into .pkgdef file.
+    /// </para>
+    /// <para>
+    /// To get loaded into VS, the package must be referred by &lt;Asset Type="Microsoft.VisualStudio.VsPackage" ...&gt; in .vsixmanifest file.
+    /// </para>
+    /// </remarks>
+    [PackageRegistration(UseManagedResourcesOnly = true)]
+    [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)] // Info on this package for Help/About
+    [ProvideMenuResource("Menus.ctmenu", 1)]
+    [ProvideToolWindow(typeof(MainPanel), Style = VsDockStyle.Tabbed, Window = "34E76E81-EE4A-11D0-AE2E-00A0C90FFFC3")] //Docks the window to the Output panel 
+    [Guid(MainPanelPackage.PackageGuidString)]
+    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
+    public sealed class MainPanelPackage : Package
+    {
+        /// <summary>
+        /// MainPanelPackage GUID string.
+        /// </summary>
+        public const string PackageGuidString = "67a004b3-f2f3-4c3e-ac15-49974b24fc49";
+        private static EnvDTE.DTE dte = null;
+        private IVsSolution _solution;
+        private SolutionEventsHandler _solutionEventsHandler;
+        private uint _solutionEventsCookie = 0;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MainPanel"/> class.
+        /// </summary>
+        public MainPanelPackage()
+        {
+            // Inside this method you can place any initialization code that does not require
+            // any Visual Studio service because at this point the package object is created but
+            // not sited yet inside Visual Studio environment. The place to do all the other
+            // initialization is the Initialize method.
+        }
+
+        #region Package Members
+
+        /// <summary>
+        /// Initialization of the package; this method is called right after the package is sited, so this is the place
+        /// where you can put all the initialization code that rely on services provided by VisualStudio.
+        /// </summary>
+        protected override void Initialize()
+        {
+            InitComponents();
+            MainPanelCommand.Initialize(this);
+            base.Initialize();
+            _solution = base.GetService(typeof(SVsSolution)) as IVsSolution;
+            if (_solution != null)
+            {
+                _solutionEventsHandler = new SolutionEventsHandler();
+                _solution.AdviseSolutionEvents(_solutionEventsHandler, out _solutionEventsCookie);
+            }
+            // To trigger upon loading a solution
+            object objLoadMgr = this;   //the class that implements IVsSolutionManager
+            IVsSolution pSolution = GetService(typeof(SVsSolution)) as IVsSolution;
+
+            object existingLoadManager = null;
+            pSolution.GetProperty((int)__VSPROPID4.VSPROPID_ActiveSolutionLoadManager, out existingLoadManager);
+            pSolution.SetProperty((int)__VSPROPID4.VSPROPID_ActiveSolutionLoadManager, objLoadMgr);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (_solutionEventsCookie != 0)
+            {
+                _solution.UnadviseSolutionEvents(_solutionEventsCookie);
+                _solutionEventsCookie = 0;
+            }
+            _solutionEventsHandler = null;
+
+            base.Dispose(disposing);
+        }
+
+        public void InitComponents()
+        {
+            IVsOutputWindow outputWindow = base.GetService(typeof(SVsOutputWindow)) as IVsOutputWindow;
+            OutputLog.InitOutputWindowPane(outputWindow);
+            dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
+            JFrogXrayOptions jfrogOptions = (JFrogXrayOptions)GetDialogPage(typeof(JFrogXrayOptions));
+            HttpUtils.InitClient(jfrogOptions.getUrl(), jfrogOptions.User, jfrogOptions.Password);
+        }
+
+        public static EnvDTE.DTE getDTE()
+        {
+            return dte;
+        }
+        #endregion
+    }
+
+    internal class SolutionEventsHandler : IVsSolutionEvents
+    {
+        internal SolutionEventsHandler()
+        {
+        }
+
+        public int OnAfterCloseSolution(object pUnkReserved)
+        {
+            MainPanel mainPanel = MainPanel.GetInstance();
+            if (mainPanel != null)
+            {
+                mainPanel.Close();
+            }
+            return VSConstants.S_OK;
+        }
+
+        public int OnAfterLoadProject(IVsHierarchy pStubHierarchy, IVsHierarchy pRealHierarchy)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnAfterOpenProject(IVsHierarchy pHierarchy, int fAdded)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
+        {
+            MainPanel mainPanel = MainPanel.GetInstance();
+            if (mainPanel != null)
+            {
+                mainPanel.Load();
+            }
+            return VSConstants.S_OK;
+        }
+
+        public int OnBeforeCloseProject(IVsHierarchy pHierarchy, int fRemoved)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnBeforeCloseSolution(object pUnkReserved)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnBeforeUnloadProject(IVsHierarchy pRealHierarchy, IVsHierarchy pStubHierarchy)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnQueryCloseProject(IVsHierarchy pHierarchy, int fRemoving, ref int pfCancel)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnQueryCloseSolution(object pUnkReserved, ref int pfCancel)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnQueryUnloadProject(IVsHierarchy pRealHierarchy, ref int pfCancel)
+        {
+            return VSConstants.S_OK;
+        }
+    }
+
+
+}

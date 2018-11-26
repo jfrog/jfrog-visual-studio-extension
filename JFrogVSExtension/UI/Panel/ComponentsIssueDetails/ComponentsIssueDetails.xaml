@@ -1,0 +1,91 @@
+﻿<UserControl x:Class="JFrogVSExtension.ComponentsIssueDetails.ComponentsIssueDetails"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             xmlns:vsp="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+             xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+             Background="{DynamicResource {x:Static vsp:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
+             Foreground="{DynamicResource {x:Static vsp:EnvironmentColors.ToolWindowTextBrushKey}}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Border BorderBrush="{DynamicResource {x:Static vsp:EnvironmentColors.BrandedUIBorderBrushKey}}" BorderThickness="0,0,0,1">
+                <TextBlock Text="Components Issues Details" Padding="3"/>
+            </Border>
+        </Grid>
+        <Grid Grid.Row="1">
+            <DataGrid 
+                Name="issuesDataGrid" 
+                IsReadOnly="true"
+                CanUserReorderColumns="False" 
+                AutoGenerateColumns="False"
+                ItemsSource="{Binding IssueDetails, Mode=OneWay}"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                MinWidth="75"
+                MaxWidth="1000"
+                HorizontalScrollBarVisibility="Auto"
+                Background="Transparent"
+                BorderThickness="0"
+                Margin="0" 
+                HorizontalGridLinesBrush="Transparent" 
+                VerticalGridLinesBrush="Transparent"
+                RowHeaderWidth="0">
+                <DataGrid.Resources>
+                    <Style  TargetType="{x:Type DataGridCell}">
+                        <Setter Property="Foreground" Value="{DynamicResource {x:Static vsp:EnvironmentColors.BrandedUITextBrushKey}}"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    </Style>
+                    <Style  TargetType="{x:Type DataGridColumnHeader}">
+                        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsp:EnvironmentColors.BrandedUIBorderBrushKey}}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource {x:Static vsp:EnvironmentColors.BrandedUITextBrushKey}}"/>
+                        <Setter Property="BorderThickness" Value="0,0,2,1"/>
+                        <Setter Property="Padding" Value="3,1,1,1"/>
+                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    </Style>
+                    <Style  TargetType="{x:Type DataGridCellsPanel}">
+                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    </Style>
+                    <Style  TargetType="{x:Type DataGridRow}">
+                        <Setter Property="Background" Value="Transparent"/>
+                    </Style>
+                </DataGrid.Resources>
+                
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="Severity" MinWidth="75" MaxWidth="500" CanUserSort="True" SortMemberPath="Severity">
+                        <DataGridTemplateColumn.CellTemplate >
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <imaging:CrispImage VerticalAlignment="Top" Margin="4,4,5,0" x:Uid="CrispRefreshImage" Width="10" Height="10" Moniker="{Binding SeveretyMoniker}" />
+                                    <TextBlock Text="{Binding Severity}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Summary" Binding="{Binding Summary}" MinWidth="100" MaxWidth="500" CanUserSort="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style>
+                                <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                                <Setter Property="TextBlock.TextAlignment" Value="Left"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Issue Type" Binding="{Binding IssueType}" MinWidth="75" MaxWidth="500" CanUserSort="True"/>
+                    <DataGridTextColumn Header="Component" Binding="{Binding Component}" MinWidth="100" Width="*" MaxWidth="500" CanUserSort="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style>
+                                <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                                <Setter Property="TextBlock.TextAlignment" Value="Left"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Grid>
+</UserControl>

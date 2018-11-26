@@ -1,0 +1,77 @@
+﻿<UserControl x:Class="JFrogVSExtension.Tree.Tree"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vsp="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+             mc:Ignorable="d" 
+             xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+             
+             d:DesignHeight="250" d:DesignWidth="300"
+             Background="{DynamicResource {x:Static vsp:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
+             Foreground="{DynamicResource {x:Static vsp:EnvironmentColors.ToolWindowTextBrushKey}}">
+    
+    <UserControl.Resources>
+        <Style TargetType="{x:Type TreeView}">
+            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsp:TreeViewColors.BackgroundBrushKey}}"/>
+            <Setter Property="Background" Value="{DynamicResource {x:Static vsp:TreeViewColors.BackgroundBrushKey}}"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+        </Style>
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static vsp:EnvironmentColors.ToolWindowTextBrushKey}}"/>
+        </Style>
+    </UserControl.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <Grid  Grid.Row="0">
+            <Border BorderThickness="0,0,0,1" BorderBrush="{DynamicResource {x:Static vsp:EnvironmentColors.BrandedUIBorderBrushKey}}">
+                <TextBlock Text="Components Tree" Padding="3"/>
+            </Border>
+        </Grid>
+        
+        <StackPanel Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <TreeView Grid.Row="1"                   
+                ItemsSource="{Binding Artifacts}"                       
+                SelectedItemChanged="SelectionChanged" 
+                BorderThickness="0,1,0,1"         
+                HorizontalAlignment="Stretch"
+                Height="auto" 
+                VerticalAlignment="Stretch" 
+                Width="auto" 
+                x:Name="TreeView">
+
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="OverridesDefaultStyle" Value="False" />
+                        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                        <Setter Property="SnapsToDevicePixels" Value="True" />
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="Margin" Value="0,3,0,0"/>
+                        <Setter Property="Foreground" Value="{DynamicResource {x:Static vsp:TreeViewColors.GlyphBrushKey}}"/>
+                        <Setter Property="Background" Value="{DynamicResource {x:Static vsp:TreeViewColors.BackgroundBrushKey}}"/>
+                        
+                    </Style>
+                </TreeView.ItemContainerStyle>
+
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <imaging:CrispImage x:Uid="CrispRefreshImage" Width="10" Height="10" Moniker="{Binding SeveretyMoniker}" />
+                            <TextBlock Padding="4,0,0,0" Grid.Column="1" Text="{Binding Key}" Width="Auto"/>
+                        </Grid>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+        </StackPanel>
+    </Grid>
+</UserControl>
