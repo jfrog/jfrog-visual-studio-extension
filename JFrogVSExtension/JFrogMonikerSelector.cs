@@ -18,7 +18,7 @@ namespace JFrogVSExtension
             int id = 0;
             switch (severity)
             {
-                case Severity.Critical:
+                case Severity.High:
                     {
                         id = 10;
                         break;

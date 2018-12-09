@@ -76,7 +76,7 @@
                             <Border BorderBrush="{DynamicResource {x:Static vsp:EnvironmentColors.BrandedUIBorderBrushKey}}" BorderThickness="1">
                                 <StackPanel Background="{DynamicResource {x:Static vsp:CommonControlsColors.ComboBoxBackgroundBrushKey}}">
                                     <CheckBox x:Name="cbAll" IsChecked="{Binding Path=AllCheckbox, Mode=TwoWay}" Content="All" Click="HandleClick"/>
-                                    <CheckBox x:Name="cbCriticall" Content="Critical" Click="HandleClick" />
+                                    <CheckBox x:Name="cbHigh" Content="High" Click="HandleClick" />
                                     <CheckBox x:Name="cbMajor" Content="Major" Click="HandleClick"/>
                                     <CheckBox x:Name="cbMinor" Content="Minor" Click="HandleClick"/>
                                     <CheckBox x:Name="cbUnknown" Content="Unknown" Click="HandleClick"/>

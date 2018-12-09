@@ -77,7 +77,7 @@
             if (filtredObject.Equals("All"))
             {
                 isAllFilterChecked = true;
-                cbCriticall.IsChecked = true;
+                cbHigh.IsChecked = true;
                 cbMajor.IsChecked = true;
                 cbMinor.IsChecked  = true;
                 cbUnknown.IsChecked = true;
@@ -91,7 +91,7 @@
             if (filtredObject.Equals("All"))
             {
                 isAllFilterChecked = false;
-                cbCriticall.IsChecked = false;
+                cbHigh.IsChecked = false;
                 cbMajor.IsChecked = false;
                 cbMinor.IsChecked = false;
                 cbUnknown.IsChecked = false;
@@ -128,7 +128,7 @@
         private void InitCheckbox()
         {
             cbAll.IsChecked = true;
-            cbCriticall.IsChecked = true;
+            cbHigh.IsChecked = true;
             cbMajor.IsChecked = true;
             cbMinor.IsChecked = true;
             cbUnknown.IsChecked = true;

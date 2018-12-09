@@ -6,6 +6,6 @@
         Unknown,
         Minor,
         Major,
-        Critical
+        High
     }
 }

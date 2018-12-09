@@ -73,9 +73,9 @@ namespace JFrogVSExtension.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap critical {
+        internal static System.Drawing.Bitmap high {
             get {
-                object obj = ResourceManager.GetObject("critical", resourceCulture);
+                object obj = ResourceManager.GetObject("high", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
