@@ -4,8 +4,8 @@
     {
         Normal,
         Unknown,
-        Minor,
-        Major,
+        Low,
+        Medium,
         High
     }
 }

@@ -12,8 +12,8 @@
       <IDSymbol name="default" value="20" />
       <IDSymbol name="JFrog" value="30" />
       <IDSymbol name="license" value="40" />
-      <IDSymbol name="major" value="50" />
-      <IDSymbol name="minor" value="60" />
+      <IDSymbol name="medium" value="50" />
+      <IDSymbol name="low" value="60" />
       <IDSymbol name="normal" value="70" />
       <IDSymbol name="security" value="80" />
       <IDSymbol name="unknown" value="90" />

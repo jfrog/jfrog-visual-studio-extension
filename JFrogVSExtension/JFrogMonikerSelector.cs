@@ -23,12 +23,12 @@ namespace JFrogVSExtension
                         id = 10;
                         break;
                     }
-                case Severity.Major:
+                case Severity.Medium:
                     {
                         id = 50;
                         break;
                     }
-                case Severity.Minor:
+                case Severity.Low:
                     {
                         id = 60;
                         break;

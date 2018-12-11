@@ -103,9 +103,9 @@ namespace JFrogVSExtension.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap major {
+        internal static System.Drawing.Bitmap medium {
             get {
-                object obj = ResourceManager.GetObject("major", resourceCulture);
+                object obj = ResourceManager.GetObject("medium", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -113,9 +113,9 @@ namespace JFrogVSExtension.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap minor {
+        internal static System.Drawing.Bitmap low {
             get {
-                object obj = ResourceManager.GetObject("minor", resourceCulture);
+                object obj = ResourceManager.GetObject("low", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

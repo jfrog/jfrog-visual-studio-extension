@@ -77,8 +77,8 @@
                                 <StackPanel Background="{DynamicResource {x:Static vsp:CommonControlsColors.ComboBoxBackgroundBrushKey}}">
                                     <CheckBox x:Name="cbAll" IsChecked="{Binding Path=AllCheckbox, Mode=TwoWay}" Content="All" Click="HandleClick"/>
                                     <CheckBox x:Name="cbHigh" Content="High" Click="HandleClick" />
-                                    <CheckBox x:Name="cbMajor" Content="Major" Click="HandleClick"/>
-                                    <CheckBox x:Name="cbMinor" Content="Minor" Click="HandleClick"/>
+                                    <CheckBox x:Name="cbMedium" Content="Medium" Click="HandleClick"/>
+                                    <CheckBox x:Name="cbLow" Content="Low" Click="HandleClick"/>
                                     <CheckBox x:Name="cbUnknown" Content="Unknown" Click="HandleClick"/>
                                     <CheckBox x:Name="cbNormal" Content="Normal" Click="HandleClick"/>
                                 </StackPanel>

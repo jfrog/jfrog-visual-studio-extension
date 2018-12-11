@@ -160,8 +160,8 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Resource Include="Resources\JFrogLogo.png" />
-    <Resource Include="Resources\major.png" />
-    <SplashScreen Include="Resources\minor.png" />
+    <Resource Include="Resources\medium.png" />
+    <SplashScreen Include="Resources\low.png" />
     <Resource Include="Resources\normal.png" />
     <Resource Include="Resources\security.png" />
     <Resource Include="Resources\unknown.png" />

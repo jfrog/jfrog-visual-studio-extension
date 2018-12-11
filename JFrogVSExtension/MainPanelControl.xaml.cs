@@ -78,8 +78,8 @@
             {
                 isAllFilterChecked = true;
                 cbHigh.IsChecked = true;
-                cbMajor.IsChecked = true;
-                cbMinor.IsChecked  = true;
+                cbMedium.IsChecked = true;
+                cbLow.IsChecked  = true;
                 cbUnknown.IsChecked = true;
                 cbNormal.IsChecked = true;
             }
@@ -92,8 +92,8 @@
             {
                 isAllFilterChecked = false;
                 cbHigh.IsChecked = false;
-                cbMajor.IsChecked = false;
-                cbMinor.IsChecked = false;
+                cbMedium.IsChecked = false;
+                cbLow.IsChecked = false;
                 cbUnknown.IsChecked = false;
                 cbNormal.IsChecked = false;
             }
@@ -129,8 +129,8 @@
         {
             cbAll.IsChecked = true;
             cbHigh.IsChecked = true;
-            cbMajor.IsChecked = true;
-            cbMinor.IsChecked = true;
+            cbMedium.IsChecked = true;
+            cbLow.IsChecked = true;
             cbUnknown.IsChecked = true;
             cbNormal.IsChecked = true;
         }
