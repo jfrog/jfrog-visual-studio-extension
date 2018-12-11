@@ -5,19 +5,19 @@
   <Symbols>
     <String Name="Resources" Value="/JFrogVSExtension;Component/Resources" />
     <Guid Name="JFrogMoniker" Value="{b2d9eecf-c9d2-4a0b-88fb-7a4715a2d763}" />
-    <ID Name="critical" Value="10" />
+    <ID Name="high" Value="10" />
     <ID Name="default" Value="20" />
     <ID Name="JFrog" Value="30" />
     <ID Name="license" Value="40" />
-    <ID Name="major" Value="50" />
-    <ID Name="minor" Value="60" />
+    <ID Name="medium" Value="50" />
+    <ID Name="low" Value="60" />
     <ID Name="normal" Value="70" />
     <ID Name="security" Value="80" />
     <ID Name="unknown" Value="90" />
   </Symbols>
   <Images>
-    <Image Guid="$(JFrogMoniker)" ID="$(critical)">
-      <Source Uri="$(Resources)/critical.png">
+    <Image Guid="$(JFrogMoniker)" ID="$(high)">
+      <Source Uri="$(Resources)/high.png">
         <Size Value="10" />
       </Source>
     </Image>
@@ -36,13 +36,13 @@
         <Size Value="10" />
       </Source>
     </Image>
-    <Image Guid="$(JFrogMoniker)" ID="$(major)">
-      <Source Uri="$(Resources)/major.png">
+    <Image Guid="$(JFrogMoniker)" ID="$(medium)">
+      <Source Uri="$(Resources)/medium.png">
         <Size Value="10" />
       </Source>
     </Image>
-    <Image Guid="$(JFrogMoniker)" ID="$(minor)">
-      <Source Uri="$(Resources)/minor.png">
+    <Image Guid="$(JFrogMoniker)" ID="$(low)">
+      <Source Uri="$(Resources)/low.png">
         <Size Value="10" />
       </Source>
     </Image>

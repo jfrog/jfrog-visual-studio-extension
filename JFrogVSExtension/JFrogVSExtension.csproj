@@ -153,15 +153,15 @@
       <TargetPath>C:\alex\fromvisualstudio</TargetPath>
       <SubType>Designer</SubType>
     </Content>
-    <Resource Include="Resources\critical.png" />
+    <Resource Include="Resources\high.png" />
     <Resource Include="Resources\default.png" />
     <Content Include="Resources\Jfrog-Logo.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Resource Include="Resources\JFrogLogo.png" />
-    <Resource Include="Resources\major.png" />
-    <SplashScreen Include="Resources\minor.png" />
+    <Resource Include="Resources\medium.png" />
+    <SplashScreen Include="Resources\low.png" />
     <Resource Include="Resources\normal.png" />
     <Resource Include="Resources\security.png" />
     <Resource Include="Resources\unknown.png" />

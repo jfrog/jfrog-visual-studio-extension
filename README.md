@@ -15,22 +15,23 @@ JFrog Visual studio extension adds JFrog Xray scanning of NuGet project dependen
 
 To build the plugin sources, please follow these steps:
 1. Clone the code from git.
-2. Open Visual Studio.
-3. Open *Tools* --> *Get Tools and Features*
+2. Download the [JFrog CLI executable](https://jfrog.com/getcli/) for Windows and place it under **$PROJECT_LOCATION\JFrogVSExtension\Resources**.
+3. Open Visual Studio.
+4. Open *Tools* --> *Get Tools and Features*
 
 ![alt](docs/images/getTools.png)
 
-4. Select the *workloads* tab and scroll to the bottem for the *Other Toolsets* section. Install *Visual Studio extension development*. Read more about Visual Studio SDK [here](https://docs.microsoft.com/en-us/visualstudio/extensibility/installing-the-visual-studio-sdk?view=vs-2017).
+5. Select the *workloads* tab and scroll to the bottem for the *Other Toolsets* section. Install *Visual Studio extension development*. Read more about Visual Studio SDK [here](https://docs.microsoft.com/en-us/visualstudio/extensibility/installing-the-visual-studio-sdk?view=vs-2017).
 
 ![alt](docs/images/extension.png)
 
-5. Once the installation is completed, re-open Visual Studio.
-6. Click on *File* --> *Open* --> *Project/Solution* and navigate to the project root dir and select the sln file.
-7. To build the project, click on *Build* tab --> *Build Solution*. The VSIX file will be created in the following location: **$PROJECT_LOCATION\bin\Release\JFrog.VSExtension.vsix**
+6. Once the installation is completed, re-open Visual Studio.
+7. Click on *File* --> *Open* --> *Project/Solution* and navigate to the project root dir and select the sln file.
+8. To build the project, click on *Build* tab --> *Build Solution*. The VSIX file will be created in the following location: **$PROJECT_LOCATION\bin\Release\JFrog.VSExtension.vsix**
 
 ![alt](docs/images/build.png)
 
-8. If you'd like to help us develop and enhance the extension, this step is for you.
+9. If you'd like to help us develop and enhance the extension, this step is for you.
    To build and run the plugin following your code changes, click on *Debug* --> *Start Debugging*.
                            
 ![alt](docs/images/debug.png)

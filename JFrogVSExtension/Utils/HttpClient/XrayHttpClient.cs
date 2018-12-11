@@ -13,7 +13,8 @@ namespace JFrogVSExtension.HttpClient
         private String url = "";
         private String user = "";
         private String password = "";
-        private String userAgent = "jfrog-VS-plugin/1.0.0"; //PUT HERE THE VERSION...
+        // Put the version here:
+        private String userAgent = "jfrog-visual-studio-extension/1.0.1";
         private System.Net.Http.HttpClient httpClient = null;
         public HttpResponseMessage PerformGetRequest(String usage)
         {

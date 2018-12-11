@@ -77,9 +77,9 @@
             if (filtredObject.Equals("All"))
             {
                 isAllFilterChecked = true;
-                cbCriticall.IsChecked = true;
-                cbMajor.IsChecked = true;
-                cbMinor.IsChecked  = true;
+                cbHigh.IsChecked = true;
+                cbMedium.IsChecked = true;
+                cbLow.IsChecked  = true;
                 cbUnknown.IsChecked = true;
                 cbNormal.IsChecked = true;
             }
@@ -91,9 +91,9 @@
             if (filtredObject.Equals("All"))
             {
                 isAllFilterChecked = false;
-                cbCriticall.IsChecked = false;
-                cbMajor.IsChecked = false;
-                cbMinor.IsChecked = false;
+                cbHigh.IsChecked = false;
+                cbMedium.IsChecked = false;
+                cbLow.IsChecked = false;
                 cbUnknown.IsChecked = false;
                 cbNormal.IsChecked = false;
             }
@@ -128,9 +128,9 @@
         private void InitCheckbox()
         {
             cbAll.IsChecked = true;
-            cbCriticall.IsChecked = true;
-            cbMajor.IsChecked = true;
-            cbMinor.IsChecked = true;
+            cbHigh.IsChecked = true;
+            cbMedium.IsChecked = true;
+            cbLow.IsChecked = true;
             cbUnknown.IsChecked = true;
             cbNormal.IsChecked = true;
         }
