@@ -60,7 +60,7 @@ namespace JFrogVSExtension.OptionsMenu
                 XrayVersion xrayVersion = HttpUtils.GetVersion();
                 if (!isCompatibleVersion(xrayVersion))
                 {
-                    testConnectionField.Text = XrayUtil.GetErrorMessage(xrayVersion.xray_version);
+                    testConnectionField.Text = XrayUtil.GetMinimumXrayVersionErrorMessage(xrayVersion.xray_version);
                     return;
                 }
 

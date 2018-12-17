@@ -42,7 +42,7 @@ namespace JFrogVSExtension.Xray
             return true;
         }
 
-        public static String GetErrorMessage(String xrayVersion)
+        public static String GetMinimumXrayVersionErrorMessage(String xrayVersion)
         {
             return "ERROR: Found Xray version: " + xrayVersion + ". This extension version supports Xray " + XrayUtil.MIN_XRAY_VERSION + " or above. For information about using older versions of Xray, please refer to the documentation.";
         }
