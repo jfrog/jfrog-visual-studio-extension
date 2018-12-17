@@ -6,7 +6,7 @@ namespace JFrogVSExtension.Xray
 {
     class XrayUtil
     {
-        public static readonly string MIN_XRAY_VERSION = "1.7.2.3";
+        public static readonly string MIN_XRAY_VERSION = "2.5.0";
 
         public static XrayStatus LoadXrayStatus(String output)
         {
@@ -40,6 +40,11 @@ namespace JFrogVSExtension.Xray
                 }
             }
             return true;
+        }
+
+        public static String GetErrorMessage(String xrayVersion)
+        {
+            return "ERROR: Found Xray version: " + xrayVersion + ". This extension version supports Xray " + XrayUtil.MIN_XRAY_VERSION + " or above. For information about using older versions of Xray, please refer to the documentation.";
         }
 
         private static int compareTokens(String minVersionToken, String versionToken) 

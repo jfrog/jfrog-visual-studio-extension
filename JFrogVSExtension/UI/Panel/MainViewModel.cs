@@ -29,7 +29,7 @@ namespace JFrogVSExtension
         public void Refresh()
         {
             Tree = new TreeViewModel();
-            Tree.Load(RefreshType.Hard, Severities);
+            Tree.Load(RefreshType.Hard, SeveritiesFromFilter);
         }
 
         public void ExpandAll()
