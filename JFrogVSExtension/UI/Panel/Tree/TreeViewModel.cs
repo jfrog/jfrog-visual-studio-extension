@@ -64,8 +64,7 @@ namespace JFrogVSExtension.Tree
                 XrayVersion xrayVersion = HttpUtils.GetVersion();
                 if (!XrayUtil.IsXrayVersionCompatible(xrayVersion.xray_version))
                 {
-                    String errorMessage = "ERROR: Unsupported Xray version: " + xrayVersion.xray_version + ", version "
-                    + XrayUtil.MIN_XRAY_VERSION + " or above required.";
+                    String errorMessage = XrayUtil.GetMinimumXrayVersionErrorMessage(xrayVersion.xray_version);
                     OutputLog.ShowMessage(errorMessage);
                     return;
                 }

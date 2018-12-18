@@ -141,12 +141,12 @@
             // 
             this.testConnectionField.BackColor = System.Drawing.SystemColors.Control;
             this.testConnectionField.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.testConnectionField.Location = new System.Drawing.Point(72, 150);
+            this.testConnectionField.Location = new System.Drawing.Point(24, 150);
             this.testConnectionField.Margin = new System.Windows.Forms.Padding(4);
             this.testConnectionField.Multiline = true;
             this.testConnectionField.Name = "testConnectionField";
             this.testConnectionField.ReadOnly = true;
-            this.testConnectionField.Size = new System.Drawing.Size(298, 71);
+            this.testConnectionField.Size = new System.Drawing.Size(346, 71);
             this.testConnectionField.TabIndex = 44;
             this.testConnectionField.TabStop = false;
             // 
