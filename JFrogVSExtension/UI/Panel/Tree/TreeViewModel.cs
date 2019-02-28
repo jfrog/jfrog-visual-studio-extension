@@ -9,6 +9,7 @@ using JFrogVSExtension.HttpClient;
 using JFrogVSExtension.Utils;
 using JFrogVSExtension.Xray;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace JFrogVSExtension.Tree
 {
@@ -19,10 +20,13 @@ namespace JFrogVSExtension.Tree
         private string selectedKey;
 
         #endregion
+
         #region Public Properties
+
         public ObservableCollection<ArtifactViewModel> Artifacts { get; set; }
         public ObservableCollection<Issue> IssueDetails { get; set; }
         public Component SelectedComponent { get; set; }
+        public Boolean EnableRefreshButton { get; set; }
         public string SelectedKey
         {
             get { return selectedKey; }
@@ -46,42 +50,45 @@ namespace JFrogVSExtension.Tree
         #region Constructor
         public TreeViewModel()
         {
+            this.EnableRefreshButton = true;
         }
 
-        public void Load(RefreshType refreshType, HashSet<Severity> severities)
+        public async Task LoadAsync(RefreshType refreshType, HashSet<Severity> severities)
         {
+            this.EnableRefreshButton = false;
             DataService dataService = DataService.Instance;
 
             RaisePropertyChanged("SelectedKey");
             try
             {
-                String solutionDir = GetSolutionDir();
+                String solutionDir = await GetSolutionDirAsync();
                 if (String.IsNullOrWhiteSpace(solutionDir))
                 {
                     return;
                 }
 
-                XrayVersion xrayVersion = HttpUtils.GetVersion();
+                XrayVersion xrayVersion = await HttpUtils.GetVersionAsync();
                 if (!XrayUtil.IsXrayVersionCompatible(xrayVersion.xray_version))
                 {
                     String errorMessage = XrayUtil.GetMinimumXrayVersionErrorMessage(xrayVersion.xray_version);
-                    OutputLog.ShowMessage(errorMessage);
+                    await OutputLog.ShowMessageAsync(errorMessage);
                     return;
                 }
                 // Steps to run: 
-                // Trigger CLI to collect json info to a file
-                // Read the info
-                // Send dependencies to Xray  
-                // Get response and build the dependencies tree
+                // 1. Trigger CLI to collect json info to a file.
+                // 2. Read the info.
+                // 3. Send dependencies to Xray.
+                // 4. Get response and build the dependencies tree.
 
                 // Running CLI - this is the returned output.
-                String returnedText = Util.GetCLIOutput(solutionDir);
-                // Load projects from output
-                Projects projects = Util.LosdNugetProjects(returnedText);
+                String returnedText = await Task.Run(() => Util.GetCLIOutputAsync(solutionDir));
+                
+                // Load projects from output.
+                Projects projects = Util.LoadNugetProjects(returnedText);
 
                 if (projects.projects == null || projects.projects.Length == 0)
                 {
-                    OutputLog.ShowMessage("No projects were found.");
+                    await OutputLog.ShowMessageAsync("No projects were found.");
                     return;
                 }
                 List<Components> components = new List<Components>();
@@ -90,15 +97,15 @@ namespace JFrogVSExtension.Tree
                 {
                     case RefreshType.Hard:
                         {
-                            // Get information for all dependencies. Ignore the cache
-                            artifacts = dataService.RefreshArtifacts(true, projects);
+                            // Get information for all dependencies. Ignore the cache.
+                            artifacts = await dataService.RefreshArtifactsAsync(true, projects);
                             break;
                         }
 
                     case RefreshType.Soft:
                         {
                             // Get information only for the delta. Means only new dependencies will be added.
-                            artifacts = dataService.RefreshArtifacts(false, projects);
+                            artifacts = await dataService.RefreshArtifactsAsync(false, projects);
                             break;
                         }
                 }
@@ -115,34 +122,38 @@ namespace JFrogVSExtension.Tree
             catch (IOException ioe)
             {
                 dataService.ClearAllComponents();
-                OutputLog.ShowMessage(ioe.Message);
-                OutputLog.ShowMessage(ioe.StackTrace);
+                await OutputLog.ShowMessageAsync(ioe.Message);
+                await OutputLog.ShowMessageAsync(ioe.StackTrace);
             }
             catch (HttpRequestException he)
             {
                 dataService.ClearAllComponents();
-                OutputLog.ShowMessage(he.Message);
-                OutputLog.ShowMessage(he.StackTrace);
-            }            
+                await OutputLog.ShowMessageAsync(he.Message);
+                await OutputLog.ShowMessageAsync(he.StackTrace);
+            }
+            finally
+            {
+                this.EnableRefreshButton = true;
+            }
         }
 
-        public void Close()
+        public async Task CloseAsync()
         {
-            OutputLog.ShowMessage("Closing solution. Clearing...");
+            await OutputLog.ShowMessageAsync("Closing solution. Clearing...");
         }
 
-        private String GetSolutionDir()
+        private async Task<String> GetSolutionDirAsync()
         {
             EnvDTE.DTE dte = MainPanelPackage.getDTE();
             if (dte == null)
             {
-                OutputLog.ShowMessage("The plugin was not initialized yet. DTE is null");
+                await OutputLog.ShowMessageAsync("The plugin was not initialized yet. DTE is null");
                 return "";
             }
             string solutionFullName = dte.Solution.FullName;
             if (String.IsNullOrWhiteSpace(solutionFullName))
             {
-                OutputLog.ShowMessage("There is no solution yet available. The path is: " + solutionFullName);
+                await OutputLog.ShowMessageAsync("There is no solution yet available. The path is: " + solutionFullName);
                 return "";
             }
            return System.IO.Path.GetDirectoryName(solutionFullName);

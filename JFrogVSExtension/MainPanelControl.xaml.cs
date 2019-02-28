@@ -3,6 +3,7 @@
     using JFrogVSExtension.Logger;
     using System.Windows;
     using System.Windows.Controls;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Interaction logic for MainPanelControl.
@@ -24,9 +25,9 @@
         /// </summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event args.</param>
-        private void RefreshTree(object sender, RoutedEventArgs e)
+        private async void RefreshTree(object sender, RoutedEventArgs e)
         {
-            ((MainViewModel)this.DataContext).Refresh();
+            await ((MainViewModel)this.DataContext).RefreshAsync();
         }
 
         /// <summary>
@@ -34,9 +35,9 @@
         /// </summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event args.</param>
-        private void ColapseTree(object sender, RoutedEventArgs e)
+        private async void ColapseTree(object sender, RoutedEventArgs e)
         {
-            ((MainViewModel)this.DataContext).Refresh();
+            await ((MainViewModel)this.DataContext).RefreshAsync();
         }
 
         /// <summary>
@@ -60,20 +61,20 @@
             ((MainViewModel)this.DataContext).CollapseAll();
         }
 
-        private void HandleClick(object sender, RoutedEventArgs e)
+        private async void HandleClick(object sender, RoutedEventArgs e)
         {
             if ((bool)((CheckBox)e.Source).IsChecked)
             {
-                HandleCheck(((CheckBox)e.Source).Content.ToString());
+                await HandleCheckAsync(((CheckBox)e.Source).Content.ToString());
             }
             else
             {
-                HandleUnchecked(((CheckBox)e.Source).Content.ToString());
+                await HandleUncheckedAsync(((CheckBox)e.Source).Content.ToString());
             }
         }
-        private void HandleCheck(string filtredObject)
-        {
 
+        private async Task HandleCheckAsync(string filtredObject)
+        {
             if (filtredObject.Equals("All"))
             {
                 isAllFilterChecked = true;
@@ -83,10 +84,10 @@
                 cbUnknown.IsChecked = true;
                 cbNormal.IsChecked = true;
             }
-            ((MainViewModel)this.DataContext).AddSeverityToFilter(filtredObject);
+            await ((MainViewModel)this.DataContext).AddSeverityToFilterAsync(filtredObject);
         }
 
-        private void HandleUnchecked(string filtredObject)
+        private async Task HandleUncheckedAsync(string filtredObject)
         {
             if (filtredObject.Equals("All"))
             {
@@ -105,7 +106,7 @@
                     cbAll.IsChecked = false;
                 }
             }
-            ((MainViewModel)this.DataContext).RemoveSeverityFromFilter(filtredObject);
+            await ((MainViewModel)this.DataContext).RemoveSeverityFromFilterAsync(filtredObject);
         }
         private void OpenFilter(object sender, RoutedEventArgs e)
         {
@@ -116,13 +117,13 @@
         {
         }
 
-        private void Tree_Loaded(object sender, RoutedEventArgs e)
+        private async void Tree_Loaded(object sender, RoutedEventArgs e)
         {
             if (isAllFilterChecked)
             {
                 InitCheckbox();
             }
-            ((MainViewModel)this.DataContext).Load();
+            await ((MainViewModel)this.DataContext).LoadAsync();
         }
 
         private void InitCheckbox()
@@ -135,18 +136,18 @@
             cbNormal.IsChecked = true;
         }
 
-        public void Load()
+        public async Task LoadAsync()
         {
             if (isAllFilterChecked)
             {
                 InitCheckbox();
             }
-            ((MainViewModel)this.DataContext).Load();
+            await ((MainViewModel)this.DataContext).LoadAsync();
         }
 
-        public void Close()
+        public async Task CloseAsync()
         {
-            ((MainViewModel)this.DataContext).Close();
+            await ((MainViewModel)this.DataContext).CloseAsync();
         }
     }
 }

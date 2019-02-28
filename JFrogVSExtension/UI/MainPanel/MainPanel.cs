@@ -3,6 +3,7 @@
     using System;
     using System.Runtime.InteropServices;
     using Microsoft.VisualStudio.Shell;
+    using Task = System.Threading.Tasks.Task;
 
     /// <summary>
     /// This class implements the tool window exposed by this package and hosts a user control.
@@ -37,14 +38,14 @@
             return mainPanel;
         }
 
-        public void Load()
+        public async Task LoadAsync()
         {
-            ((MainPanelControl)this.Content).Load();
+            await ((MainPanelControl)this.Content).LoadAsync();
         }
 
-        public void Close()
+        public async Task CloseAsync()
         {
-            ((MainPanelControl)this.Content).Close();
+            await ((MainPanelControl)this.Content).CloseAsync();
         }
     }
 }

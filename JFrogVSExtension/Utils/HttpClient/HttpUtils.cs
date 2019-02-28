@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace JFrogVSExtension.HttpClient
 {
@@ -14,12 +15,12 @@ namespace JFrogVSExtension.HttpClient
     {
         private static XrayHttpClient xray = new XrayHttpClient();
 
-        public static XrayStatus GetPing()
+        public static async Task<XrayStatus> GetPingAsync()
         {
             try
             {
-                HttpResponseMessage responseFromXray = xray.PerformGetRequest("system/ping");
-                string resultFromXray = parseXrayResponse(responseFromXray);
+                HttpResponseMessage responseFromXray = await xray.PerformGetRequestAsync("system/ping");
+                string resultFromXray = await parseXrayResponseAsync(responseFromXray);
                 return XrayUtil.LoadXrayStatus(resultFromXray);
             } catch (Exception e)
             {
@@ -27,12 +28,12 @@ namespace JFrogVSExtension.HttpClient
             }
         }
 
-        public static XrayVersion GetVersion()
+        public static async Task<XrayVersion> GetVersionAsync()
         {
             try
             {
-                HttpResponseMessage responseFromXray = xray.PerformGetRequest("system/version");
-                string resultFromXray = parseXrayResponse(responseFromXray);
+                HttpResponseMessage responseFromXray = await xray.PerformGetRequestAsync("system/version");
+                string resultFromXray = await parseXrayResponseAsync(responseFromXray);
                 return XrayUtil.LoadXrayVersion(resultFromXray);
             }
             catch (Exception e)
@@ -41,17 +42,16 @@ namespace JFrogVSExtension.HttpClient
             }
         }
 
-        public static Artifacts GetCopmonentsFromXray(List<Components> collection)
+        public static async Task<Artifacts> GetCopmonentsFromXrayAsync(List<Components> collection)
         {
-
-            HttpResponseMessage componentResponse = getResponseFromXray(collection);
-            string componentResult = parseXrayResponse(componentResponse);
-            OutputLog.ShowMessage(componentResult);
+            HttpResponseMessage componentResponse = await getResponseFromXrayAsync(collection);
+            string componentResult = await parseXrayResponseAsync(componentResponse);
+            await OutputLog.ShowMessageAsync(componentResult);
             Artifacts artifacts = JsonConvert.DeserializeObject<Artifacts>(componentResult);
             return artifacts;
         }
 
-        private static HttpResponseMessage getResponseFromXray(List<Components> collection)
+        private static async Task<HttpResponseMessage> getResponseFromXrayAsync(List<Components> collection)
         {
             var collectionWrapper = new
             {
@@ -59,26 +59,26 @@ namespace JFrogVSExtension.HttpClient
             };
 
             string json = JsonConvert.SerializeObject(collectionWrapper);
-            return xray.PerformPostRequest("summary/component ", json);            
+            return await xray.PerformPostRequestAsync("summary/component ", json);            
         }
 
-        private static string parseXrayResponse(HttpResponseMessage result)
+        private static async Task<string> parseXrayResponseAsync(HttpResponseMessage result)
         {
             if (result.StatusCode == HttpStatusCode.OK)
             {
-                using (StreamReader sr = new StreamReader(result.Content.ReadAsStreamAsync().Result))
+                using (StreamReader sr = new StreamReader(await result.Content.ReadAsStreamAsync()))
                 {
-                    return sr.ReadToEnd();
+                    return await sr.ReadToEndAsync();
                 }
             }
             String message = "Received response status code: " + (int)result.StatusCode + ". Message: " + result.ReasonPhrase;
             throw new HttpRequestException(message);
         }
 
-        public static String PostComponentToXray(Components component)
+        public static async Task<String> PostComponentToXrayAsync(Components component)
         {
             var collection = new List<Components>();
-            HttpResponseMessage xrayComponentResponse = getResponseFromXray(collection);
+            HttpResponseMessage xrayComponentResponse = await getResponseFromXrayAsync(collection);
             if (xrayComponentResponse.StatusCode == HttpStatusCode.Unauthorized)
             {
                 return "Received " + HttpStatusCode.Unauthorized + " from Xray. Plesae check your credentials.";

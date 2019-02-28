@@ -8,28 +8,31 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace JFrogVSExtension.Utils
 {
     class Util
     {
         public readonly static string PREFIX = "nuget://";
+        
         // This method will load the json to a List of objects. 
         // The Json retrieved from the output itself
-        public static Projects LosdNugetProjects(String output)
+        public static Projects LoadNugetProjects(String output)
         {
             // Reading the file as stream and changing to list of items.
-            // The items are configured in an other class
+            // The items are configured in another class
             // output = System.IO.File.ReadAllText( @"C:\alex\jvse-new\jvse\JFrogVSExtension\output.txt");
             Projects projects = JsonConvert.DeserializeObject<Projects>(output);
             return projects;
         }
-        public static String GetCLIOutput(string solutionDir)
+
+        public static async Task<String> GetCLIOutputAsync(string solutionDir)
         {
             String strAppPath = GetAssemblyLocalPathFrom(typeof(MainPanelCommand));
             String strFilePath = Path.Combine(strAppPath, "Resources");
             String pathToCli = Path.Combine(strFilePath, "jfrog.exe");
-            OutputLog.ShowMessage("Path for the JFrog CLI: " + pathToCli);
+            await OutputLog.ShowMessageAsync("Path for the JFrog CLI: " + pathToCli);
             //Create process
             Process pProcess = new System.Diagnostics.Process();
 
@@ -85,7 +88,8 @@ namespace JFrogVSExtension.Utils
                 pProcess.BeginOutputReadLine();
                 pProcess.BeginErrorReadLine();
                 pProcess.WaitForExit();
-                // To wait for the entire output to be written
+
+                // Wait for the entire output to be written
                 if (outputWaitHandle.WaitOne(2) &&
                        errorWaitHandle.WaitOne(2))
                 {
@@ -97,7 +101,7 @@ namespace JFrogVSExtension.Utils
                     }
                     if (!string.IsNullOrEmpty(error.ToString()))
                     {
-                        OutputLog.ShowMessage(error.ToString());
+                        await OutputLog.ShowMessageAsync(error.ToString());
                     }
                     // Returning the output from the CLI that is the json itself.
                     return strOutput.ToString();
@@ -105,7 +109,7 @@ namespace JFrogVSExtension.Utils
                 else
                 {
                     // Timed out.
-                    OutputLog.ShowMessage("Process timeout");
+                    await OutputLog.ShowMessageAsync("Process timeout");
                     throw new IOException("Process timeout, please run the following command from the solution directory and send us the output:" + pathToCli + " rt ndt");
                 }
             }

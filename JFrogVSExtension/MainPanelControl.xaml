@@ -39,7 +39,8 @@
                             Click="RefreshTree" 
                             ToolTip="Refresh the tree"
                             Background="Transparent"
-                            BorderBrush="Transparent">
+                            BorderBrush="Transparent"
+                            IsEnabled="{Binding Tree.EnableRefreshButton}">
                             <imaging:CrispImage x:Uid="CrispRefreshImage" Moniker="{x:Static catalog:KnownMonikers.Refresh}"/>
                         </Button>
                         <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Background="{DynamicResource {x:Static vsp:EnvironmentColors.CommandBarSplitButtonSeparatorBrushKey}}" />

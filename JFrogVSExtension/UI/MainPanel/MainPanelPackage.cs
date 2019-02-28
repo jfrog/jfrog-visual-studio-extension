@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using System.ComponentModel.Design;
 using JFrogVSExtension.HttpClient;
 using JFrogVSExtension.Logger;
 using JFrogVSExtension.OptionsMenu;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using System.Threading;
+using Task = System.Threading.Tasks.Task;
 
 namespace JFrogVSExtension
 {
@@ -27,13 +30,14 @@ namespace JFrogVSExtension
     /// To get loaded into VS, the package must be referred by &lt;Asset Type="Microsoft.VisualStudio.VsPackage" ...&gt; in .vsixmanifest file.
     /// </para>
     /// </remarks>
-    [PackageRegistration(UseManagedResourcesOnly = true)]
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)] // Info on this package for Help/About
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideToolWindow(typeof(MainPanel), Style = VsDockStyle.Tabbed, Window = "34E76E81-EE4A-11D0-AE2E-00A0C90FFFC3")] //Docks the window to the Output panel 
+    [ProvideService(typeof(MainPanel), IsAsyncQueryable = true)]
     [Guid(MainPanelPackage.PackageGuidString)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
-    public sealed class MainPanelPackage : Package
+    public sealed class MainPanelPackage : AsyncPackage
     {
         /// <summary>
         /// MainPanelPackage GUID string.
@@ -61,11 +65,15 @@ namespace JFrogVSExtension
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initialization code that rely on services provided by VisualStudio.
         /// </summary>
-        protected override void Initialize()
+        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            InitComponents();
-            MainPanelCommand.Initialize(this);
-            base.Initialize();
+            await InitComponentsAsync();
+            OleMenuCommandService commandService = await base.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
+            MainPanelCommand.Initialize(this, commandService);
+            await base.InitializeAsync(cancellationToken, progress);
+
+            // Switch to main thread for dealing with type IVsSolution.
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             _solution = base.GetService(typeof(SVsSolution)) as IVsSolution;
             if (_solution != null)
             {
@@ -93,11 +101,10 @@ namespace JFrogVSExtension
             base.Dispose(disposing);
         }
 
-        public void InitComponents()
+        public async Task InitComponentsAsync()
         {
-            IVsOutputWindow outputWindow = base.GetService(typeof(SVsOutputWindow)) as IVsOutputWindow;
-            OutputLog.InitOutputWindowPane(outputWindow);
-            dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
+            await OutputLog.InitOutputWindowPaneAsync();
+            dte = (EnvDTE.DTE) await GetServiceAsync(typeof(EnvDTE.DTE));
             JFrogXrayOptions jfrogOptions = (JFrogXrayOptions)GetDialogPage(typeof(JFrogXrayOptions));
             HttpUtils.InitClient(jfrogOptions.getUrl(), jfrogOptions.User, jfrogOptions.Password);
         }
@@ -120,7 +127,7 @@ namespace JFrogVSExtension
             MainPanel mainPanel = MainPanel.GetInstance();
             if (mainPanel != null)
             {
-                mainPanel.Close();
+                mainPanel.CloseAsync();
             }
             return VSConstants.S_OK;
         }
@@ -140,7 +147,7 @@ namespace JFrogVSExtension
             MainPanel mainPanel = MainPanel.GetInstance();
             if (mainPanel != null)
             {
-                mainPanel.Load();
+                mainPanel.LoadAsync();
             }
             return VSConstants.S_OK;
         }

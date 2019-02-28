@@ -30,7 +30,7 @@ namespace JFrogVSExtension
         /// Adds our command handlers for menu (commands must exist in the command table file)
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
-        private MainPanelCommand(Package package)
+        private MainPanelCommand(Package package, OleMenuCommandService commandService)
         {
             if (package == null)
             {
@@ -38,12 +38,10 @@ namespace JFrogVSExtension
             }
 
             this.package = package;
-
-            OleMenuCommandService commandService = this.ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (commandService != null)
             {
                 var menuCommandID = new CommandID(CommandSet, CommandId);
-                var menuItem = new MenuCommand(this.ShowToolWindow, menuCommandID);
+                var menuItem = new MenuCommand(this.ShowToolWindowAsync, menuCommandID);
                 commandService.AddCommand(menuItem);
             }
         }
@@ -72,9 +70,10 @@ namespace JFrogVSExtension
         /// Initializes the singleton instance of the command.
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
-        public static void Initialize(Package package)
+        /// <param name="commandService">Menu command service to add menu-command.</param>
+        public static void Initialize(Package package, OleMenuCommandService commandService)
         {
-            Instance = new MainPanelCommand(package);
+            Instance = new MainPanelCommand(package, commandService);
         }
 
         /// <summary>
@@ -82,7 +81,7 @@ namespace JFrogVSExtension
         /// </summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event args.</param>
-        private void ShowToolWindow(object sender, EventArgs e)
+        private async void ShowToolWindowAsync(object sender, EventArgs e)
         {
             // Get the instance number 0 of this tool window. This window is single instance so this instance
             // is actually the only one.
@@ -93,6 +92,7 @@ namespace JFrogVSExtension
                 throw new NotSupportedException("Cannot create tool window");
             }
 
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }

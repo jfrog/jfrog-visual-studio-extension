@@ -5,6 +5,7 @@ using JFrogVSExtension.Xray;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace JFrogVSExtension.Data
 {
@@ -106,6 +107,7 @@ namespace JFrogVSExtension.Data
             var artifactsMap = artifacts.artifacts.ToDictionary(x => x.general.ComponentId, x => x);
             return Util.ParseDependencies(dep, artifactsMap, this);
         }
+
         // Parsing the dependencies and returning the top severity from all the dependency. 
         // This top severity that is returned, is the project serverity
         private Severity getTopComponentSeverity(Severity topSeverity, Component depComponent)
@@ -122,7 +124,7 @@ namespace JFrogVSExtension.Data
             return topSeverity;
         }
 
-        public Artifacts RefreshArtifacts(bool hard, Projects projects)
+        public async Task<Artifacts> RefreshArtifactsAsync(bool hard, Projects projects)
         {
             List<Components> components = new List<Components>();
 
@@ -148,13 +150,14 @@ namespace JFrogVSExtension.Data
             Artifacts artifacts = GetArtifacts();
             while (i + BULK < components.Count)
             {
-                Artifacts buldArtifacts = HttpUtils.GetCopmonentsFromXray(components.GetRange(i, BULK));
+                Artifacts buldArtifacts = await HttpUtils.GetCopmonentsFromXrayAsync(components.GetRange(i, BULK));
                 artifacts.artifacts.AddRange(buldArtifacts.artifacts);
                 i += BULK;
             }
             if (components.Count - i > 0)
             {
-                artifacts.artifacts.AddRange(HttpUtils.GetCopmonentsFromXray(components.GetRange(i, components.Count - i)).artifacts);
+                Artifacts artifactsToAdd = await HttpUtils.GetCopmonentsFromXrayAsync(components.GetRange(i, components.Count - i));
+                artifacts.artifacts.AddRange(artifactsToAdd.artifacts);
             }
             return artifacts;
         }

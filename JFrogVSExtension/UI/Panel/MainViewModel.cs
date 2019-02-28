@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using JFrogVSExtension.Data;
 using JFrogVSExtension.Xray;
+using System.Threading.Tasks;
 
 namespace JFrogVSExtension
 {
@@ -18,7 +19,8 @@ namespace JFrogVSExtension
         public static HashSet<Severity> SeveritiesFromFilter { get; set; }
         #endregion
 
-        #region constractor
+        #region Constructor
+
         public MainViewModel()
         {
             Severities = new HashSet<Severity>();
@@ -26,10 +28,10 @@ namespace JFrogVSExtension
             SeveritiesFromFilter = Severities;      
         }
 
-        public void Refresh()
+        public async Task RefreshAsync()
         {
             Tree = new TreeViewModel();
-            Tree.Load(RefreshType.Hard, SeveritiesFromFilter);
+            await Tree.LoadAsync(RefreshType.Hard, SeveritiesFromFilter);
         }
 
         public void ExpandAll()
@@ -53,7 +55,7 @@ namespace JFrogVSExtension
             }
         }
 
-        public void AddSeverityToFilter(string severityName)
+        public async Task AddSeverityToFilterAsync(string severityName)
         {
             if (severityName.Equals("All"))
             {
@@ -66,10 +68,10 @@ namespace JFrogVSExtension
                 SeveritiesFromFilter.Add(severity);
             }
             Tree = new TreeViewModel();
-            Tree.Load(RefreshType.None, SeveritiesFromFilter);
+            await Tree.LoadAsync(RefreshType.None, SeveritiesFromFilter);
         }
 
-        public void RemoveSeverityFromFilter(string severityName)
+        public async Task RemoveSeverityFromFilterAsync(string severityName)
         {
             if (severityName.Equals("All"))
             {
@@ -84,7 +86,7 @@ namespace JFrogVSExtension
                 }
             }
             Tree = new TreeViewModel();
-            Tree.Load(RefreshType.None, SeveritiesFromFilter);
+            await Tree.LoadAsync(RefreshType.None, SeveritiesFromFilter);
         }
 
         public void ResetSeverities()
@@ -95,16 +97,16 @@ namespace JFrogVSExtension
             }
         }
 
-        public void Load()
+        public async Task LoadAsync()
         {
             Tree = new TreeViewModel();
-            Tree.Load(RefreshType.Soft, Severities);
+            await Tree.LoadAsync(RefreshType.Soft, Severities);
         }
 
-        public void Close()
+        public async Task CloseAsync()
         {
             Tree = new TreeViewModel();
-            Tree.Close();
+            await Tree.CloseAsync();
         }
         #endregion
     }
