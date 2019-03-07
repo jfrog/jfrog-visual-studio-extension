@@ -35,7 +35,7 @@
             </Border>
         </Grid>
         
-        <StackPanel Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <TreeView Grid.Row="1"                   
                 ItemsSource="{Binding Artifacts}"                       
                 SelectedItemChanged="SelectionChanged" 
@@ -72,6 +72,6 @@
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
             </TreeView>
-        </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

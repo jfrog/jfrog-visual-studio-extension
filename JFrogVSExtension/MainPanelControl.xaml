@@ -96,12 +96,10 @@
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="2*" MinWidth="300"/>
             </Grid.ColumnDefinitions>
-            <ScrollViewer>
-                <Grid x:Name="Tree" Grid.Column="0" DataContext="{Binding Tree}">
-                    <Tree:Tree Loaded="Tree_Loaded"/>
-                </Grid>
-            </ScrollViewer>
-            <GridSplitter Grid.Column="1" Width="4"
+            <Grid x:Name="Tree" Grid.Column="0" DataContext="{Binding Tree}">
+                <Tree:Tree Loaded="Tree_Loaded"/>
+            </Grid>
+                <GridSplitter Grid.Column="1" Width="4"
                       HorizontalAlignment="Stretch" 
                       Background="{DynamicResource {x:Static vsp:EnvironmentColors.ToolWindowBorderBrushKey}}"/>
             <Grid x:Name="Info" Grid.Column="2">
