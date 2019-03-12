@@ -22,7 +22,8 @@ namespace JFrogVSExtension.HttpClient
                 HttpResponseMessage responseFromXray = await xray.PerformGetRequestAsync("system/ping");
                 string resultFromXray = await parseXrayResponseAsync(responseFromXray);
                 return XrayUtil.LoadXrayStatus(resultFromXray);
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 throw new IOException(e.Message, e);
             }
@@ -81,7 +82,7 @@ namespace JFrogVSExtension.HttpClient
             HttpResponseMessage xrayComponentResponse = await getResponseFromXrayAsync(collection);
             if (xrayComponentResponse.StatusCode == HttpStatusCode.Unauthorized)
             {
-                return "Received " + HttpStatusCode.Unauthorized + " from Xray. Plesae check your credentials.";
+                return "Received " + HttpStatusCode.Unauthorized + " from Xray. Please check your credentials.";
             }
 
             if (xrayComponentResponse.StatusCode == HttpStatusCode.Forbidden)

@@ -62,7 +62,7 @@ namespace JFrogVSExtension.OptionsMenu
                 XrayStatus xrayStatus = await HttpUtils.GetPingAsync();
                 if (xrayStatus == null)
                 {
-                    testConnectionField.Text = "Failed to perfom ping.";
+                    testConnectionField.Text = "Failed to perform ping.";
                     return;
                 }
                 XrayVersion xrayVersion = await HttpUtils.GetVersionAsync();

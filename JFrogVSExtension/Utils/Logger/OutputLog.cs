@@ -17,12 +17,9 @@ namespace JFrogVSExtension.Logger
         public static async Task InitOutputWindowPaneAsync()
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-            var outputWindowObj = ServiceProvider.GlobalProvider.GetService(typeof(SVsOutputWindow)) as IVsOutputWindow;
-            // Get the output window
             if (outputWindow == null)
             {
-                outputWindow = outputWindowObj;
-                await ShowMessageAsync("Logger init");
+                outputWindow = ServiceProvider.GlobalProvider.GetService(typeof(SVsOutputWindow)) as IVsOutputWindow;
             }
         }
 
@@ -31,10 +28,20 @@ namespace JFrogVSExtension.Logger
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             IVsOutputWindowPane outputWindowPane = null;
 
+            // Initialize the output window. 
+            // Required if trying to output a message before the MainPanel has initialized.
+            await InitOutputWindowPaneAsync();
+
             // Initialize the JFrog output window pane if required.
             if (outputWindow != null && ErrorHandler.Failed(outputWindow.GetPane(OutputWindowPaneUid, out outputWindowPane)))
             {
-                outputWindowPane = initWindowPane();
+                outputWindowPane = InitJfrogWindowPane();
+            }
+
+            // If couldn't set the output window, cannot log messages.
+            if (outputWindow == null)
+            {
+                return;
             }
 
             // Write the message.
@@ -46,10 +53,9 @@ namespace JFrogVSExtension.Logger
             outputWindowPane.OutputStringThreadSafe("\n");
         }
 
-        private static IVsOutputWindowPane initWindowPane()
+        private static IVsOutputWindowPane InitJfrogWindowPane()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            IVsOutputWindowPane outputWindowPane;
             int hr;
             const int VISIBLE = 1;
             const int DO_NOT_CLEAR_WITH_SOLUTION = 0;
@@ -57,7 +63,7 @@ namespace JFrogVSExtension.Logger
             hr = outputWindow.CreatePane(OutputWindowPaneUid, "JFrog", VISIBLE, DO_NOT_CLEAR_WITH_SOLUTION);
             ErrorHandler.ThrowOnFailure(hr);
 
-            hr = outputWindow.GetPane(OutputWindowPaneUid, out outputWindowPane);
+            hr = outputWindow.GetPane(OutputWindowPaneUid, out IVsOutputWindowPane outputWindowPane);
             ErrorHandler.ThrowOnFailure(hr);
 
             return outputWindowPane;
