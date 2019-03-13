@@ -5,6 +5,7 @@ using System.IO;
 using JFrogVSExtension.Xray;
 using JFrogVSExtension.Logger;
 using JFrogVSExtension.Utils;
+using System.Threading.Tasks;
 
 namespace JFrogVSExtension.OptionsMenu
 {
@@ -41,8 +42,15 @@ namespace JFrogVSExtension.OptionsMenu
             testConnectionField.Text = "";
         }
 
+        private async void TestConnection(object sender, EventArgs e)
+        {
+            this.btnTestConnection.Enabled = false;
+            testConnectionField.Text = "Awaiting response...";
+            await PerformTestConnectionAsync();
+            this.btnTestConnection.Enabled = true;
+        }
 
-        private void performTestConnection(object sender, EventArgs e)
+        private async Task PerformTestConnectionAsync()
         {
             try
             {
@@ -51,13 +59,13 @@ namespace JFrogVSExtension.OptionsMenu
                     txtBoxServer.Text += "/";
                 }
                 HttpUtils.InitClient(txtBoxServer.Text, txtBoxUser.Text, txtBoxPassword.Text);
-                XrayStatus xrayStatus = HttpUtils.GetPing();
+                XrayStatus xrayStatus = await HttpUtils.GetPingAsync();
                 if (xrayStatus == null)
                 {
-                    testConnectionField.Text = "Failed to perfom ping.";
+                    testConnectionField.Text = "Failed to perform ping.";
                     return;
                 }
-                XrayVersion xrayVersion = HttpUtils.GetVersion();
+                XrayVersion xrayVersion = await HttpUtils.GetVersionAsync();
                 if (!isCompatibleVersion(xrayVersion))
                 {
                     testConnectionField.Text = XrayUtil.GetMinimumXrayVersionErrorMessage(xrayVersion.xray_version);
@@ -65,11 +73,12 @@ namespace JFrogVSExtension.OptionsMenu
                 }
 
                 // Check components permissions. 
-                String message = HttpUtils.PostComponentToXray(new Components("", Util.PREFIX + "testComponent"));
+                String message = await HttpUtils.PostComponentToXrayAsync(new Components("", Util.PREFIX + "testComponent"));
                 if (String.IsNullOrEmpty(message))
                 {
                     testConnectionField.Text = "Received Xray version: " + xrayVersion.xray_version;
-                } else
+                }
+                else
                 {
                     testConnectionField.Text = message;
                 }
@@ -77,7 +86,7 @@ namespace JFrogVSExtension.OptionsMenu
             catch (IOException ioe)
             {
                 testConnectionField.Text = ioe.Message;
-                OutputLog.ShowMessage("Caught exception when performing test connection: " + ioe);
+                await OutputLog.ShowMessageAsync("Caught exception when performing test connection: " + ioe);
             }
         }
 

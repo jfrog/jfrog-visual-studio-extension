@@ -39,7 +39,8 @@
                             Click="RefreshTree" 
                             ToolTip="Refresh the tree"
                             Background="Transparent"
-                            BorderBrush="Transparent">
+                            BorderBrush="Transparent"
+                            IsEnabled="{Binding Tree.EnableRefreshButton}">
                             <imaging:CrispImage x:Uid="CrispRefreshImage" Moniker="{x:Static catalog:KnownMonikers.Refresh}"/>
                         </Button>
                         <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Background="{DynamicResource {x:Static vsp:EnvironmentColors.CommandBarSplitButtonSeparatorBrushKey}}" />
@@ -95,12 +96,10 @@
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="2*" MinWidth="300"/>
             </Grid.ColumnDefinitions>
-            <ScrollViewer>
-                <Grid x:Name="Tree" Grid.Column="0" DataContext="{Binding Tree}">
-                    <Tree:Tree Loaded="Tree_Loaded"/>
-                </Grid>
-            </ScrollViewer>
-            <GridSplitter Grid.Column="1" Width="4"
+            <Grid x:Name="Tree" Grid.Column="0" DataContext="{Binding Tree}">
+                <Tree:Tree Loaded="Tree_Loaded"/>
+            </Grid>
+                <GridSplitter Grid.Column="1" Width="4"
                       HorizontalAlignment="Stretch" 
                       Background="{DynamicResource {x:Static vsp:EnvironmentColors.ToolWindowBorderBrushKey}}"/>
             <Grid x:Name="Info" Grid.Column="2">

@@ -95,7 +95,7 @@
             this.btnTestConnection.TabIndex = 40;
             this.btnTestConnection.Text = "Test Connection";
             this.btnTestConnection.UseVisualStyleBackColor = true;
-            this.btnTestConnection.Click += new System.EventHandler(this.performTestConnection);
+            this.btnTestConnection.Click += new System.EventHandler(this.TestConnection);
             // 
             // serverUrl
             // 

@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace JFrogVSExtension.HttpClient
 {
@@ -16,12 +17,12 @@ namespace JFrogVSExtension.HttpClient
         // Put the version here:
         private String userAgent = "jfrog-visual-studio-extension/1.0.1";
         private System.Net.Http.HttpClient httpClient = null;
-        public HttpResponseMessage PerformGetRequest(String usage)
+        public async Task<HttpResponseMessage> PerformGetRequestAsync(String usage)
         {
             InitClient();
             try
             {
-                HttpResponseMessage result = httpClient.GetAsync(url + usage).Result;
+                HttpResponseMessage result = await httpClient.GetAsync(url + usage);
                 return result;
             }
             catch (Exception ex)
@@ -37,27 +38,25 @@ namespace JFrogVSExtension.HttpClient
             }
         }
 
-        private static string parseXrayResponse(HttpResponseMessage result)
+        private static async Task<string> ParseXrayResponseAsync(HttpResponseMessage result)
         {
             if (result.StatusCode == HttpStatusCode.OK)
             {
-                using (StreamReader sr = new StreamReader(result.Content.ReadAsStreamAsync().Result))
+                using (StreamReader sr = new StreamReader(await result.Content.ReadAsStreamAsync()))
                 {
-                    return sr.ReadToEnd();
+                    return await sr.ReadToEndAsync();
                 }
             }
             String message = "Received response status code: " + (int)result.StatusCode + ". Message: " + result.ReasonPhrase;
             throw new HttpRequestException(message);
         }
 
-        public HttpResponseMessage PerformPostRequest(String usage, String content)
+        public async Task<HttpResponseMessage> PerformPostRequestAsync(String usage, String content)
         {
             InitClient();
             try
             {
-                HttpResponseMessage result = httpClient.PostAsync(url + usage, new StringContent(content, Encoding.UTF8,
-                    "application/json")).Result;
-                return result;
+                return await httpClient.PostAsync(url + usage, new StringContent(content, Encoding.UTF8, "application/json"));
             }
             catch (Exception ex)
             {
