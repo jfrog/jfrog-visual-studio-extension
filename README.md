@@ -3,14 +3,15 @@ JFrog Visual studio extension adds JFrog Xray scanning of NuGet project dependen
 To learn how to use the extension, please visit the [JFrog Visual Studio Extension User Guide](https://www.jfrog.com/confluence/display/XRAY/IDE+Integration#IDEIntegration-JFrogVisualStudioExtension).
 
 # Installing the Extension
-1. Open Visual Studio
-2. Open *Tools* --> *Extensions and Updates*
+1. Make sure nuget.exe exists under your PATH environment variable
+2. Open Visual Studio
+3. Open *Tools* --> *Extensions and Updates*
 
 ![alt](docs/images/getTools.png)
 
-3. Search for JFrog Visual Studio Extension
-4. Click on *Download*
-5. Once the installation is completed, re-open Visual Studio.
+4. Search for JFrog Visual Studio Extension
+5. Click on *Download*
+6. Once the installation is completed, re-open Visual Studio.
 
 # Building the Sources
 
