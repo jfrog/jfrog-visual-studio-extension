@@ -139,7 +139,9 @@ namespace JFrogVSExtension.Data
             {
                 if (nugetProject.dependencies != null && nugetProject.dependencies.Length > 0)
                 {
+                    // Get project's components which are not included in the cache.
                     componentsSet.UnionWith(Util.GetComponents(nugetProject.dependencies, GetComponentsCache()));
+                    // Update cache with new components.
                     GetComponentsCache().UnionWith(componentsSet);
                 }
             }
