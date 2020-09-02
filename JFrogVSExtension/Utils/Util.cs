@@ -196,7 +196,7 @@ namespace JFrogVSExtension.Utils
         // Make sure that all of the component's dependencies are added to the DataService.
         // This scenario might happen as a package may appear in the dependencies-tree numerous times with different dependencies.
         // This is due to a possible situation of multiple subprojects under the same solution,
-        // where the same package appears in several projects but its dependencies varies between the packages.config files of the subprojects.
+        // where the same package appears in several projects, but for some projects, some dependencies are missing in the packages.config.
         private static void updateDataServiceWithMissingDependencies(Component component, DataService dataService)
         {
             Component componentInDataService = dataService.getComponent(component.Key);
@@ -212,7 +212,7 @@ namespace JFrogVSExtension.Utils
 
             foreach (string dependencyString in component.Dependencies)
             {
-                if (componentInDataService.Dependencies != null && !componentInDataService.Dependencies.Contains(dependencyString))
+                if (!componentInDataService.Dependencies.Contains(dependencyString))
                 {
                     componentInDataService.Dependencies.Add(dependencyString);
                 }
@@ -262,7 +262,7 @@ namespace JFrogVSExtension.Utils
 
                 // Discover comp's dependencies even if already exists in cache.
                 // This is due to a possible situation of multiple subprojects under the same solution,
-                // where the same package appears in several projects but its dependencies varies between the packages.config of the subprojects.
+                // where the same package appears in several projects, but for some projects, some dependencies are missing in the packages.config.
                 // In such case, the CLI outputs a dependencies-tree in which each project shows different dependencies for the package.
                 if (dependency.dependencies != null && dependency.dependencies.Length > 0)
                 {
