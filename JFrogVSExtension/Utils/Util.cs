@@ -166,16 +166,24 @@ namespace JFrogVSExtension.Utils
                                     comp.Issues.Add(issue);
                                 }
                             }
-
                         }
                         else
                         {
-                            comp.Issues.AddRange(component.Issues);
+                            if (component.Issues != null)
+                            {
+                                comp.Issues.AddRange(component.Issues);
+                            }
                         }
+
                         if (!dataService.getComponents().ContainsKey(component.Key))
                         {
                             dataService.getComponents().Add(component.Key, component);
                         }
+                        else
+                        {
+                            updateDataServiceWithMissingDependencies(component, dataService);
+                        }
+
                         projectDependencies.Add(dependency.id);
                     }
                 }
@@ -183,6 +191,32 @@ namespace JFrogVSExtension.Utils
                 comp.TopSeverity = topSeverity;
             }
             return comp;
+        }
+
+        // Make sure that all of the component's dependencies are added to the DataService.
+        // This scenario might happen as a package may appear in the dependencies-tree numerous times with different dependencies.
+        // This is due to a possible situation of multiple subprojects under the same solution,
+        // where the same package appears in several projects, but for some projects, some dependencies are missing in the packages.config.
+        private static void updateDataServiceWithMissingDependencies(Component component, DataService dataService)
+        {
+            Component componentInDataService = dataService.getComponent(component.Key);
+            if (component.Dependencies == null || componentInDataService == null)
+            {
+                return;
+            }
+
+            if (componentInDataService.Dependencies == null)
+            {
+                componentInDataService.Dependencies = new List<string>();
+            }
+
+            foreach (string dependencyString in component.Dependencies)
+            {
+                if (!componentInDataService.Dependencies.Contains(dependencyString))
+                {
+                    componentInDataService.Dependencies.Add(dependencyString);
+                }
+            }
         }
 
         private static void setComponentDetails(Component comp, Artifact artifact)
@@ -210,6 +244,7 @@ namespace JFrogVSExtension.Utils
             comp.Licenses = artifact.licenses;
         }
 
+        // Return Set of Components which are not contained in componentsCache.
         public static HashSet<Components> GetComponents(Dependency[] dependencies, HashSet<Components> componentsCache)
         {
             HashSet<Components> ids = new HashSet<Components>();
@@ -219,19 +254,25 @@ namespace JFrogVSExtension.Utils
                 {
                     component_id = PREFIX + dependency.id
                 };
+
                 if (!componentsCache.Contains(comp))
                 {
                     ids.Add(comp);
-                    if (dependency.dependencies != null && dependency.dependencies.Length > 0)
-                    {
-                        HashSet<Components> internalIdS = GetComponents(dependency.dependencies, componentsCache);
-                        ids.UnionWith(internalIdS);
-                    }
                 }
 
+                // Discover comp's dependencies even if already exists in cache.
+                // This is due to a possible situation of multiple subprojects under the same solution,
+                // where the same package appears in several projects, but for some projects, some dependencies are missing in the packages.config.
+                // In such case, the CLI outputs a dependencies-tree in which each project shows different dependencies for the package.
+                if (dependency.dependencies != null && dependency.dependencies.Length > 0)
+                {
+                    HashSet<Components> internalIdS = GetComponents(dependency.dependencies, componentsCache);
+                    ids.UnionWith(internalIdS);
+                }
             }
             return ids;
         }
+
         public static Severity GetTopSeverity(Severity topSeverityComp, Severity topSeverityDep)
         {
             int compID = JFrogMonikerSelector.GetSeverityID(topSeverityComp);
@@ -261,6 +302,7 @@ namespace JFrogVSExtension.Utils
 
         public List<Artifact> artifacts { get; set; } = new List<Artifact>();
     }
+
     public class NugetProject
     {
         public string name;
@@ -274,6 +316,7 @@ namespace JFrogVSExtension.Utils
         public string md5;
         public Dependency[] dependencies;
     }
+
     public class Projects
     {
         public NugetProject[] projects;
@@ -287,6 +330,7 @@ namespace JFrogVSExtension.Utils
         public Components()
         {
         }
+
         public Components(String sha1, String component_id)
         {
             this.sha1 = sha1;

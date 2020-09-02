@@ -53,6 +53,8 @@ namespace JFrogVSExtension.Tree
             this.EnableRefreshButton = true;
         }
 
+        #endregion
+
         public async Task LoadAsync(RefreshType refreshType, HashSet<Severity> severities)
         {
             this.EnableRefreshButton = false;
@@ -91,7 +93,6 @@ namespace JFrogVSExtension.Tree
                     await OutputLog.ShowMessageAsync("No projects were found.");
                     return;
                 }
-                List<Components> components = new List<Components>();
                 Artifacts artifacts = null;
                 switch (refreshType)
                 {
@@ -158,6 +159,5 @@ namespace JFrogVSExtension.Tree
             }
            return System.IO.Path.GetDirectoryName(solutionFullName);
         }
-        #endregion
     }
 }
