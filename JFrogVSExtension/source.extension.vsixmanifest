@@ -5,7 +5,6 @@
         <DisplayName>JFrog</DisplayName>
         <Description xml:space="preserve">Visual Studio extension to integrate with JFrog Xray for scanning solution components. </Description>
         <Icon>Resources\Jfrog-Logo.ico</Icon>
-        <PreviewImage>Resources\JFrogLogo.png</PreviewImage>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0, 17.0)" />
