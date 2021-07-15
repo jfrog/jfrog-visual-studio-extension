@@ -1,6 +1,14 @@
 # JFrog Visual Studio Extension
 # Table of Contents
 
+- [About this Extension](#about-this-extension)
+  - [Component Tree Icons](#component-tree-icons)
+- [Installing the Extension](#installing-the-extension)
+- [Building the Sources](#building-the-sources)
+- [Troublshooting Issues](#troublshooting-issues)
+- [Release Notes](#release-notes)
+- [Code Contributions](#code-contributions)
+
 ## About this Extension
 JFrog Visual studio extension adds JFrog Xray scanning of NuGet project dependencies to your Visual Studio.
 To learn how to use the extension, please visit the [JFrog Visual Studio Extension User Guide](https://www.jfrog.com/confluence/display/XRAY/IDE+Integration#IDEIntegration-JFrogVisualStudioExtension).
