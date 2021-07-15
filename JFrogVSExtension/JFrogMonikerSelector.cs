@@ -1,7 +1,6 @@
 ﻿using JFrogVSExtension.Xray;
 using Microsoft.VisualStudio.Imaging.Interop;
 using System;
-using JFrogVSExtension.Logger;
 
 namespace JFrogVSExtension
 {
