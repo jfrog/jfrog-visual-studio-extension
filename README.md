@@ -1,8 +1,22 @@
-# Overview
+# JFrog Visual Studio Extension
+# Table of Contents
+
+## About this Extension
 JFrog Visual studio extension adds JFrog Xray scanning of NuGet project dependencies to your Visual Studio.
 To learn how to use the extension, please visit the [JFrog Visual Studio Extension User Guide](https://www.jfrog.com/confluence/display/XRAY/IDE+Integration#IDEIntegration-JFrogVisualStudioExtension).
 
-# Installing the Extension
+### Component Tree Icons
+The icon demonstrates the top severity issue of a selected component and its transitive dependencies. The following table describes the severities from lowest to highest:
+|                 Icon                | Severity |                                       Description                                      |
+|:-----------------------------------:|:--------:|:---------------------------------------------------------------------------------------|
+|   ![Normal](JFrogVSExtension/Resources/normal.png)   |  Normal  | Scanned - No Issues                                                                    |
+|  ![Unknown](JFrogVSExtension/Resources/unknown.png)  |  Unknown | No CVEs attached to the vulnerability or the selected component not identified in Xray |
+|      ![Low](JFrogVSExtension/Resources/low.png)      |    Low   | Top issue with low severity                                                            |
+|   ![Medium](JFrogVSExtension/Resources/medium.png)   |  Medium  | Top issue with medium severity                                                         |
+|     ![High](JFrogVSExtension/Resources/high.png)     |   High   | Top issue with high severity                                                           |
+| ![Critical](JFrogVSExtension/Resources/critical.png) | Critical | Top issue with critical severity  
+
+## Installing the Extension
 1. Make sure nuget.exe exists under your PATH environment variable
 2. Open Visual Studio
 3. Open *Tools* --> *Extensions and Updates*
@@ -13,7 +27,7 @@ To learn how to use the extension, please visit the [JFrog Visual Studio Extensi
 5. Click on *Download*
 6. Once the installation is completed, re-open Visual Studio.
 
-# Building the Sources
+## Building the Sources
 
 To build the plugin sources, please follow these steps:
 1. Clone the code from git.
@@ -39,13 +53,13 @@ To build the plugin sources, please follow these steps:
                            
 ![alt](docs/images/debug.png)
 
-# Troublshooting Issues
+## Troublshooting Issues
 When openning the project in Visual Studio for the first time, the following error may appear : *"Fody.WeavingTask" task was not given a value for the required parameter "SolutionDir"*.
 
 To fix this,close the solution and open it again. More information can be found [here](https://stackoverflow.com/questions/50225374/xamarinissues-with-fody-weavingtask-and-solutiondir)
 
-# Release Notes
+## Release Notes
 The release notes are available on [Bintray](https://bintray.com/jfrog/jfrog-extensions/jfrog-visual-studio-extension#release).
 
-# Code Contributions
+## Code Contributions
 We welcome community contribution through pull requests.
