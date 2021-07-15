@@ -82,6 +82,7 @@
                                     <CheckBox x:Name="cbLow" Content="Low" Click="HandleClick"/>
                                     <CheckBox x:Name="cbUnknown" Content="Unknown" Click="HandleClick"/>
                                     <CheckBox x:Name="cbNormal" Content="Normal" Click="HandleClick"/>
+                                    <CheckBox x:Name="cbCritical" Content="Critical" Click="HandleClick"/>
                                 </StackPanel>
                             </Border>
                         </Popup>

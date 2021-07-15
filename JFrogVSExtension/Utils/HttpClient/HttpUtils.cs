@@ -48,8 +48,16 @@ namespace JFrogVSExtension.HttpClient
             HttpResponseMessage componentResponse = await getResponseFromXrayAsync(collection);
             string componentResult = await parseXrayResponseAsync(componentResponse);
             await OutputLog.ShowMessageAsync(componentResult);
-            Artifacts artifacts = JsonConvert.DeserializeObject<Artifacts>(componentResult);
-            return artifacts;
+            try
+            {
+                Artifacts artifacts = JsonConvert.DeserializeObject<Artifacts>(componentResult);
+                return artifacts;
+            }
+            catch (Exception e)
+            {
+                await OutputLog.ShowMessageAsync("Failed deserializing component result in Xray response.");
+                throw new IOException(e.Message, e);
+            }
         }
 
         private static async Task<HttpResponseMessage> getResponseFromXrayAsync(List<Components> collection)

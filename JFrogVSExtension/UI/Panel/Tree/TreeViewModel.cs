@@ -132,6 +132,12 @@ namespace JFrogVSExtension.Tree
                 await OutputLog.ShowMessageAsync(he.Message);
                 await OutputLog.ShowMessageAsync(he.StackTrace);
             }
+            catch (Exception e)
+            {
+                dataService.ClearAllComponents();
+                await OutputLog.ShowMessageAsync(e.Message);
+                await OutputLog.ShowMessageAsync(e.StackTrace);
+            }
             finally
             {
                 this.EnableRefreshButton = true;
