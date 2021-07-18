@@ -28,8 +28,8 @@
       </Source>
     </Image>
     <Image Guid="$(JFrogMoniker)" ID="$(JFrog)">
-      <Source Uri="$(Resources)/JFrogLogo.png">
-        <Dimensions Width="200" Height="200" />
+      <Source Uri="$(Resources)/JFrogLogoMenu.png">
+        <Dimensions Width="218" Height="212" />
       </Source>
     </Image>
     <Image Guid="$(JFrogMoniker)" ID="$(license)">

@@ -160,7 +160,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Resources\JFrogLogo.png">
+    <Resource Include="Resources\JFrogLogoMenu.png" />
+    <Content Include="Resources\JFrogLogoMarketplace.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
