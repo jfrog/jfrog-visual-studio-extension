@@ -156,15 +156,19 @@
     <Resource Include="Resources\critical.png" />
     <Resource Include="Resources\high.png" />
     <Resource Include="Resources\default.png" />
-    <Content Include="Resources\Jfrog-Logo.ico">
+    <Content Include="Resources\Icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Resources\JFrogExtension.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Resources\PreviewImage.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Resource Include="Resources\JFrogLogoMenu.png" />
-    <Content Include="Resources\JFrogLogoMarketplace.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <Resource Include="Resources\medium.png" />
     <SplashScreen Include="Resources\low.png" />
     <Resource Include="Resources\normal.png" />
