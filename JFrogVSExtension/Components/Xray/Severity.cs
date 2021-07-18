@@ -6,6 +6,7 @@
         Unknown,
         Low,
         Medium,
-        High
+        High,
+        Critical
     }
 }

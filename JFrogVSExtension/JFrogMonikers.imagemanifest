@@ -5,7 +5,8 @@
   <Symbols>
     <String Name="Resources" Value="/JFrogVSExtension;Component/Resources" />
     <Guid Name="JFrogMoniker" Value="{b2d9eecf-c9d2-4a0b-88fb-7a4715a2d763}" />
-    <ID Name="high" Value="10" />
+    <ID Name="critical" Value="10" />
+    <ID Name="high" Value="19" />
     <ID Name="default" Value="20" />
     <ID Name="JFrog" Value="30" />
     <ID Name="license" Value="40" />
@@ -28,7 +29,7 @@
     </Image>
     <Image Guid="$(JFrogMoniker)" ID="$(JFrog)">
       <Source Uri="$(Resources)/JFrogLogo.png">
-        <Dimensions Width="218" Height="212" />
+        <Dimensions Width="200" Height="200" />
       </Source>
     </Image>
     <Image Guid="$(JFrogMoniker)" ID="$(license)">
@@ -58,6 +59,11 @@
     </Image>
     <Image Guid="$(JFrogMoniker)" ID="$(unknown)">
       <Source Uri="$(Resources)/unknown.png">
+        <Size Value="10" />
+      </Source>
+    </Image>
+    <Image Guid="$(JFrogMoniker)" ID="$(critical)">
+      <Source Uri="$(Resources)/critical.png">
         <Size Value="10" />
       </Source>
     </Image>

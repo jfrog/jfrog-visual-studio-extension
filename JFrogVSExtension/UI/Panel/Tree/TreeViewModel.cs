@@ -120,17 +120,11 @@ namespace JFrogVSExtension.Tree
                     Artifacts.Add(new ArtifactViewModel(key));
                 }
             }
-            catch (IOException ioe)
+            catch (Exception e)
             {
                 dataService.ClearAllComponents();
-                await OutputLog.ShowMessageAsync(ioe.Message);
-                await OutputLog.ShowMessageAsync(ioe.StackTrace);
-            }
-            catch (HttpRequestException he)
-            {
-                dataService.ClearAllComponents();
-                await OutputLog.ShowMessageAsync(he.Message);
-                await OutputLog.ShowMessageAsync(he.StackTrace);
+                await OutputLog.ShowMessageAsync(e.Message);
+                await OutputLog.ShowMessageAsync(e.StackTrace);
             }
             finally
             {

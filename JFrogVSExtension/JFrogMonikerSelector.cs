@@ -18,9 +18,14 @@ namespace JFrogVSExtension
             int id = 0;
             switch (severity)
             {
-                case Severity.High:
+                case Severity.Critical:
                     {
                         id = 10;
+                        break;
+                    }
+                case Severity.High:
+                    {
+                        id = 19;
                         break;
                     }
                 case Severity.Medium:
@@ -41,6 +46,12 @@ namespace JFrogVSExtension
                 case Severity.Unknown:
                     {
                         id = 90;
+                        break;
+                    }
+                // If no serverity matches, use normal as default.
+                default:
+                    {
+                        id = 70;
                         break;
                     }
             }

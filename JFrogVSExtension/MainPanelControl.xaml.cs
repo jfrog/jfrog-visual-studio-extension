@@ -83,6 +83,7 @@
                 cbLow.IsChecked  = true;
                 cbUnknown.IsChecked = true;
                 cbNormal.IsChecked = true;
+                cbCritical.IsChecked = true;
             }
             await ((MainViewModel)this.DataContext).AddSeverityToFilterAsync(filtredObject);
         }
@@ -97,6 +98,7 @@
                 cbLow.IsChecked = false;
                 cbUnknown.IsChecked = false;
                 cbNormal.IsChecked = false;
+                cbCritical.IsChecked = false;
             }
             else
             {
@@ -134,6 +136,7 @@
             cbLow.IsChecked = true;
             cbUnknown.IsChecked = true;
             cbNormal.IsChecked = true;
+            cbCritical.IsChecked = true;
         }
 
         public async Task LoadAsync()

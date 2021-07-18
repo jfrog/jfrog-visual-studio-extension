@@ -22,7 +22,6 @@ namespace JFrogVSExtension.Utils
         {
             // Reading the file as stream and changing to list of items.
             // The items are configured in another class
-            // output = System.IO.File.ReadAllText( @"C:\alex\jvse-new\jvse\JFrogVSExtension\output.txt");
             Projects projects = JsonConvert.DeserializeObject<Projects>(output);
             return projects;
         }
