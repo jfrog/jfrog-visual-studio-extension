@@ -1,4 +1,7 @@
 # JFrog Visual Studio Extension
+
+[![Visual Studio Marketplace](https://vsmarketplacebadge.apphb.com/version/JFrog.JFrog.svg)](https://marketplace.visualstudio.com/items?itemName=JFrog.JFrog)
+
 # Table of Contents
 
 - [About this Extension](#about-this-extension)
