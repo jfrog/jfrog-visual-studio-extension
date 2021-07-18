@@ -70,7 +70,7 @@ When openning the project in Visual Studio for the first time, the following err
 To fix this,close the solution and open it again. More information can be found [here](https://stackoverflow.com/questions/50225374/xamarinissues-with-fody-weavingtask-and-solutiondir)
 
 ## Release Notes
-The release notes are available on [Bintray](https://bintray.com/jfrog/jfrog-extensions/jfrog-visual-studio-extension#release).
+The release notes are available [here](RELEASE.md#release-notes).
 
 ## Code Contributions
 We welcome community contribution through pull requests.
