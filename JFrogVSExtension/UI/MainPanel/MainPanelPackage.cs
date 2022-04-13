@@ -74,7 +74,7 @@ namespace JFrogVSExtension
 
             // Switch to main thread for dealing with type IVsSolution.
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-            _solution = base.GetService(typeof(SVsSolution)) as IVsSolution;
+            _solution = await base.GetServiceAsync(typeof(SVsSolution)) as IVsSolution;
             if (_solution != null)
             {
                 _solutionEventsHandler = new SolutionEventsHandler();
@@ -82,7 +82,7 @@ namespace JFrogVSExtension
             }
             // To trigger upon loading a solution
             object objLoadMgr = this;   //the class that implements IVsSolutionManager
-            IVsSolution pSolution = GetService(typeof(SVsSolution)) as IVsSolution;
+            IVsSolution pSolution = await GetServiceAsync(typeof(SVsSolution)) as IVsSolution;
 
             object existingLoadManager = null;
             pSolution.GetProperty((int)__VSPROPID4.VSPROPID_ActiveSolutionLoadManager, out existingLoadManager);
@@ -103,6 +103,7 @@ namespace JFrogVSExtension
 
         public async Task InitComponentsAsync()
         {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             await OutputLog.InitOutputWindowPaneAsync();
             dte = (EnvDTE.DTE) await GetServiceAsync(typeof(EnvDTE.DTE));
             JFrogXrayOptions jfrogOptions = (JFrogXrayOptions)GetDialogPage(typeof(JFrogXrayOptions));
