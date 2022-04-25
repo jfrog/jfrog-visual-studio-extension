@@ -42,7 +42,9 @@ namespace JFrogVSExtension.OptionsMenu
             testConnectionField.Text = "";
         }
 
+#pragma warning disable VSTHRD100 // Avoid async void methods - Signature expected by event handler.
         private async void TestConnection(object sender, EventArgs e)
+#pragma warning restore VSTHRD100 // Avoid async void methods
         {
             this.btnTestConnection.Enabled = false;
             testConnectionField.Text = "Awaiting response...";

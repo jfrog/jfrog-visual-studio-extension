@@ -10,6 +10,7 @@ using JFrogVSExtension.Utils;
 using JFrogVSExtension.Xray;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.Shell;
 
 namespace JFrogVSExtension.Tree
 {
@@ -145,6 +146,7 @@ namespace JFrogVSExtension.Tree
                 await OutputLog.ShowMessageAsync("The plugin was not initialized yet. DTE is null");
                 return "";
             }
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             string solutionFullName = dte.Solution.FullName;
             if (String.IsNullOrWhiteSpace(solutionFullName))
             {

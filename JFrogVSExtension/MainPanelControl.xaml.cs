@@ -25,7 +25,9 @@
         /// </summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event args.</param>
+#pragma warning disable VSTHRD100 // Avoid async void methods - Signature expected by event handler.
         private async void RefreshTree(object sender, RoutedEventArgs e)
+#pragma warning restore VSTHRD100 // Avoid async void methods
         {
             await ((MainViewModel)this.DataContext).RefreshAsync();
         }
@@ -35,7 +37,9 @@
         /// </summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event args.</param>
+#pragma warning disable VSTHRD100 // Avoid async void methods - Signature expected by event handler.
         private async void ColapseTree(object sender, RoutedEventArgs e)
+#pragma warning restore VSTHRD100 // Avoid async void methods
         {
             await ((MainViewModel)this.DataContext).RefreshAsync();
         }
@@ -61,7 +65,9 @@
             ((MainViewModel)this.DataContext).CollapseAll();
         }
 
+#pragma warning disable VSTHRD100 // Avoid async void methods - Signature expected by event handler.
         private async void HandleClick(object sender, RoutedEventArgs e)
+#pragma warning restore VSTHRD100 // Avoid async void methods
         {
             if ((bool)((CheckBox)e.Source).IsChecked)
             {
@@ -119,7 +125,9 @@
         {
         }
 
+#pragma warning disable VSTHRD100 // Avoid async void methods - Signature expected by event handler.
         private async void Tree_Loaded(object sender, RoutedEventArgs e)
+#pragma warning restore VSTHRD100 // Avoid async void methods
         {
             if (isAllFilterChecked)
             {

@@ -41,7 +41,7 @@ namespace JFrogVSExtension
             if (commandService != null)
             {
                 var menuCommandID = new CommandID(CommandSet, CommandId);
-                var menuItem = new MenuCommand(this.ShowToolWindowAsync, menuCommandID);
+                var menuItem = new MenuCommand(this.ShowToolWindow, menuCommandID);
                 commandService.AddCommand(menuItem);
             }
         }
@@ -81,7 +81,9 @@ namespace JFrogVSExtension
         /// </summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event args.</param>
-        private async void ShowToolWindowAsync(object sender, EventArgs e)
+#pragma warning disable VSTHRD100 // Avoid async void methods - Signature expected by event handler.
+        private async void ShowToolWindow(object sender, EventArgs e)
+#pragma warning restore VSTHRD100 // Avoid async void methods
         {
             // Get the instance number 0 of this tool window. This window is single instance so this instance
             // is actually the only one.
