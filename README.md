@@ -1,9 +1,9 @@
 # JFrog Visual Studio Extension
 
-|         Target          |                                                                           Status                                                                            |
-|:-----------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------:|
-|   Visual Studio 2022    | [![Visual Studio 2022](https://vsmarketplacebadge.apphb.com/version/JFrog.JFrogV2.svg)](https://marketplace.visualstudio.com/items?itemName=JFrog.JFrogV2)  |
-| Visual Studio 2017,2019 | [![Visual Studio 2017,2019](https://vsmarketplacebadge.apphb.com/version/JFrog.JFrog.svg)](https://marketplace.visualstudio.com/items?itemName=JFrog.JFrog) |
+|          Target          |                                                                           Status                                                                            |
+|:------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------:|
+|    Visual Studio 2022    | [![Visual Studio 2022](https://vsmarketplacebadge.apphb.com/version/JFrog.JFrogV2.svg)](https://marketplace.visualstudio.com/items?itemName=JFrog.JFrogV2)  |
+| Visual Studio 2017, 2019 | [![Visual Studio 2017,2019](https://vsmarketplacebadge.apphb.com/version/JFrog.JFrog.svg)](https://marketplace.visualstudio.com/items?itemName=JFrog.JFrog) |
 
 # Table of Contents
 
