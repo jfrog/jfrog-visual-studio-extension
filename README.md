@@ -1,9 +1,10 @@
 # JFrog Visual Studio Extension
 
-|          Target          |                                     Status                                                                                                                  |                                                                   Installs                                                                    |
-|:------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------:|
-|    Visual Studio 2022    |[![Visual Studio 2022](https://vsmarketplacebadge.apphb.com/version/JFrog.JFrogV2.svg)](https://marketplace.visualstudio.com/items?itemName=JFrog.JFrogV2)   | ![Artifactory Extension Marketplace Installs](https://img.shields.io/visual-studio-marketplace/i/JFrog.JFrogV2?label=marketplace%20installs)  |
-| Visual Studio 2017, 2019 |[![Visual Studio 2017,2019](https://vsmarketplacebadge.apphb.com/version/JFrog.JFrog.svg)](https://marketplace.visualstudio.com/items?itemName=JFrog.JFrog)  |           ![Visual Studio 2017,2019](https://img.shields.io/visual-studio-marketplace/i/JFrog.JFrog?label=marketplace%20installs)            |
+|          Target          |                                                                           Status                                                                            |                                                                                  Installs                                                                                   |
+|:------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+|    Visual Studio 2022    | [![Visual Studio 2022](https://vsmarketplacebadge.apphb.com/version/JFrog.JFrogV2.svg)](https://marketplace.visualstudio.com/items?itemName=JFrog.JFrogV2)  | ![Artifactory Extension Marketplace Installs](https://img.shields.io/visual-studio-marketplace/i/JFrog.JFrogV2?label=marketplace%20installs&color=blue&style=for-the-badge) |
+| Visual Studio 2017, 2019 | [![Visual Studio 2017,2019](https://vsmarketplacebadge.apphb.com/version/JFrog.JFrog.svg)](https://marketplace.visualstudio.com/items?itemName=JFrog.JFrog) |           ![Visual Studio 2017,2019](https://img.shields.io/visual-studio-marketplace/i/JFrog.JFrog?label=marketplace%20installs&color=blue&style=for-the-badge)            |
+
 
 # Table of Contents
 
