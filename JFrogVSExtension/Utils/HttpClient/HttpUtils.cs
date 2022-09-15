@@ -84,20 +84,9 @@ namespace JFrogVSExtension.HttpClient
             throw new HttpRequestException(message);
         }
 
-        public static async Task<String> PostComponentToXrayAsync(Components component)
+        public static async Task<HttpResponseMessage> TestConnectionAndPermissionsAsync()
         {
-            var collection = new List<Components>();
-            HttpResponseMessage xrayComponentResponse = await getResponseFromXrayAsync(collection);
-            if (xrayComponentResponse.StatusCode == HttpStatusCode.Unauthorized)
-            {
-                return "Received " + HttpStatusCode.Unauthorized + " from Xray. Please check your credentials.";
-            }
-
-            if (xrayComponentResponse.StatusCode == HttpStatusCode.Forbidden)
-            {
-                return "Received " + HttpStatusCode.Forbidden + " from Xray. Please make sure that the user has 'View Components' permission in Xray.";
-            }
-            return "";
+            return await getResponseFromXrayAsync(new List<Components>());
         }
 
         public static void InitClient(String url, String username, String password)

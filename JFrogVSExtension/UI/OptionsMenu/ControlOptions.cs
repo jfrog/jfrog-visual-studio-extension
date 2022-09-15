@@ -2,9 +2,9 @@
 using System.Windows.Forms;
 using JFrogVSExtension.HttpClient;
 using System.IO;
+using System.Net;
 using JFrogVSExtension.Xray;
 using JFrogVSExtension.Logger;
-using JFrogVSExtension.Utils;
 using System.Threading.Tasks;
 
 namespace JFrogVSExtension.OptionsMenu
@@ -68,22 +68,28 @@ namespace JFrogVSExtension.OptionsMenu
                     return;
                 }
                 XrayVersion xrayVersion = await HttpUtils.GetVersionAsync();
-                if (!isCompatibleVersion(xrayVersion))
+                if (!XrayUtil.IsXrayVersionCompatible(xrayVersion.xray_version))
                 {
                     testConnectionField.Text = XrayUtil.GetMinimumXrayVersionErrorMessage(xrayVersion.xray_version);
                     return;
                 }
 
                 // Check components permissions. 
-                String message = await HttpUtils.PostComponentToXrayAsync(new Components("", Util.PREFIX + "testComponent"));
-                if (String.IsNullOrEmpty(message))
+                var response = await HttpUtils.TestConnectionAndPermissionsAsync();
+                string message;
+                switch (response.StatusCode)
                 {
-                    testConnectionField.Text = "Received Xray version: " + xrayVersion.xray_version;
+                    case HttpStatusCode.Unauthorized:
+                        message = $"Received {HttpStatusCode.Unauthorized} from Xray. Please check your credentials.";
+                        break;
+                    case HttpStatusCode.Forbidden:
+                        message =  $"Received {HttpStatusCode.Forbidden} from Xray. Please make sure that the user has 'View Components' permission in Xray.";
+                        break;
+                    default:
+                        message = $"Successfully connected to Xray version: {xrayVersion.xray_version}";
+                        break;
                 }
-                else
-                {
-                    testConnectionField.Text = message;
-                }
+                testConnectionField.Text = message;
             }
             catch (IOException ioe)
             {
@@ -91,14 +97,6 @@ namespace JFrogVSExtension.OptionsMenu
                 await OutputLog.ShowMessageAsync("Caught exception when performing test connection: " + ioe);
             }
         }
-
-        private bool isCompatibleVersion(XrayVersion xrayVersion)
-        {
-            if (XrayUtil.IsXrayVersionCompatible(xrayVersion.xray_version))
-            {
-                return true;
-            }
-            return false;
-        }
+        
     }
 }

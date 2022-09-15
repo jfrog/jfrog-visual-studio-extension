@@ -54,18 +54,6 @@ namespace JFrogVSExtension.OptionsMenu
         public string Password { get; set; } = "";
 
         /// <summary>
-        /// Handles "activate" messages from the Visual Studio environment.
-        /// </summary>
-        /// <devdoc>
-        /// This method is called when Visual Studio wants to activate this page.  
-        /// </devdoc>
-        /// <remarks>If this handler sets e.Cancel to true, the activation will not occur.</remarks>
-        protected override void OnActivate(CancelEventArgs e)
-        {
-            base.OnActivate(e);
-        }
-
-        /// <summary>
         /// Handles "apply" messages from the Visual Studio environment.
         /// </summary>
         /// <devdoc>
