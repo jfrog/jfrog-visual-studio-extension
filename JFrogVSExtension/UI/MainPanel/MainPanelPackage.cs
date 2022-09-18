@@ -107,7 +107,7 @@ namespace JFrogVSExtension
             await OutputLog.InitOutputWindowPaneAsync();
             dte = (EnvDTE.DTE) await GetServiceAsync(typeof(EnvDTE.DTE));
             JFrogXrayOptions jfrogOptions = (JFrogXrayOptions)GetDialogPage(typeof(JFrogXrayOptions));
-            HttpUtils.InitClient(jfrogOptions.getUrl(), jfrogOptions.User, jfrogOptions.Password);
+            HttpUtils.InitClient(jfrogOptions.Server, jfrogOptions.User, jfrogOptions.Password);
         }
 
         public static EnvDTE.DTE getDTE()

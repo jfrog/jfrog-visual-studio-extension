@@ -33,15 +33,12 @@ namespace JFrogVSExtension.OptionsMenu
             User = "";
         }
 
-        public string Server { get => getUrl(); set => setUrl(value); }
-        protected String url;
-
-        public String getUrl()
-        {
-            return url;
-        }
-
-        public void setUrl(String url)
+        public string Server { get => url; set => setUrl(value); }
+        protected string url;
+        public string project { get; set; }
+        public string[] watches { get; set; }
+        public ScanPloicy scanPolicy { get; set; }
+        public void setUrl(string url)
         {
             if (!url.EndsWith("/"))
             {
@@ -70,6 +67,13 @@ namespace JFrogVSExtension.OptionsMenu
             }
             base.OnApply(e);
             HttpUtils.InitClient(url, User, Password);
+        }
+
+        public enum ScanPloicy
+        {
+            AllVunerabilities,
+            Project,
+            Watches
         }
     }
 }

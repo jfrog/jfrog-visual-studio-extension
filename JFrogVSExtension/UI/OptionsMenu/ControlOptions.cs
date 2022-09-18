@@ -97,6 +97,21 @@ namespace JFrogVSExtension.OptionsMenu
                 await OutputLog.ShowMessageAsync("Caught exception when performing test connection: " + ioe);
             }
         }
-        
+
+        private void allVulnerabilities_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void project_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void watches_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
     }
 }
