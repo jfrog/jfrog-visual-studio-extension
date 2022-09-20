@@ -28,28 +28,26 @@ namespace JFrogVSExtension.OptionsMenu
 
         public JFrogXrayOptions()
         {
-            url = "";
+            platformUrl = "";
+            xrayUrl = "";
+            artifctoryUrl = "";
             Password = "";
             User = "";
+            AccessToken = "";
         }
 
-        public string Server { get => url; set => setUrl(value); }
-        protected string url;
-        public string project { get; set; }
-        public string[] watches { get; set; }
-        public ScanPloicy scanPolicy { get; set; }
-        public void setUrl(string url)
-        {
-            if (!url.EndsWith("/"))
-            {
-                url += "/";
-            }
-            this.url = url;
-        }
-        public string User { get; set; } = "";
-
-        public string Password { get; set; } = "";
-
+        public string PlatformUrl { get => platformUrl; set => platformUrl = AddSlashIfNeeded(value); }
+        protected string platformUrl;
+        public string XrayUrl { get => xrayUrl; set => xrayUrl = AddSlashIfNeeded(value); }
+        protected string xrayUrl;
+        public string ArtifactoryUrl { get => artifctoryUrl; set => artifctoryUrl = AddSlashIfNeeded(value); }
+        protected string artifctoryUrl;
+        public string Project { get; set; }
+        public string[] Watches { get; set; }
+        public ScanPolicy Policy { get; set; }
+        public string User { get; set; } 
+        public string Password { get; set; }
+        public string AccessToken { get; set; }
         /// <summary>
         /// Handles "apply" messages from the Visual Studio environment.
         /// </summary>
@@ -61,15 +59,36 @@ namespace JFrogVSExtension.OptionsMenu
         {
             if (e.ApplyBehavior == ApplyKind.Apply)
             {
-                Server = _optionsControl.ServerTextBoxValue;
-                Password = _optionsControl.PasswordTextBoxValue;
-                User = _optionsControl.UserTextBoxValue;
+                PlatformUrl = _optionsControl.PlatformUrlTextBoxValue;
+                XrayUrl = _optionsControl.XrayServerTextBoxValue;
+                artifctoryUrl = _optionsControl.ArtifactoryServerTextBoxValue;
+                if (_optionsControl.UseAccessToken)
+                {
+                    AccessToken = _optionsControl.AccessTokenTextBoxValue;
+                    Password = "";
+                    User = "";
+                }
+                else
+                {
+                    Password = _optionsControl.PasswordTextBoxValue;
+                    User = _optionsControl.UserTextBoxValue;
+                    AccessToken = "";
+                }
             }
             base.OnApply(e);
-            HttpUtils.InitClient(url, User, Password);
+            HttpUtils.InitClient(XrayUrl,ArtifactoryUrl, User, Password, AccessToken);
         }
 
-        public enum ScanPloicy
+        private string AddSlashIfNeeded(string url)
+        {
+            if (!url.EndsWith("/"))
+            {
+                url += "/";
+            }
+            return url;
+        }
+
+        public enum ScanPolicy
         {
             AllVunerabilities,
             Project,

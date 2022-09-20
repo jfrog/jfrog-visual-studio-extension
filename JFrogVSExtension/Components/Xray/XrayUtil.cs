@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Text.RegularExpressions;
 
 namespace JFrogVSExtension.Xray
@@ -8,31 +7,30 @@ namespace JFrogVSExtension.Xray
     {
         public static readonly string MIN_XRAY_VERSION = "2.5.0";
 
-        public static XrayStatus LoadXrayStatus(String output)
+        public static ServerStatus LoadServerStatus(string output)
         {
-            {
-                XrayStatus status = JsonConvert.DeserializeObject<XrayStatus>(output);
-                return status;
-            }
+            return JsonConvert.DeserializeObject<ServerStatus>(output);
         }
 
-        public static XrayVersion LoadXrayVersion(String output)
+        public static XrayVersion LoadXrayVersion(string output)
         {
-            {
-                XrayVersion version = JsonConvert.DeserializeObject<XrayVersion>(output);
-                return version;
-            }
+            return JsonConvert.DeserializeObject<XrayVersion>(output);
         }
 
-        public static bool IsXrayVersionCompatible(String xrayVersion)
+        public static ArtifactoryVersion LoadArtifactoryVersion(string output)
         {
-            String[] versionTokens = xrayVersion.Split('.');
-            String[] minimumVersionToken = MIN_XRAY_VERSION.Split('.');
+            return JsonConvert.DeserializeObject<ArtifactoryVersion>(output);
+        }
+
+        public static bool IsXrayVersionCompatible(string xrayVersion)
+        {
+            string[] versionTokens = xrayVersion.Split('.');
+            string[] minimumVersionToken = MIN_XRAY_VERSION.Split('.');
 
             for (int i= 0; i < minimumVersionToken.Length; i++)
             {
-                String minVersionToken = minimumVersionToken[i].Trim();
-                String versionToken = versionTokens.Length < i + 1 ? "0" : versionTokens[i].Trim();
+                string minVersionToken = minimumVersionToken[i].Trim();
+                string versionToken = versionTokens.Length < i + 1 ? "0" : versionTokens[i].Trim();
                 int result = compareTokens(minVersionToken, versionToken);
                 if (result != 0)
                 {
@@ -42,15 +40,15 @@ namespace JFrogVSExtension.Xray
             return true;
         }
 
-        public static String GetMinimumXrayVersionErrorMessage(String xrayVersion)
+        public static string GetMinimumXrayVersionErrorMessage(string xrayVersion)
         {
             return "ERROR: Found Xray version: " + xrayVersion + ". This extension version supports Xray " + XrayUtil.MIN_XRAY_VERSION + " or above. For information about using older versions of Xray, please refer to the documentation.";
         }
 
-        private static int compareTokens(String minVersionToken, String versionToken) 
+        private static int compareTokens(string minVersionToken, string versionToken) 
         {
-            int versionTokenFirstNumeric = Int32.Parse(Regex.Match(versionToken, @"\d+").Value);
-            int minVersionTokenFirstNumeric = Int32.Parse(Regex.Match(minVersionToken, @"\d+").Value);
+            int versionTokenFirstNumeric = int.Parse(Regex.Match(versionToken, @"\d+").Value);
+            int minVersionTokenFirstNumeric = int.Parse(Regex.Match(minVersionToken, @"\d+").Value);
             return versionTokenFirstNumeric.CompareTo(minVersionTokenFirstNumeric);
         }
 

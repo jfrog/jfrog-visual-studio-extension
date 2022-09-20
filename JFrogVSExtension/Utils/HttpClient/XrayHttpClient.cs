@@ -8,27 +8,41 @@ using System.Threading.Tasks;
 
 namespace JFrogVSExtension.HttpClient
 {
-    class XrayHttpClient
+    class JfrogHttpClient
     {
 
-        private String url = "";
-        private String user = "";
-        private String password = "";
-        // Put the version here:
-        private String userAgent = "jfrog-visual-studio-extension/1.0.1";
+        private string xrayUrl = "";
+        private string artifactoryUrl = "";
+        private string user = "";
+        private string password = "";
+        private string userAgent = "jfrog-visual-studio-extension";
         private System.Net.Http.HttpClient httpClient = null;
-        public async Task<HttpResponseMessage> PerformGetRequestAsync(String usage)
+        private bool UseAccessToken { get => string.IsNullOrEmpty(user); }
+
+
+
+        public async Task<HttpResponseMessage> PerformXrayGetRequestAsync(string api)
+        {
+            return await PerformGetRequestAsync(xrayUrl + api);
+        }
+
+        public async Task<HttpResponseMessage> PerformArtifactoryGetRequestAsync(string api)
+        {
+            return await PerformGetRequestAsync(artifactoryUrl + api);
+        }
+
+        private async Task<HttpResponseMessage> PerformGetRequestAsync(string url)
         {
             InitClient();
             try
             {
-                HttpResponseMessage result = await httpClient.GetAsync(url + usage);
+                HttpResponseMessage result = await httpClient.GetAsync(url);
                 return result;
             }
             catch (Exception ex)
             {
                 Exception innerException = ex.InnerException;
-                String message = ex.Message;
+                string message = ex.Message;
                 while (innerException != null && innerException.InnerException != null)
                 {
                     message = innerException.Message;
@@ -38,30 +52,28 @@ namespace JFrogVSExtension.HttpClient
             }
         }
 
-        private static async Task<string> ParseXrayResponseAsync(HttpResponseMessage result)
+        public async Task<HttpResponseMessage> PerformXrayPostRequestAsync(string api, string content)
         {
-            if (result.StatusCode == HttpStatusCode.OK)
-            {
-                using (StreamReader sr = new StreamReader(await result.Content.ReadAsStreamAsync()))
-                {
-                    return await sr.ReadToEndAsync();
-                }
-            }
-            String message = "Received response status code: " + (int)result.StatusCode + ". Message: " + result.ReasonPhrase;
-            throw new HttpRequestException(message);
+            return await PerformPostRequestAsync(xrayUrl + api,content);
         }
 
-        public async Task<HttpResponseMessage> PerformPostRequestAsync(String usage, String content)
+        public async Task<HttpResponseMessage> PerformArtifactoryPostRequestAsync(string api, string content)
+        {
+            return await PerformPostRequestAsync(artifactoryUrl + api, content);
+        }
+
+
+        private async Task<HttpResponseMessage> PerformPostRequestAsync(string url, string content)
         {
             InitClient();
             try
             {
-                return await httpClient.PostAsync(url + usage, new StringContent(content, Encoding.UTF8, "application/json"));
+                return await httpClient.PostAsync(url, new StringContent(content, Encoding.UTF8, "application/json"));
             }
             catch (Exception ex)
             {
                 Exception innerException = ex.InnerException;
-                String message = ex.Message;
+                string message = ex.Message;
                 while (innerException != null && innerException.InnerException != null)
                 {
                     message = innerException.Message;
@@ -71,7 +83,7 @@ namespace JFrogVSExtension.HttpClient
             }
         }
 
-        private System.Net.Http.HttpClient AddHeader(String name, String value, System.Net.Http.HttpClient client)
+        private System.Net.Http.HttpClient AddHeader(string name, string value, System.Net.Http.HttpClient client)
         {
             client.DefaultRequestHeaders.Add(name, value);
             return client;
@@ -81,24 +93,35 @@ namespace JFrogVSExtension.HttpClient
         {
             if (httpClient == null)
             {
-                
-                //Create a query
                 System.Net.Http.HttpClient client = new System.Net.Http.HttpClient();
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(
-                                                                    string.Format("{0}:{1}", user, password))));
+                if (!UseAccessToken)
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(
+                                                                        string.Format("{0}:{1}", user, password))));
+                }
+                else
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", password);
+                }
                 httpClient = AddHeader("User-Agent", userAgent, client);
             }
         }
 
        // Triggered each time when the options are saved. 
        // Since this being triggered from the options menu, the httpClient need to be init every time.
-        public void InitClient(String url, String username, String password)
+        public void InitClient(string xrayUrl, string artifactoryUrl, string username, string token)
         {
             httpClient = null;
             user = username;
-            this.password = password;
-            this.url = url + "api/v1/";
+            password = token;
+            this.xrayUrl = xrayUrl;
+            this.artifactoryUrl = artifactoryUrl;
             InitClient();
+        }
+
+        public void InitClient(string xrayUrl, string artifactoryUrl, string accessToken)
+        {
+            InitClient(xrayUrl, artifactoryUrl, "", accessToken);
         }
     }
 }

@@ -70,7 +70,7 @@ namespace JFrogVSExtension.Tree
                     return;
                 }
 
-                XrayVersion xrayVersion = await HttpUtils.GetVersionAsync();
+                XrayVersion xrayVersion = await HttpUtils.GetXrayVersionAsync();
                 if (!XrayUtil.IsXrayVersionCompatible(xrayVersion.xray_version))
                 {
                     String errorMessage = XrayUtil.GetMinimumXrayVersionErrorMessage(xrayVersion.xray_version);

@@ -106,8 +106,6 @@ namespace JFrogVSExtension
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             await OutputLog.InitOutputWindowPaneAsync();
             dte = (EnvDTE.DTE) await GetServiceAsync(typeof(EnvDTE.DTE));
-            JFrogXrayOptions jfrogOptions = (JFrogXrayOptions)GetDialogPage(typeof(JFrogXrayOptions));
-            HttpUtils.InitClient(jfrogOptions.Server, jfrogOptions.User, jfrogOptions.Password);
         }
 
         public static EnvDTE.DTE getDTE()
@@ -128,7 +126,7 @@ namespace JFrogVSExtension
             MainPanel mainPanel = MainPanel.GetInstance();
             if (mainPanel != null)
             {
-                mainPanel.CloseAsync();
+                _ = mainPanel.CloseAsync();
             }
             return VSConstants.S_OK;
         }
@@ -148,7 +146,7 @@ namespace JFrogVSExtension
             MainPanel mainPanel = MainPanel.GetInstance();
             if (mainPanel != null)
             {
-                mainPanel.LoadAsync();
+                _ = mainPanel.LoadAsync();
             }
             return VSConstants.S_OK;
         }
