@@ -106,6 +106,8 @@ namespace JFrogVSExtension
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             await OutputLog.InitOutputWindowPaneAsync();
             dte = (EnvDTE.DTE) await GetServiceAsync(typeof(EnvDTE.DTE));
+            JFrogXrayOptions jfrogOptions = (JFrogXrayOptions)GetDialogPage(typeof(JFrogXrayOptions));
+            HttpUtils.InitClient(jfrogOptions.XrayUrl,jfrogOptions.ArtifactoryUrl, jfrogOptions.User, jfrogOptions.Password,jfrogOptions.AccessToken);
         }
 
         public static EnvDTE.DTE getDTE()
@@ -117,10 +119,6 @@ namespace JFrogVSExtension
 
     internal class SolutionEventsHandler : IVsSolutionEvents
     {
-        internal SolutionEventsHandler()
-        {
-        }
-
         public int OnAfterCloseSolution(object pUnkReserved)
         {
             MainPanel mainPanel = MainPanel.GetInstance();

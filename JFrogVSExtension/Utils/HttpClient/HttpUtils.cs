@@ -93,7 +93,7 @@ namespace JFrogVSExtension.HttpClient
             };
 
             string json = JsonConvert.SerializeObject(collectionWrapper);
-            return await jfrog.PerformXrayPostRequestAsync("summary/component ", json);            
+            return await jfrog.PerformXrayPostRequestAsync("api/v1/summary/component ", json);            
         }
 
         private static async Task<string> ParseResponseAsync(HttpResponseMessage result)

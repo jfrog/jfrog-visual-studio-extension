@@ -126,8 +126,6 @@ namespace JFrogVSExtension.Data
 
         public async Task<Artifacts> RefreshArtifactsAsync(bool hard, Projects projects)
         {
-            List<Components> components = new List<Components>();
-
             if (hard)
             {
                 // Removes all components so Xray will later on scan for ALL the dependencies. 
@@ -140,12 +138,12 @@ namespace JFrogVSExtension.Data
                 if (nugetProject.dependencies != null && nugetProject.dependencies.Length > 0)
                 {
                     // Get project's components which are not included in the cache.
-                    componentsSet.UnionWith(Util.GetComponents(nugetProject.dependencies, GetComponentsCache()));
+                    componentsSet.UnionWith(Util.GetNoCachedComponents(nugetProject.dependencies, GetComponentsCache()));
                     // Update cache with new components.
                     GetComponentsCache().UnionWith(componentsSet);
                 }
             }
-            components = componentsSet.ToList();
+            var components = componentsSet.ToList();
 
             int BULK = 100;
             int i = 0;

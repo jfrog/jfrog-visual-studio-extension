@@ -22,10 +22,10 @@ namespace JFrogVSExtension.Xray
         public String Component { get; set; } = ""; // This is the name from general
 
         public Issue() { }
-        public Issue(Severity severity, string summery, string issueType, string component)
+        public Issue(Severity severity, string summary, string issueType, string component)
         {
             Severity = severity;
-            Summary = summery;
+            Summary = summary;
             IssueType = issueType;
             Component = component;
         }

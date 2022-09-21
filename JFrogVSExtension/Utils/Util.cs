@@ -244,7 +244,7 @@ namespace JFrogVSExtension.Utils
         }
 
         // Return Set of Components which are not contained in componentsCache.
-        public static HashSet<Components> GetComponents(Dependency[] dependencies, HashSet<Components> componentsCache)
+        public static HashSet<Components> GetNoCachedComponents(Dependency[] dependencies, HashSet<Components> componentsCache)
         {
             HashSet<Components> ids = new HashSet<Components>();
             foreach (Dependency dependency in dependencies)
@@ -265,7 +265,7 @@ namespace JFrogVSExtension.Utils
                 // In such case, the CLI outputs a dependencies-tree in which each project shows different dependencies for the package.
                 if (dependency.dependencies != null && dependency.dependencies.Length > 0)
                 {
-                    HashSet<Components> internalIdS = GetComponents(dependency.dependencies, componentsCache);
+                    HashSet<Components> internalIdS = GetNoCachedComponents(dependency.dependencies, componentsCache);
                     ids.UnionWith(internalIdS);
                 }
             }
@@ -343,21 +343,13 @@ namespace JFrogVSExtension.Utils
 
         public override bool Equals(object obj)
         {
-            Components comp = new Components();
-            if (obj is Components)
-            {
-                comp = (Components)obj;
-            }
-            else
+            if (!(obj is Components))
             {
                 return false;
             }
+            var comp = (Components)obj;
 
-            if (this.sha1.Equals(comp.sha1) && this.component_id.Equals(comp.component_id))
-            {
-                return true;
-            }
-            return false;
+            return (this.sha1.Equals(comp.sha1) && this.component_id.Equals(comp.component_id));
         }
     }
 }

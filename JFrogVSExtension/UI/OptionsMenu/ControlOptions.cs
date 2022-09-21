@@ -8,6 +8,7 @@ using JFrogVSExtension.Logger;
 using System.Threading.Tasks;
 using static JFrogVSExtension.OptionsMenu.JFrogXrayOptions;
 using Microsoft.VisualStudio.PlatformUI;
+using Newtonsoft.Json.Linq;
 
 namespace JFrogVSExtension.OptionsMenu
 {
@@ -25,36 +26,39 @@ namespace JFrogVSExtension.OptionsMenu
         public string PlatformUrlTextBoxValue
         {
             get { return textBoxPlatformUrl.Text; }
-            set { textBoxPlatformUrl.Text = value; }
         }
         public string XrayServerTextBoxValue
         {
             get { return textBoxXrayUrl.Text; }
-            set { textBoxXrayUrl.Text = value; }
         }
         public string ArtifactoryServerTextBoxValue
         {
             get { return textBoxArtifactoryUrl.Text; }
-            set { textBoxArtifactoryUrl.Text = value; }
         }
         public string UserTextBoxValue
         {
             get { return textBoxUser.Text; }
-            set { textBoxUser.Text = value; }
         }
 
         public string PasswordTextBoxValue
         {
             get { return textBoxPassword.Text; }
-            set { textBoxPassword.Text = value; }
         }
 
         public string AccessTokenTextBoxValue
         {
             get { return textBoxAccessToken.Text; }
-            set { textBoxAccessToken.Text = value; }
         }
 
+        public string ProjectTextBoxValue
+        {
+            get { return textBoxProject.Text; }
+        }
+
+        public string WatchesTextBoxValue
+        {
+            get { return textBoxWatches.Text; }
+        }
         private void CustomOptionsControl_Load(object sender, EventArgs e)
         {
             textBoxPlatformUrl.Text = OptionsPage.PlatformUrl;
@@ -106,9 +110,11 @@ namespace JFrogVSExtension.OptionsMenu
                     break ;
                 case ScanPolicy.Project:
                     radioBtnProject.Checked = true;
+                    textBoxProject.Text = OptionsPage.Project;
                     break;
                 case ScanPolicy.Watches:
                     radioBtnWatches.Checked = true;
+                    textBoxWatches.Text = string.Join(", ",OptionsPage.Watches);
                     break;
             }
         }

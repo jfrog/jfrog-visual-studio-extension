@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace JFrogVSExtension.OptionsMenu
@@ -73,6 +74,16 @@ namespace JFrogVSExtension.OptionsMenu
                     Password = _optionsControl.PasswordTextBoxValue;
                     User = _optionsControl.UserTextBoxValue;
                     AccessToken = "";
+                }
+                Policy = _optionsControl.Policy;
+                switch( Policy)
+                {
+                    case ScanPolicy.Project:
+                        Project = _optionsControl.ProjectTextBoxValue.Trim();
+                        break;
+                    case ScanPolicy.Watches:
+                        Watches = _optionsControl.WatchesTextBoxValue.Split(',').Select(watch => watch.Trim()).ToArray();
+                        break;
                 }
             }
             base.OnApply(e);
