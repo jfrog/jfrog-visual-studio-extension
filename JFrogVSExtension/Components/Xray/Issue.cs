@@ -19,15 +19,17 @@ namespace JFrogVSExtension.Xray
         public Severity Severity { get; set; } = Severity.Normal;
         [JsonProperty(PropertyName = "summary")]
         public String Summary { get; set; }
+        public string FixedVersions {get;set;}
         public String Component { get; set; } = ""; // This is the name from general
 
         public Issue() { }
-        public Issue(Severity severity, string summary, string issueType, string component)
+        public Issue(Severity severity, string summary, string issueType, string component, string fixedVersions)
         {
             Severity = severity;
             Summary = summary;
             IssueType = issueType;
             Component = component;
+            FixedVersions = fixedVersions;
         }
 
         public ImageMoniker SeveretyMoniker
