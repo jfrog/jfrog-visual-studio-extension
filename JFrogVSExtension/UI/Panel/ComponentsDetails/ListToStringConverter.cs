@@ -23,7 +23,7 @@ namespace JFrogVSExtension.ComponentsDetails
                 String licenseNames = "";
                 foreach (License license in copyOfList)
                 {
-                    licenseNames += license.FullName + " ";
+                    licenseNames += license.Name + " ";
                 }
                 return licenseNames;
             }

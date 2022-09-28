@@ -1,4 +1,6 @@
-﻿using System;
+﻿using JFrogVSExtension.Xray;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -39,7 +41,7 @@ namespace JFrogVSExtension.Utils.ScanManager
             _ = await Util.GetCLIOutputAsync(cliconfigCommand, "",cliEnv).ConfigureAwait(true);
         }
 
-        public async Task<Artifacts> PreformScanAsync(string workingDir)
+        public async Task<string> PreformScanAsync(string workingDir)
         {
             var cliAuditCommand = $"audit --format=json --server-id=\"{CliServerId}\" --licenses";
             switch (Policy)
@@ -51,13 +53,7 @@ namespace JFrogVSExtension.Utils.ScanManager
                     cliAuditCommand += $" --watches=\"{watches}\"";
                     break;
             }
-            var scanResults = await Util.GetCLIOutputAsync(cliAuditCommand,workingDir,cliEnv);
-            return await ParseCliAuditJsonAsync(scanResults);
-        }
-
-        private Task<Artifacts> ParseCliAuditJsonAsync(string scanResults)
-        {
-            throw new NotImplementedException();
+            return await  Util.GetCLIOutputAsync(cliAuditCommand, workingDir, cliEnv);
         }
     }
 }

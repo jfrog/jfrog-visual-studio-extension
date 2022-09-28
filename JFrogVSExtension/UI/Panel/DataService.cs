@@ -3,6 +3,7 @@ using JFrogVSExtension.Logger;
 using JFrogVSExtension.Utils;
 using JFrogVSExtension.Utils.ScanManager;
 using JFrogVSExtension.Xray;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -125,44 +126,6 @@ namespace JFrogVSExtension.Data
             return topSeverity;
         }
 
-        public async Task<Artifacts> RefreshArtifactsAsync(bool hard, Projects projects,string wd)
-        {
-            if (hard)
-            {
-                // Removes all components so Xray will later on scan for ALL the dependencies. 
-                ClearAllComponents();
-            }
-
-            HashSet<Components> componentsSet = new HashSet<Components>();
-            foreach (NugetProject nugetProject in projects.projects)
-            {
-                if (nugetProject.dependencies != null && nugetProject.dependencies.Length > 0)
-                {
-                    // Get project's components which are not included in the cache.
-                    componentsSet.UnionWith(Util.GetNoCachedComponents(nugetProject.dependencies, GetComponentsCache()));
-                    // Update cache with new components.
-                    GetComponentsCache().UnionWith(componentsSet);
-                }
-            }
-            var components = componentsSet.ToList();
-
-            int BULK = 100;
-            int i = 0;
-            Artifacts artifacts = GetArtifacts();
-            while (i + BULK < components.Count)
-            {
-                Artifacts buldArtifacts = await HttpUtils.GetCopmonentsFromXrayAsync(components.GetRange(i, BULK));
-                artifacts.artifacts.AddRange(buldArtifacts.artifacts);
-                i += BULK;
-            }
-            if (components.Count - i > 0)
-            {
-                Artifacts artifactsToAdd = await HttpUtils.GetCopmonentsFromXrayAsync(components.GetRange(i, components.Count - i));
-                artifacts.artifacts.AddRange(artifactsToAdd.artifacts);
-            }
-            return artifacts;
-        }
-
         public async Task<Artifacts> GetSecurityIssuesAsync(bool reScan, Projects projects,string wd)
         {
             if (!reScan)
@@ -185,8 +148,12 @@ namespace JFrogVSExtension.Data
                 }
             }
             var scanResuls = await ScanManager.Instance.PreformScanAsync(wd);
-            GetArtifacts().artifacts.AddRange(scanResuls.artifacts);
-            return scanResuls;
+            var artifacts = ParseCliAuditJson(scanResuls);
+            // The return value of this function is never used, the data is saved due tothe intenal artifacts refrence.
+            // Should be refactored to more maintanable and clear flow.
+            ClearAllComponents();
+            GetArtifacts().artifacts.AddRange(artifacts.artifacts);
+            return artifacts;
         }
 
         public void ClearAllComponents()
@@ -215,11 +182,33 @@ namespace JFrogVSExtension.Data
             this.components = new Dictionary<string, Component>();
             this.componentsCache = new HashSet<Components>();
         }
+        private Artifacts ParseCliAuditJson(string scanResults)
+        {
+            var artifacts = new Artifacts();
+            var auditResults = JsonConvert.DeserializeObject<AuditResults>(scanResults);
+            foreach (var securityIssue in auditResults.AllSecurityIssues)
+            {
+                foreach (var entry in securityIssue.Components) {
+                    var id = entry.Key.Substring(entry.Key.IndexOf("://"));
+                    var artifact = new Artifact();
+                    var issue = new Issue(securityIssue.Severity, securityIssue.Summery, "", entry.Value.ImpcatPAths[0][0].ComponentId, entry.Value.FixedVersions.ToString());
+                    artifact.general = new GeneralInfo()
+                    {
+                        Name = id,
+                        ComponentId = entry.Value.ImpcatPAths[0][0].ComponentId,
+                    };
+                    artifact.Issues.Add(issue);
+                artifacts.artifacts.Add(artifact);
+                }
+            }
+            return artifacts;
+        }
     }
 
     public enum RefreshType
     {
         Hard, Soft, None
     }
+
 }
 
