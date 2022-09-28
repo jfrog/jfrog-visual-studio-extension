@@ -84,7 +84,7 @@ namespace JFrogVSExtension.Tree
                 // 4. Get response and build the dependencies tree.
 
                 // Running CLI - this is the returned output.
-                String returnedText = await Task.Run(() => Util.GetCLIOutputAsync(solutionDir));
+                String returnedText = await Task.Run(() => Util.GetCLIOutputAsync("rt nuget-deps-tree",solutionDir));
                 
                 // Load projects from output.
                 Projects projects = Util.LoadNugetProjects(returnedText);
@@ -100,14 +100,14 @@ namespace JFrogVSExtension.Tree
                     case RefreshType.Hard:
                         {
                             // Get information for all dependencies. Ignore the cache.
-                            artifacts = await dataService.RefreshArtifactsAsync(true, projects);
+                            artifacts = await dataService.GetSecurityIssuesAsync(true, projects, solutionDir);
                             break;
                         }
 
                     case RefreshType.Soft:
                         {
                             // Get information only for the delta. Means only new dependencies will be added.
-                            artifacts = await dataService.RefreshArtifactsAsync(false, projects);
+                            artifacts = await dataService.GetSecurityIssuesAsync(false, projects, solutionDir);
                             break;
                         }
                 }

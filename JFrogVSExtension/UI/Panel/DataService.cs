@@ -1,6 +1,7 @@
 ﻿using JFrogVSExtension.HttpClient;
 using JFrogVSExtension.Logger;
 using JFrogVSExtension.Utils;
+using JFrogVSExtension.Utils.ScanManager;
 using JFrogVSExtension.Xray;
 using System;
 using System.Collections.Generic;
@@ -124,7 +125,7 @@ namespace JFrogVSExtension.Data
             return topSeverity;
         }
 
-        public async Task<Artifacts> RefreshArtifactsAsync(bool hard, Projects projects)
+        public async Task<Artifacts> RefreshArtifactsAsync(bool hard, Projects projects,string wd)
         {
             if (hard)
             {
@@ -160,6 +161,32 @@ namespace JFrogVSExtension.Data
                 artifacts.artifacts.AddRange(artifactsToAdd.artifacts);
             }
             return artifacts;
+        }
+
+        public async Task<Artifacts> GetSecurityIssuesAsync(bool reScan, Projects projects,string wd)
+        {
+            if (!reScan)
+            {
+                var componentsSet = new HashSet<Components>();
+                foreach (NugetProject nugetProject in projects.projects)
+                {
+                    if (nugetProject.dependencies != null && nugetProject.dependencies.Length > 0)
+                    {
+                        // Get project's components which are not included in the cache.
+                        componentsSet.UnionWith(Util.GetNoCachedComponents(nugetProject.dependencies, GetComponentsCache()));
+                        // Update cache with new components.
+                        GetComponentsCache().UnionWith(componentsSet);
+                    }
+                }
+                // No cahnge to the project dependencis, and a re-scan was not requested - returns the cached results
+                if (!componentsSet.Any())
+                {
+                    return GetArtifacts();
+                }
+            }
+            var scanResuls = await ScanManager.Instance.PreformScanAsync(wd);
+            GetArtifacts().artifacts.AddRange(scanResuls.artifacts);
+            return scanResuls;
         }
 
         public void ClearAllComponents()

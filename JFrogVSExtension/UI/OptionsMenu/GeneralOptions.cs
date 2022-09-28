@@ -44,7 +44,7 @@ namespace JFrogVSExtension.OptionsMenu
         public string ArtifactoryUrl { get => artifctoryUrl; set => artifctoryUrl = AddSlashIfNeeded(value); }
         protected string artifctoryUrl;
         public string Project { get; set; }
-        public string[] Watches { get; set; }
+        public string Watches { get; set; }
         public ScanPolicy Policy { get; set; }
         public string User { get; set; } 
         public string Password { get; set; }
@@ -82,7 +82,7 @@ namespace JFrogVSExtension.OptionsMenu
                         Project = _optionsControl.ProjectTextBoxValue.Trim();
                         break;
                     case ScanPolicy.Watches:
-                        Watches = _optionsControl.WatchesTextBoxValue.Split(',').Select(watch => watch.Trim()).ToArray();
+                        Watches = _optionsControl.WatchesTextBoxValue.Trim();
                         break;
                 }
             }

@@ -5,7 +5,7 @@ namespace JFrogVSExtension.Xray
 {
     class XrayUtil
     {
-        public static readonly string MIN_XRAY_VERSION = "2.5.0";
+        public static readonly string MIN_XRAY_VERSION = "3.29.0";
 
         public static ServerStatus LoadServerStatus(string output)
         {

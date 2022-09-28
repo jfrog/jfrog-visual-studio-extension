@@ -26,11 +26,11 @@ namespace JFrogVSExtension.Utils
             return projects;
         }
 
-        public static async Task<String> GetCLIOutputAsync(string solutionDir)
+        public static async Task<string> GetCLIOutputAsync(string command,string workingDir = "", Dictionary<string,string> envVars= null)
         {
-            String strAppPath = GetAssemblyLocalPathFrom(typeof(MainPanelCommand));
-            String strFilePath = Path.Combine(strAppPath, "Resources");
-            String pathToCli = Path.Combine(strFilePath, "jfrog.exe");
+            var strAppPath = GetAssemblyLocalPathFrom(typeof(MainPanelCommand));
+            var strFilePath = Path.Combine(strAppPath, "Resources");
+            var pathToCli = Path.Combine(strFilePath, "jf.exe");
             await OutputLog.ShowMessageAsync("Path for the JFrog CLI: " + pathToCli);
             //Create process
             Process pProcess = new System.Diagnostics.Process();
@@ -40,7 +40,7 @@ namespace JFrogVSExtension.Utils
 
             // strCommandParameters are parameters to pass to program
             // Here we will run the nuget command for the cli
-            pProcess.StartInfo.Arguments = "rt nuget-deps-tree";
+            pProcess.StartInfo.Arguments = command;
 
             pProcess.StartInfo.UseShellExecute = false;
             pProcess.StartInfo.CreateNoWindow = true;
@@ -48,8 +48,14 @@ namespace JFrogVSExtension.Utils
             pProcess.StartInfo.RedirectStandardOutput = true;
             pProcess.StartInfo.RedirectStandardError = true;
             pProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            pProcess.StartInfo.WorkingDirectory = solutionDir;
-
+            pProcess.StartInfo.WorkingDirectory = workingDir;
+            if (envVars != null)
+            {
+                foreach (var envVar in envVars) 
+                {
+                    pProcess.StartInfo.EnvironmentVariables[envVar.Key] = envVar.Value;
+                }
+            }
             StringBuilder strOutput = new StringBuilder();
             StringBuilder error = new StringBuilder();
 
@@ -89,13 +95,13 @@ namespace JFrogVSExtension.Utils
                 pProcess.WaitForExit();
 
                 // Wait for the entire output to be written
-                if (outputWaitHandle.WaitOne(2) &&
-                       errorWaitHandle.WaitOne(2))
+                if (outputWaitHandle.WaitOne(5000) &&
+                       errorWaitHandle.WaitOne(5000))
                 {
                     // Process completed. Check process.ExitCode here.
                     if (pProcess.ExitCode != 0)
                     {
-                        string message = "Failed to get CLI output. Exit code: " + pProcess.ExitCode + " Returned error:" + error.ToString();
+                        string message = $"Failed to get CLI output for {command}. Exit code: {pProcess.ExitCode} Returned error:{error}";
                         throw new IOException(message);
                     }
                     if (!string.IsNullOrEmpty(error.ToString()))
@@ -109,7 +115,7 @@ namespace JFrogVSExtension.Utils
                 {
                     // Timed out.
                     await OutputLog.ShowMessageAsync("Process timeout");
-                    throw new IOException("Process timeout, please run the following command from the solution directory and send us the output:" + pathToCli + " rt ndt");
+                    throw new IOException($"Process timeout,  {pathToCli} {command}");
                 }
             }
         }
