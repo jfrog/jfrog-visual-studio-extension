@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.Threading;
 using Task = System.Threading.Tasks.Task;
+using JFrogVSExtension.Utils.ScanManager;
 
 namespace JFrogVSExtension
 {
@@ -108,6 +109,7 @@ namespace JFrogVSExtension
             dte = (EnvDTE.DTE) await GetServiceAsync(typeof(EnvDTE.DTE));
             JFrogXrayOptions jfrogOptions = (JFrogXrayOptions)GetDialogPage(typeof(JFrogXrayOptions));
             HttpUtils.InitClient(jfrogOptions.XrayUrl,jfrogOptions.ArtifactoryUrl, jfrogOptions.User, jfrogOptions.Password,jfrogOptions.AccessToken);
+            await ScanManager.Instance.InitializeAsync(jfrogOptions.XrayUrl, jfrogOptions.ArtifactoryUrl, jfrogOptions.User, jfrogOptions.Password, jfrogOptions.AccessToken,jfrogOptions.Policy, jfrogOptions.Project, jfrogOptions.Watches);
         }
 
         public static EnvDTE.DTE getDTE()

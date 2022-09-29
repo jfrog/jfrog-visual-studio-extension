@@ -77,7 +77,8 @@ namespace JFrogVSExtension.OptionsMenu
             }
             InitializScanPolicy(OptionsPage.Policy);
             TextBoxPlatformUrlTextChanged(sender, e);
-            SeparateUrlCheckBoxCheckedChanged(sender, e); 
+            SeparateUrlCheckBoxCheckedChanged(sender, e);
+            UseAccessTokenCheckedChanged(sender, e);
             testConnectionField.Text = "";
         }
 

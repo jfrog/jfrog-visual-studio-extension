@@ -68,11 +68,14 @@ namespace JFrogVSExtension.Data
                             projectDependencies.Add(depComponent.Key);
                         } 
                         topSeverity = getTopComponentSeverity(topSeverity, depComponent);
-                        foreach (Issue issue in depComponent.Issues)
+                        if (depComponent.Issues != null)
                         {
-                            if (!comp.Issues.Contains(issue))
+                            foreach (Issue issue in depComponent.Issues)
                             {
-                                comp.Issues.Add(issue);
+                                if (!comp.Issues.Contains(issue))
+                                {
+                                    comp.Issues.Add(issue);
+                                }
                             }
                         }
                     }
@@ -148,12 +151,12 @@ namespace JFrogVSExtension.Data
                 }
             }
             var scanResuls = await ScanManager.Instance.PreformScanAsync(wd);
-            var artifacts = ParseCliAuditJson(scanResuls);
+            var artifacts = await ParseCliAuditJson(scanResuls);
             // The return value of this function is never used, the data is saved due tothe intenal artifacts refrence.
             // Should be refactored to more maintanable and clear flow.
             ClearAllComponents();
-            GetArtifacts().artifacts.AddRange(artifacts.artifacts);
-            return artifacts;
+            GetArtifacts().artifacts.AddRange(artifacts);
+            return null;
         }
 
         public void ClearAllComponents()
@@ -182,26 +185,36 @@ namespace JFrogVSExtension.Data
             this.components = new Dictionary<string, Component>();
             this.componentsCache = new HashSet<Components>();
         }
-        private Artifacts ParseCliAuditJson(string scanResults)
+        private async Task<IEnumerable<Artifact>> ParseCliAuditJson(string scanResults)
         {
-            var artifacts = new Artifacts();
-            var auditResults = JsonConvert.DeserializeObject<AuditResults>(scanResults);
-            foreach (var securityIssue in auditResults.AllSecurityIssues)
+            var artifacts = new  Dictionary<string,Artifact>();
+            var auditResults = JsonConvert.DeserializeObject<List<AuditResults>>(scanResults);
+            foreach (var securityIssue in auditResults.First().AllSecurityIssues)
             {
                 foreach (var entry in securityIssue.Components) {
                     var id = entry.Key.Substring(entry.Key.IndexOf("://"));
-                    var artifact = new Artifact();
-                    var issue = new Issue(securityIssue.Severity, securityIssue.Summery, "", entry.Value.ImpcatPAths[0][0].ComponentId, entry.Value.FixedVersions.ToString());
-                    artifact.general = new GeneralInfo()
+                    Artifact artifact;
+                    if (artifacts.ContainsKey(id))
                     {
-                        Name = id,
-                        ComponentId = entry.Value.ImpcatPAths[0][0].ComponentId,
-                    };
+                        artifact = artifacts[id];
+                    } else
+                    {
+                        artifact = new Artifact
+                        {
+                            general = new GeneralInfo()
+                            {
+                                Name = id,
+                                ComponentId = entry.Value.ImpcatPAths[0][0].ComponentId,
+                            }
+                        };
+                        artifacts.Add(id, artifact);
+                    }
+                    await OutputLog.ShowMessageAsync($"Issue {securityIssue.Severity}, {securityIssue.Summery}, {entry.Value.ImpcatPAths[0][0].ComponentId}, {string.Join(" ", entry.Value.FixedVersions)}");
+                    var issue = new Issue(securityIssue.Severity, securityIssue.Summery, "", entry.Value.ImpcatPAths[0][0].ComponentId, string.Join(" ",entry.Value.FixedVersions));
                     artifact.Issues.Add(issue);
-                artifacts.artifacts.Add(artifact);
                 }
             }
-            return artifacts;
+            return artifacts.Values.ToList();
         }
     }
 

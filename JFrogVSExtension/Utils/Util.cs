@@ -30,7 +30,7 @@ namespace JFrogVSExtension.Utils
         {
             var strAppPath = GetAssemblyLocalPathFrom(typeof(MainPanelCommand));
             var strFilePath = Path.Combine(strAppPath, "Resources");
-            var pathToCli = Path.Combine(strFilePath, "jf.exe");
+            var pathToCli = Path.Combine(strFilePath, "jfrog.exe");
             await OutputLog.ShowMessageAsync("Path for the JFrog CLI: " + pathToCli);
             //Create process
             Process pProcess = new System.Diagnostics.Process();
@@ -95,8 +95,8 @@ namespace JFrogVSExtension.Utils
                 pProcess.WaitForExit();
 
                 // Wait for the entire output to be written
-                if (outputWaitHandle.WaitOne(5000) &&
-                       errorWaitHandle.WaitOne(5000))
+                if (outputWaitHandle.WaitOne(1000) &&
+                       errorWaitHandle.WaitOne(1000))
                 {
                     // Process completed. Check process.ExitCode here.
                     if (pProcess.ExitCode != 0)
@@ -109,6 +109,7 @@ namespace JFrogVSExtension.Utils
                         await OutputLog.ShowMessageAsync(error.ToString());
                     }
                     // Returning the output from the CLI that is the json itself.
+                    await OutputLog.ShowMessageAsync($"JFrog CLI {command} finished successfully");
                     return strOutput.ToString();
                 }
                 else
