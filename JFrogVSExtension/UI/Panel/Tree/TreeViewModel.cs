@@ -112,7 +112,7 @@ namespace JFrogVSExtension.Tree
                         }
                 }
                 dataService.Severities = severities;
-                dataService.populateRootElements(projects);
+                dataService.PopulateRootElements(projects);
                
                 this.Artifacts = new ObservableCollection<ArtifactViewModel>();
                 

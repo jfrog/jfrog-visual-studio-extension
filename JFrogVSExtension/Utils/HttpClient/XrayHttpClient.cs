@@ -10,7 +10,6 @@ namespace JFrogVSExtension.HttpClient
 {
     class JfrogHttpClient
     {
-
         private string xrayUrl = "";
         private string artifactoryUrl = "";
         private string user = "";
@@ -18,8 +17,6 @@ namespace JFrogVSExtension.HttpClient
         private string userAgent = "jfrog-visual-studio-extension";
         private System.Net.Http.HttpClient httpClient = null;
         private bool UseAccessToken { get => string.IsNullOrEmpty(user); }
-
-
 
         public async Task<HttpResponseMessage> PerformXrayGetRequestAsync(string api)
         {
@@ -62,7 +59,6 @@ namespace JFrogVSExtension.HttpClient
             return await PerformPostRequestAsync(artifactoryUrl + api, content);
         }
 
-
         private async Task<HttpResponseMessage> PerformPostRequestAsync(string url, string content)
         {
             InitClient();
@@ -97,7 +93,7 @@ namespace JFrogVSExtension.HttpClient
                 if (!UseAccessToken)
                 {
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(
-                                                                        string.Format("{0}:{1}", user, password))));
+                        string.Format("{0}:{1}", user, password))));
                 }
                 else
                 {

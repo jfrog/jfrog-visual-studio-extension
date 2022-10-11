@@ -28,6 +28,7 @@ namespace JFrogVSExtension.HttpClient
                 throw new IOException(e.Message, e);
             }
         }
+
         public static async Task GetArtifactoryPingAsync()
         {
             try
@@ -40,6 +41,7 @@ namespace JFrogVSExtension.HttpClient
                 throw new IOException(e.Message, e);
             }
         }
+
         public static async Task<XrayVersion> GetXrayVersionAsync()
         {
             try
@@ -64,23 +66,6 @@ namespace JFrogVSExtension.HttpClient
             }
             catch (Exception e)
             {
-                throw new IOException(e.Message, e);
-            }
-        }
-
-        public static async Task<Artifacts> GetCopmonentsFromXrayAsync(List<Components> collection)
-        {
-            HttpResponseMessage componentResponse = await getResponseFromXrayAsync(collection);
-            string componentResult = await ParseResponseAsync(componentResponse);
-            await OutputLog.ShowMessageAsync(componentResult);
-            try
-            {
-                Artifacts artifacts = JsonConvert.DeserializeObject<Artifacts>(componentResult);
-                return artifacts;
-            }
-            catch (Exception e)
-            {
-                await OutputLog.ShowMessageAsync("Failed deserializing component result in Xray response.");
                 throw new IOException(e.Message, e);
             }
         }

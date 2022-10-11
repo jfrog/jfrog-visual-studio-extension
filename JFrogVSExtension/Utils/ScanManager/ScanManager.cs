@@ -27,6 +27,7 @@ namespace JFrogVSExtension.Utils.ScanManager
         }
         public ScanPolicy Policy { get; private set; }
         #endregion
+
         public async Task InitializeAsync(string xrayUrl,string artifactoryUrl,string user,string password,string accessToken, ScanPolicy policy ,string project="", string watches="")
         {
             await ConfigCLIAsync(xrayUrl, artifactoryUrl, user, password, accessToken);

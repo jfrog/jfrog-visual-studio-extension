@@ -118,7 +118,6 @@
     <Compile Include="Components\Xray\Severity.cs" />
     <Compile Include="Components\Xray\License.cs" />
     <Compile Include="Components\Xray\Issue.cs" />
-    <Compile Include="Components\Xray\GeneralInfo.cs" />
     <Compile Include="Components\Xray\Artifact.cs" />
   </ItemGroup>
   <ItemGroup>

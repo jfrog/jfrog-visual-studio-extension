@@ -131,71 +131,67 @@ namespace JFrogVSExtension.Utils
 
         public static Component ParseDependencies(Dependency dep, Dictionary<string, Artifact> artifactsMap, DataService dataService)
         {
-            Component comp = new Component();
+            Component comp = new Component(dep.id);
+            Severity topSeverity = Severity.Normal;
             if (artifactsMap.ContainsKey(dep.id))
             {
-                List<String> projectDependencies = new List<string>();
-
                 Artifact artifact = artifactsMap[dep.id];
-                setComponentDetails(comp, artifact);
+                SetComponentIssuesAndLicenses(comp, artifact);
 
-                Severity topSeverity;
                 if (artifact.Issues != null && artifact.Issues.Count > 0)
                 {
                     topSeverity = GetTopSeverityFromIssues(artifact.Issues);
                 }
-                else
-                {
-                    topSeverity = Severity.Normal;
-                }
-
-                if (dep.dependencies != null && dep.dependencies.Length > 0)
-                {
-                    foreach (Dependency dependency in dep.dependencies)
-                    {
-                        // Let's get the component information of the dependency. 
-                        Component component = ParseDependencies(dependency, artifactsMap, dataService);
-                        if (!dataService.Severities.Contains(component.TopSeverity))
-                        {
-                            continue;
-                        }
-
-                        topSeverity = GetTopSeverity(topSeverity, component.TopSeverity);
-                        if (component.Issues != null && component.Issues.Count > 0 && comp.Issues != null && comp.Issues.Count > 0)
-                        {
-                            // Means that the component already has some issues. 
-                            // Need to check that this is a new issue that we are adding.
-                            foreach (Issue issue in component.Issues)
-                            {
-                                if (!comp.Issues.Contains(issue))
-                                {
-                                    comp.Issues.Add(issue);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (component.Issues != null)
-                            {
-                                comp.Issues.AddRange(component.Issues);
-                            }
-                        }
-
-                        if (!dataService.getComponents().ContainsKey(component.Key))
-                        {
-                            dataService.getComponents().Add(component.Key, component);
-                        }
-                        else
-                        {
-                            updateDataServiceWithMissingDependencies(component, dataService);
-                        }
-
-                        projectDependencies.Add(dependency.id);
-                    }
-                }
-                comp.Dependencies = projectDependencies;
-                comp.TopSeverity = topSeverity;
             }
+
+            List<String> projectDependencies = new List<string>();
+            if (dep.dependencies != null && dep.dependencies.Length > 0)
+            {
+                foreach (Dependency dependency in dep.dependencies)
+                {
+                    // Let's get the component information of the dependency. 
+                    Component depComponent = ParseDependencies(dependency, artifactsMap, dataService);
+                    if (!dataService.Severities.Contains(depComponent.TopSeverity))
+                    {
+                        continue;
+                    }
+
+                    topSeverity = GetTopSeverity(topSeverity, depComponent.TopSeverity);
+                    if (depComponent.Issues != null && depComponent.Issues.Count > 0 && comp.Issues != null && comp.Issues.Count > 0)
+                    {
+                        // Means that the component already has some issues. 
+                        // Need to check that this is a new issue that we are adding.
+                        foreach (Issue issue in depComponent.Issues)
+                        {
+                            if (!comp.Issues.Contains(issue))
+                            {
+                                comp.Issues.Add(issue);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (depComponent.Issues != null)
+                        {
+                            comp.Issues.AddRange(depComponent.Issues);
+                        }
+                    }
+
+                    if (!dataService.getComponents().ContainsKey(depComponent.Key))
+                    {
+                        dataService.getComponents().Add(depComponent.Key, depComponent);
+                    }
+                    else
+                    {
+                        updateDataServiceWithMissingDependencies(depComponent, dataService);
+                    }
+
+                    projectDependencies.Add(dependency.id);
+                }
+            }
+            comp.Dependencies = projectDependencies;
+            comp.TopSeverity = topSeverity;
+           
             return comp;
         }
 
@@ -225,29 +221,17 @@ namespace JFrogVSExtension.Utils
             }
         }
 
-        private static void setComponentDetails(Component comp, Artifact artifact)
+        private static void SetComponentIssuesAndLicenses(Component comp, Artifact artifact)
         {
             if (artifact.Issues != null && artifact.Issues.Count > 0)
             {
                 foreach (Issue issue in artifact.Issues)
                 {
-                    issue.Component = artifact.general.ComponentId;
+                    issue.Component = artifact.ArtifactId;
                 }
             }
-            string name = artifact.general.ComponentId;
-            string[] elements = name.Split(':');
-            string version = "";
-            if (elements.Length == 2)
-            {
-                name = elements[0];
-                version = elements[1];
-            }
-            comp.Name = name;
-            comp.Key = artifact.general.ComponentId;
-            comp.Version = version;
-            comp.Group = name;
             comp.Issues = artifact.Issues;
-            comp.Licenses = artifact.licenses;
+            comp.Licenses = artifact.Licenses;
         }
 
         // Return Set of Components which are not contained in componentsCache.

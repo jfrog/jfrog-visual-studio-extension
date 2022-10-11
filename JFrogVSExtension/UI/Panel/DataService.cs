@@ -45,12 +45,12 @@ namespace JFrogVSExtension.Data
             return artifacts;
         }
 
-        public void populateRootElements(Projects projects)
+        public void PopulateRootElements(Projects projects)
         {
             List<String> names = new List<String>();
             foreach (NugetProject project in projects.projects)
             {
-                List<String> projectDependencies = new List<string>();
+                List<string> projectDependencies = new List<string>();
                 Component comp = new Component()
                 {
                     Key = project.name,
@@ -62,12 +62,12 @@ namespace JFrogVSExtension.Data
                 {
                     foreach (Dependency dep in project.dependencies)
                     {
-                        Component depComponent = getComponent(dep);
+                        Component depComponent = GetComponent(dep);
                         if (Severities.Contains(depComponent.TopSeverity))
                         {
                             projectDependencies.Add(depComponent.Key);
                         } 
-                        topSeverity = getTopComponentSeverity(topSeverity, depComponent);
+                        topSeverity = GetTopComponentSeverity(topSeverity, depComponent);
                         if (depComponent.Issues != null)
                         {
                             foreach (Issue issue in depComponent.Issues)
@@ -107,15 +107,15 @@ namespace JFrogVSExtension.Data
             }
         }
 
-        private Component getComponent(Dependency dep)
+        private Component GetComponent(Dependency dep)
         {
-            var artifactsMap = artifacts.artifacts.ToDictionary(x => x.general.ComponentId, x => x);
+            var artifactsMap = artifacts.artifacts.ToDictionary(x => x.ArtifactId, x => x);
             return Util.ParseDependencies(dep, artifactsMap, this);
         }
 
         // Parsing the dependencies and returning the top severity from all the dependency. 
-        // This top severity that is returned, is the project serverity
-        private Severity getTopComponentSeverity(Severity topSeverity, Component depComponent)
+        // This top severity that is returned, is the project severity.
+        private Severity GetTopComponentSeverity(Severity topSeverity, Component depComponent)
         {
             if (depComponent != null)
             {
@@ -129,7 +129,7 @@ namespace JFrogVSExtension.Data
             return topSeverity;
         }
 
-        public async Task<Artifacts> GetSecurityIssuesAsync(bool reScan, Projects projects,string wd)
+        public async Task<Artifacts> GetSecurityIssuesAsync(bool reScan, Projects projects, string wd)
         {
             if (!reScan)
             {
@@ -144,14 +144,14 @@ namespace JFrogVSExtension.Data
                         GetComponentsCache().UnionWith(componentsSet);
                     }
                 }
-                // No cahnge to the project dependencis, and a re-scan was not requested - returns the cached results
+                // No change to the project dependencies, and a re-scan was not requested - returns the cached results.
                 if (!componentsSet.Any())
                 {
                     return GetArtifacts();
                 }
             }
             var scanResuls = await ScanManager.Instance.PreformScanAsync(wd);
-            var artifacts = await ParseCliAuditJson(scanResuls);
+            var artifacts = await ParseCliAuditJsonAsync(scanResuls);
             // The return value of this function is never used, the data is saved due tothe intenal artifacts refrence.
             // Should be refactored to more maintanable and clear flow.
             ClearAllComponents();
@@ -185,36 +185,46 @@ namespace JFrogVSExtension.Data
             this.components = new Dictionary<string, Component>();
             this.componentsCache = new HashSet<Components>();
         }
-        private async Task<IEnumerable<Artifact>> ParseCliAuditJson(string scanResults)
+
+        private async Task<IEnumerable<Artifact>> ParseCliAuditJsonAsync(string scanResults)
         {
             var artifacts = new  Dictionary<string,Artifact>();
             var auditResults = JsonConvert.DeserializeObject<List<AuditResults>>(scanResults);
             foreach (var securityIssue in auditResults.First().AllSecurityIssues)
             {
                 foreach (var entry in securityIssue.Components) {
-                    var id = entry.Key.Substring(entry.Key.IndexOf("://"));
+                    var artifactId = GetIdWithoutPackagePrefix(entry.Key);
+                    var directDependencyId = GetIdWithoutPackagePrefix(entry.Value.ImpactPaths[0][0].ComponentId);
                     Artifact artifact;
-                    if (artifacts.ContainsKey(id))
+                    if (artifacts.ContainsKey(artifactId))
                     {
-                        artifact = artifacts[id];
+                        artifact = artifacts[artifactId];
                     } else
                     {
                         artifact = new Artifact
                         {
-                            general = new GeneralInfo()
-                            {
-                                Name = id,
-                                ComponentId = entry.Value.ImpcatPAths[0][0].ComponentId,
-                            }
+                            ArtifactId = artifactId,
                         };
-                        artifacts.Add(id, artifact);
+                        artifacts.Add(artifactId, artifact);
                     }
-                    await OutputLog.ShowMessageAsync($"Issue {securityIssue.Severity}, {securityIssue.Summery}, {entry.Value.ImpcatPAths[0][0].ComponentId}, {string.Join(" ", entry.Value.FixedVersions)}");
-                    var issue = new Issue(securityIssue.Severity, securityIssue.Summery, "", entry.Value.ImpcatPAths[0][0].ComponentId, string.Join(" ",entry.Value.FixedVersions));
+                    await OutputLog.ShowMessageAsync($"Issue {securityIssue.Severity}, {securityIssue.Summary}, {directDependencyId}, {string.Join(" ", entry.Value.FixedVersions)}");
+                    var issueType = string.IsNullOrEmpty(securityIssue.IssueType) ? "security" : securityIssue.IssueType;
+                    var issue = new Issue(securityIssue.Severity, securityIssue.Summary, issueType, directDependencyId, string.Join(" ",entry.Value.FixedVersions));
                     artifact.Issues.Add(issue);
                 }
             }
             return artifacts.Values.ToList();
+        }
+
+        private string GetIdWithoutPackagePrefix(string raw)
+        {
+            var separator = "://";
+            var separatorIndex = raw.IndexOf(separator);
+            if (separatorIndex != -1)
+            {
+                return raw.Substring(separatorIndex + separator.Length);
+            }
+            return raw;
         }
     }
 
@@ -224,4 +234,3 @@ namespace JFrogVSExtension.Data
     }
 
 }
-

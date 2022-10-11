@@ -1,6 +1,9 @@
 ﻿using JFrogVSExtension.Data.ViewModels;
+using JFrogVSExtension.Utils;
 using JFrogVSExtension.Xray;
+using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace JFrogVSExtension.Data
 {
@@ -13,11 +16,23 @@ namespace JFrogVSExtension.Data
         public string Name { get; set; } = "";
         public string Version { get; set; } = "";
         public string Type { get; set; } = "Nuget";
-        public List<License> Licenses { get; set; }
+        public List<License> Licenses { get; set; } = new List<License>();
         public Severity TopSeverity { get; set; } = Severity.Normal;
         public List<string> Dependencies { get; set; }
-        public List<Issue> Issues { get; set; }
+        public List<Issue> Issues { get; set; } = new List<Issue>();
 
+        public Component() { }
+        public Component(string artifactId)
+        {
+            string[] elements = artifactId.Split(':');
+            if (elements.Length == 2)
+            {
+                Name = elements[0];
+                Version = elements[1];
+                Key = artifactId;
+                Group = elements[0];
+            }
+        }
         public override bool Equals(object obj)
         {
             Component comp = new Component();
