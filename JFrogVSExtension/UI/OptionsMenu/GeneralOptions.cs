@@ -1,4 +1,5 @@
 ﻿using JFrogVSExtension.HttpClient;
+using JFrogVSExtension.Utils.ScanManager;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel;
@@ -76,7 +77,7 @@ namespace JFrogVSExtension.OptionsMenu
                     AccessToken = "";
                 }
                 Policy = _optionsControl.Policy;
-                switch( Policy)
+                switch(Policy)
                 {
                     case ScanPolicy.Project:
                         Project = _optionsControl.ProjectTextBoxValue.Trim();
@@ -88,6 +89,7 @@ namespace JFrogVSExtension.OptionsMenu
             }
             base.OnApply(e);
             HttpUtils.InitClient(XrayUrl,ArtifactoryUrl, User, Password, AccessToken);
+            _ = ScanManager.Instance.InitializeAsync(XrayUrl, ArtifactoryUrl, User, Password, AccessToken, Policy, Project, Watches);
         }
 
         private string AddSlashIfNeeded(string url)
