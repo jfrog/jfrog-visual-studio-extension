@@ -151,7 +151,7 @@ namespace JFrogVSExtension.Data
                 }
             }
             var scanResuls = await ScanManager.Instance.PreformScanAsync(wd);
-            var artifacts = await ParseCliAuditJsonAsync(scanResuls);
+            var artifacts = ParseCliAuditJson(scanResuls);
             // The return value of this function is never used, the data is saved due tothe intenal artifacts refrence.
             // Should be refactored to more maintanable and clear flow.
             ClearAllComponents();
@@ -186,34 +186,58 @@ namespace JFrogVSExtension.Data
             this.componentsCache = new HashSet<Components>();
         }
 
-        private async Task<IEnumerable<Artifact>> ParseCliAuditJsonAsync(string scanResults)
+        private IEnumerable<Artifact> ParseCliAuditJson(string scanResults)
         {
             var artifacts = new  Dictionary<string,Artifact>();
             var auditResults = JsonConvert.DeserializeObject<List<AuditResults>>(scanResults);
-            foreach (var securityIssue in auditResults.First().AllSecurityIssues)
-            {
-                foreach (var entry in securityIssue.Components) {
-                    var artifactId = GetIdWithoutPackagePrefix(entry.Key);
-                    var directDependencyId = GetIdWithoutPackagePrefix(entry.Value.ImpactPaths[0][0].ComponentId);
-                    Artifact artifact;
-                    if (artifacts.ContainsKey(artifactId))
-                    {
-                        artifact = artifacts[artifactId];
-                    } else
-                    {
-                        artifact = new Artifact
+            foreach (var auditResult in auditResults) {
+                // Handel security issuses (violations and vulnerabilities)
+                foreach (var securityIssue in auditResult.AllSecurityIssues)
+                {
+                    foreach (var entry in securityIssue.Components) {
+                        var artifactId = GetIdWithoutPackagePrefix(entry.Key);
+                        var directDependencyId = GetIdWithoutPackagePrefix(entry.Value.ImpactPaths[0][0].ComponentId);
+                        Artifact artifact;
+                        if (artifacts.ContainsKey(artifactId))
                         {
-                            ArtifactId = artifactId,
-                        };
-                        artifacts.Add(artifactId, artifact);
+                            artifact = artifacts[artifactId];
+                        }
+                        else
+                        {
+                            artifact = new Artifact
+                            {
+                                ArtifactId = artifactId,
+                            };
+                            artifacts.Add(artifactId, artifact);
+                        }
+                        var issueType = string.IsNullOrEmpty(securityIssue.IssueType) ? "security" : securityIssue.IssueType;
+                        var fixedVerions = entry.Value.FixedVersions != null ? string.Join(" ", entry.Value.FixedVersions) : "";
+                        var issue = new Issue(securityIssue.Severity, securityIssue.Summary, issueType, directDependencyId, fixedVerions);
+                        if (!artifact.Issues.Contains(issue))
+                        {
+                            artifact.Issues.Add(issue);
+                        }
                     }
-                    await OutputLog.ShowMessageAsync($"Issue {securityIssue.Severity}, {securityIssue.Summary}, {directDependencyId}, {string.Join(" ", entry.Value.FixedVersions)}");
-                    var issueType = string.IsNullOrEmpty(securityIssue.IssueType) ? "security" : securityIssue.IssueType;
-                    var issue = new Issue(securityIssue.Severity, securityIssue.Summary, issueType, directDependencyId, string.Join(" ",entry.Value.FixedVersions));
-                    artifact.Issues.Add(issue);
+                    // Handel licenses information
+                    foreach (var license in auditResult.Licenses)
+                    {
+                        foreach (var entry in license.Components)
+                        {
+                            var artifactId = GetIdWithoutPackagePrefix(entry.Key);
+                            if (!artifacts.ContainsKey(artifactId))
+                            {
+                                var artifact = new Artifact
+                                {
+                                    ArtifactId = artifactId,
+                                };
+                                artifacts.Add(artifactId, artifact);
+                            }
+                            artifacts[artifactId].Licenses = new List<License>() { new License(license.Name) };
+                        }
+                    }
                 }
             }
-            return artifacts.Values.ToList();
+            return (artifacts.Values.ToList());
         }
 
         private string GetIdWithoutPackagePrefix(string raw)

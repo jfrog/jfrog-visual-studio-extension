@@ -27,7 +27,7 @@ namespace JFrogVSExtension.ComponentsDetails
                 }
                 return licenseNames;
             }
-            return "";
+            return "Unknown";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

@@ -26,7 +26,7 @@ namespace JFrogVSExtension.Utils
             return projects;
         }
 
-        public static async Task<string> GetCLIOutputAsync(string command,string workingDir = "", Dictionary<string,string> envVars= null)
+        public static async Task<string> GetCLIOutputAsync(string command,string workingDir = "",bool configCommand=false, Dictionary<string,string> envVars= null)
         {
             var strAppPath = GetAssemblyLocalPathFrom(typeof(MainPanelCommand));
             var strFilePath = Path.Combine(strAppPath, "Resources");
@@ -41,6 +41,8 @@ namespace JFrogVSExtension.Utils
             // strCommandParameters are parameters to pass to program
             // Here we will run the nuget command for the cli
             pProcess.StartInfo.Arguments = command;
+            // Avoid printing commands with credentials
+            var commandString = configCommand ? "config command" : command;
 
             pProcess.StartInfo.UseShellExecute = false;
             pProcess.StartInfo.CreateNoWindow = true;
@@ -95,13 +97,13 @@ namespace JFrogVSExtension.Utils
                 pProcess.WaitForExit();
 
                 // Wait for the entire output to be written
-                if (outputWaitHandle.WaitOne(1000) &&
-                       errorWaitHandle.WaitOne(1000))
+                if (outputWaitHandle.WaitOne(1) &&
+                       errorWaitHandle.WaitOne(1))
                 {
                     // Process completed. Check process.ExitCode here.
                     if (pProcess.ExitCode != 0)
                     {
-                        string message = $"Failed to get CLI output for {command}. Exit code: {pProcess.ExitCode} Returned error:{error}";
+                        string message = $"Failed to get CLI output for {commandString}. Exit code: {pProcess.ExitCode} Returned error:{error}";
                         throw new IOException(message);
                     }
                     if (!string.IsNullOrEmpty(error.ToString()))
@@ -109,14 +111,14 @@ namespace JFrogVSExtension.Utils
                         await OutputLog.ShowMessageAsync(error.ToString());
                     }
                     // Returning the output from the CLI that is the json itself.
-                    await OutputLog.ShowMessageAsync($"JFrog CLI {command} finished successfully");
+                    await OutputLog.ShowMessageAsync($"JFrog CLI {commandString} finished successfully");
                     return strOutput.ToString();
                 }
                 else
                 {
                     // Timed out.
                     await OutputLog.ShowMessageAsync("Process timeout");
-                    throw new IOException($"Process timeout,  {pathToCli} {command}");
+                    throw new IOException($"Process timeout,  {pathToCli} {commandString}");
                 }
             }
         }

@@ -20,10 +20,12 @@ namespace JFrogVSExtension.Xray
     {
         [JsonProperty(PropertyName = "violations")]
         public List<SecurityIssue> Violations { get; set; } = new List<SecurityIssue>();
+
         [JsonProperty(PropertyName = "vulnerabilities")]
         public List<SecurityIssue> Vulnerabilities { get; set; } = new List<SecurityIssue>();
+
         [JsonProperty(PropertyName = "licenses")]
-        public List<License> License { get; set; } = new List<License>();
+        public List<License> Licenses { get; set; } = new List<License>();
 
         // Results will contain only violation OR only vulnerabilites dependes on the given scan context.
         public List<SecurityIssue> AllSecurityIssues { get => Violations.Count > 0 ? Violations : Vulnerabilities; }

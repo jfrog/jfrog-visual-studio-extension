@@ -8,8 +8,18 @@ namespace JFrogVSExtension.Xray
         [JsonProperty(PropertyName = "components")]
         public Dictionary<string, AuditComponent> Components { get; set; }
 
-        [JsonProperty(PropertyName = "name")]
+        [JsonProperty(PropertyName = "license_key")]
         public string Name { get; set; }
 
+        public License()
+        {
+            Name = "Unknown";
+            Components = new Dictionary<string, AuditComponent>();
+        }
+
+        public License(string name)
+        {
+            Name = string.IsNullOrEmpty(name) ? "Unknown": name;
+        }
     }
 }
