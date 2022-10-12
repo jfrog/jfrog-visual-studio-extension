@@ -148,19 +148,20 @@ namespace JFrogVSExtension.Data
                     return GetArtifacts();
                 }
             }
+            ClearAllComponents();
             var scanResuls = await ScanManager.Instance.PreformScanAsync(wd);
             var artifacts = ParseCliAuditJson(scanResuls);
             // The return value of this function is never used, the data is saved due tothe intenal artifacts refrence.
             // Should be refactored to more maintanable and clear flow.
-            ClearAllComponents();
             GetArtifacts().artifacts.AddRange(artifacts);
-            return null;
+            return GetArtifacts();
         }
 
         public void ClearAllComponents()
         {
             GetComponentsCache().Clear();
             GetArtifacts().artifacts.Clear();
+            components.Clear();
         }
 
         public Component getComponent(string key)
