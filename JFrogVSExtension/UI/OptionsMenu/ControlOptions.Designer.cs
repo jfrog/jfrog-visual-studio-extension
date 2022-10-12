@@ -29,7 +29,10 @@
         private void InitializeComponent()
         {
             this.xrayGroup = new System.Windows.Forms.GroupBox();
-            this.useAccessToken = new System.Windows.Forms.CheckBox();
+            this.AuthMethod = new System.Windows.Forms.TextBox();
+            this.AuthRadioButtons = new System.Windows.Forms.GroupBox();
+            this.accessToken = new System.Windows.Forms.RadioButton();
+            this.basicAuth = new System.Windows.Forms.RadioButton();
             this.textBoxAccessToken = new System.Windows.Forms.TextBox();
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.textBoxXrayUrl = new System.Windows.Forms.TextBox();
@@ -52,11 +55,13 @@
             this.password = new System.Windows.Forms.TextBox();
             this.testConnectionField = new System.Windows.Forms.TextBox();
             this.xrayGroup.SuspendLayout();
+            this.AuthRadioButtons.SuspendLayout();
             this.SuspendLayout();
             // 
             // xrayGroup
             // 
-            this.xrayGroup.Controls.Add(this.useAccessToken);
+            this.xrayGroup.Controls.Add(this.AuthMethod);
+            this.xrayGroup.Controls.Add(this.AuthRadioButtons);
             this.xrayGroup.Controls.Add(this.textBoxAccessToken);
             this.xrayGroup.Controls.Add(this.textBox4);
             this.xrayGroup.Controls.Add(this.textBoxXrayUrl);
@@ -88,16 +93,51 @@
             this.xrayGroup.TabStop = false;
             this.xrayGroup.Text = "JFrog Options";
             // 
-            // useAccessToken
+            // AuthMethod
             // 
-            this.useAccessToken.AutoSize = true;
-            this.useAccessToken.Location = new System.Drawing.Point(196, 74);
-            this.useAccessToken.Name = "useAccessToken";
-            this.useAccessToken.Size = new System.Drawing.Size(168, 24);
-            this.useAccessToken.TabIndex = 58;
-            this.useAccessToken.Text = "Use Access Token";
-            this.useAccessToken.UseVisualStyleBackColor = true;
-            this.useAccessToken.CheckedChanged += new System.EventHandler(this.UseAccessTokenCheckedChanged);
+            this.AuthMethod.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.AuthMethod.Location = new System.Drawing.Point(4, 76);
+            this.AuthMethod.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.AuthMethod.Multiline = true;
+            this.AuthMethod.Name = "AuthMethod";
+            this.AuthMethod.ReadOnly = true;
+            this.AuthMethod.Size = new System.Drawing.Size(183, 28);
+            this.AuthMethod.TabIndex = 60;
+            this.AuthMethod.TabStop = false;
+            this.AuthMethod.Text = "Authentication Method";
+            // 
+            // AuthRadioButtons
+            // 
+            this.AuthRadioButtons.Controls.Add(this.accessToken);
+            this.AuthRadioButtons.Controls.Add(this.basicAuth);
+            this.AuthRadioButtons.Location = new System.Drawing.Point(196, 74);
+            this.AuthRadioButtons.Name = "AuthRadioButtons";
+            this.AuthRadioButtons.Size = new System.Drawing.Size(435, 28);
+            this.AuthRadioButtons.TabIndex = 59;
+            this.AuthRadioButtons.TabStop = false;
+            // 
+            // accessToken
+            // 
+            this.accessToken.AutoSize = true;
+            this.accessToken.Location = new System.Drawing.Point(138, 0);
+            this.accessToken.Name = "accessToken";
+            this.accessToken.Size = new System.Drawing.Size(134, 24);
+            this.accessToken.TabIndex = 1;
+            this.accessToken.TabStop = true;
+            this.accessToken.Text = "Access Token";
+            this.accessToken.UseVisualStyleBackColor = true;
+            this.accessToken.CheckedChanged += new System.EventHandler(this.AccessTokenCheckedChanged);
+            // 
+            // basicAuth
+            // 
+            this.basicAuth.AutoSize = true;
+            this.basicAuth.Location = new System.Drawing.Point(6, 0);
+            this.basicAuth.Name = "basicAuth";
+            this.basicAuth.Size = new System.Drawing.Size(111, 24);
+            this.basicAuth.TabIndex = 0;
+            this.basicAuth.TabStop = true;
+            this.basicAuth.Text = "Basic Auth";
+            this.basicAuth.UseVisualStyleBackColor = true;
             // 
             // textBoxAccessToken
             // 
@@ -181,7 +221,7 @@
             this.label1.Location = new System.Drawing.Point(4, 388);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(111, 20);
+            this.label1.Size = new System.Drawing.Size(120, 20);
             this.label1.TabIndex = 50;
             this.label1.Text = "Scanning Policy";
             // 
@@ -268,11 +308,11 @@
             // 
             // btnTestConnection
             // 
-            this.btnTestConnection.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTestConnection.Location = new System.Drawing.Point(661, 312);
+            this.btnTestConnection.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnTestConnection.Location = new System.Drawing.Point(668, 312);
             this.btnTestConnection.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnTestConnection.Name = "btnTestConnection";
-            this.btnTestConnection.Size = new System.Drawing.Size(138, 35);
+            this.btnTestConnection.Size = new System.Drawing.Size(142, 44);
             this.btnTestConnection.TabIndex = 40;
             this.btnTestConnection.Text = "Test Connection";
             this.btnTestConnection.UseVisualStyleBackColor = true;
@@ -342,6 +382,8 @@
             this.Load += new System.EventHandler(this.CustomOptionsControl_Load);
             this.xrayGroup.ResumeLayout(false);
             this.xrayGroup.PerformLayout();
+            this.AuthRadioButtons.ResumeLayout(false);
+            this.AuthRadioButtons.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -368,8 +410,11 @@
         private System.Windows.Forms.TextBox textBox3;
         private System.Windows.Forms.TextBox artifactoryUrl;
         private System.Windows.Forms.CheckBox separateUrlCheckBox;
-        private System.Windows.Forms.CheckBox useAccessToken;
         private System.Windows.Forms.TextBox textBoxAccessToken;
         private System.Windows.Forms.TextBox textBox4;
+        private System.Windows.Forms.GroupBox AuthRadioButtons;
+        private System.Windows.Forms.RadioButton accessToken;
+        private System.Windows.Forms.RadioButton basicAuth;
+        private System.Windows.Forms.TextBox AuthMethod;
     }
 }

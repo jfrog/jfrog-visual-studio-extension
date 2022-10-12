@@ -22,7 +22,7 @@ namespace JFrogVSExtension.OptionsMenu
         public JFrogXrayOptions OptionsPage { get; set; }
         public ScanPolicy Policy { get => policy; private set => SetScanPolicy(value); }
         private ScanPolicy policy;
-        public bool UseAccessToken { get => useAccessToken.Checked; }
+        public bool UseAccessToken { get => accessToken.Checked; }
         public string PlatformUrlTextBoxValue
         {
             get { return textBoxPlatformUrl.Text; }
@@ -67,18 +67,21 @@ namespace JFrogVSExtension.OptionsMenu
             if (!string.IsNullOrEmpty(OptionsPage.AccessToken))
             {
                 textBoxAccessToken.Text = OptionsPage.AccessToken;
-                useAccessToken.Checked = true;
+                accessToken.Checked = true;
+                basicAuth.Checked = false;
+
             }
             else
             {
                 textBoxPassword.Text = OptionsPage.Password;
                 textBoxUser.Text = OptionsPage.User;
-                useAccessToken.Checked = false;
+                accessToken.Checked = false;
+                basicAuth.Checked = true;
             }
             InitializScanPolicy(OptionsPage.Policy);
             TextBoxPlatformUrlTextChanged(sender, e);
             SeparateUrlCheckBoxCheckedChanged(sender, e);
-            UseAccessTokenCheckedChanged(sender, e);
+            AccessTokenCheckedChanged(sender, e);
             testConnectionField.Text = "";
         }
 
@@ -201,25 +204,6 @@ namespace JFrogVSExtension.OptionsMenu
             Policy = newScanPolicy;
         }
 
-        private void UseAccessTokenCheckedChanged(object sender, EventArgs e)
-        {
-            if (useAccessToken.Checked)
-            {
-                textBoxAccessToken.Enabled = true;
-                textBoxPassword.Enabled = false;
-                textBoxUser.Enabled = false;
-                textBoxAccessToken.Focus();
-            }
-            else
-            {
-                textBoxAccessToken.Enabled = false;
-                textBoxPassword.Enabled = true;
-                textBoxUser.Enabled = true;
-                textBoxUser.Focus();
-            }
-
-        }
-
         private void SeparateUrlCheckBoxCheckedChanged(object sender, EventArgs e)
         {
             if (separateUrlCheckBox.Checked)
@@ -250,6 +234,25 @@ namespace JFrogVSExtension.OptionsMenu
                     textBoxXrayUrl.Text = platformUrl + "xray/";
                 }
             }
+        }
+
+        private void AccessTokenCheckedChanged(object sender, EventArgs e)
+        {
+            if (accessToken.Checked)
+            {
+                textBoxAccessToken.Enabled = true;
+                textBoxPassword.Enabled = false;
+                textBoxUser.Enabled = false;
+                textBoxAccessToken.Focus();
+            }
+            else
+            {
+                textBoxAccessToken.Enabled = false;
+                textBoxPassword.Enabled = true;
+                textBoxUser.Enabled = true;
+                textBoxUser.Focus();
+            }
+
         }
     }
 }
