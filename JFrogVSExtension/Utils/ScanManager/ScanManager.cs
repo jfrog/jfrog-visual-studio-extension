@@ -14,7 +14,8 @@ namespace JFrogVSExtension.Utils.ScanManager
     {
         #region Private fields
         private const string CliServerId = "jfrog-visual-studio-extension";
-        private readonly Dictionary<string, string> cliEnv = new Dictionary<string, string> { { "CI", "TRUE" } };
+        private const string userAgent = "jfrog-visual-studio-extension";
+        private readonly Dictionary<string, string> cliEnv = new Dictionary<string, string> { { "CI", "TRUE" }, { "JFROG_CLI_USER_AGENT", userAgent } };
         private string project;
         private string watches;
         private static ScanManager instance = null;
