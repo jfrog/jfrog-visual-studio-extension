@@ -42,7 +42,7 @@ namespace JFrogVSExtension.Xray
 
         public override int GetHashCode()
         {
-            return Severity.GetHashCode() + Summary.GetHashCode() + IssueType.GetHashCode() + Component.GetHashCode() + FixedVersions.GetHashCode();
+            return Severity.GetHashCode() + Summary.GetHashCode() + IssueType.GetHashCode() + FixedVersions.GetHashCode();
         }
 
         public ImageMoniker SeveretyMoniker

@@ -146,7 +146,7 @@ namespace JFrogVSExtension.Utils
                 }
             }
 
-            List<String> projectDependencies = new List<string>();
+            var projectDependencies = new List<string>();
             if (dep.dependencies != null && dep.dependencies.Length > 0)
             {
                 foreach (Dependency dependency in dep.dependencies)

@@ -1,6 +1,4 @@
-﻿using JFrogVSExtension.HttpClient;
-using JFrogVSExtension.Logger;
-using JFrogVSExtension.Utils;
+﻿using JFrogVSExtension.Utils;
 using JFrogVSExtension.Utils.ScanManager;
 using JFrogVSExtension.Xray;
 using Newtonsoft.Json;
@@ -191,25 +189,13 @@ namespace JFrogVSExtension.Data
             var artifacts = new  Dictionary<string,Artifact>();
             var auditResults = JsonConvert.DeserializeObject<List<AuditResults>>(scanResults);
             foreach (var auditResult in auditResults) {
-                // Handel security issuses (violations and vulnerabilities)
+                // Handle security issuses (violations and vulnerabilities)
                 foreach (var securityIssue in auditResult.AllSecurityIssues)
                 {
                     foreach (var entry in securityIssue.Components) {
                         var artifactId = GetIdWithoutPackagePrefix(entry.Key);
                         var directDependencyId = GetIdWithoutPackagePrefix(entry.Value.ImpactPaths[0][0].ComponentId);
-                        Artifact artifact;
-                        if (artifacts.ContainsKey(artifactId))
-                        {
-                            artifact = artifacts[artifactId];
-                        }
-                        else
-                        {
-                            artifact = new Artifact
-                            {
-                                ArtifactId = artifactId,
-                            };
-                            artifacts.Add(artifactId, artifact);
-                        }
+                        var artifact = GetOrCreateArtifact(artifacts, artifactId);
                         var issueType = string.IsNullOrEmpty(securityIssue.IssueType) ? "security" : securityIssue.IssueType;
                         var fixedVerions = entry.Value.FixedVersions != null ? string.Join(" ", entry.Value.FixedVersions) : "";
                         var issue = new Issue(securityIssue.Severity, securityIssue.Summary, issueType, directDependencyId, fixedVerions);
@@ -218,26 +204,33 @@ namespace JFrogVSExtension.Data
                             artifact.Issues.Add(issue);
                         }
                     }
-                    // Handel licenses information
+                    // Handle licenses information
                     foreach (var license in auditResult.Licenses)
                     {
                         foreach (var entry in license.Components)
                         {
                             var artifactId = GetIdWithoutPackagePrefix(entry.Key);
-                            if (!artifacts.ContainsKey(artifactId))
-                            {
-                                var artifact = new Artifact
-                                {
-                                    ArtifactId = artifactId,
-                                };
-                                artifacts.Add(artifactId, artifact);
-                            }
-                            artifacts[artifactId].Licenses = new List<License>() { new License(license.Name) };
+                            var artifact = GetOrCreateArtifact(artifacts, artifactId);
+                            artifact.Licenses = new List<License>() { new License(license.Name) };
                         }
                     }
                 }
             }
             return (artifacts.Values.ToList());
+        }
+
+        private Artifact GetOrCreateArtifact(Dictionary<string, Artifact> artifacts, string artifactId )
+        {
+            if (!artifacts.ContainsKey(artifactId))
+            {
+                var artifact = new Artifact
+                {
+                    ArtifactId = artifactId,
+                };
+                artifacts.Add(artifactId, artifact);
+                return artifact;
+            }
+            return artifacts[artifactId];
         }
 
         private string GetIdWithoutPackagePrefix(string raw)
