@@ -39,13 +39,14 @@ namespace JFrogVSExtension.Utils.ScanManager
 
         private async Task ConfigCLIAsync(string xrayUrl, string artifactoryUrl, string user, string password, string accessToken)
         {
-            var cliconfigCommand = $"config add \"{CliServerId}\" --xray-url=\"{xrayUrl}\" --artifactory-url=\"{artifactoryUrl}\" --user=\"{user}\" --password=\"{password}\" --access-token=\"{accessToken}\" --interactive=false --overwrite";
-            _ = await Util.GetCLIOutputAsync(cliconfigCommand, "", true, cliEnv).ConfigureAwait(true);
+            var cliConfigCommand = $"config add \"{CliServerId}\" --xray-url=\"{xrayUrl}\" --artifactory-url=\"{artifactoryUrl}\" --user=\"{user}\" --password=\"{password}\" --access-token=\"{accessToken}\" --interactive=false --overwrite";
+            _ = await Util.GetCLIOutputAsync(cliConfigCommand, "", true, cliEnv).ConfigureAwait(true);
         }
 
-        public async Task<string> PreformScanAsync(string workingDir)
+        public async Task<string> PreformScanAsync(List<string> workingDirs)
         {
-            var cliAuditCommand = $"audit --format=\"json\" --server-id=\"{CliServerId}\" --licenses --fail=\"false\"";
+            var workingDirsString = workingDirs.Count() > 1 ? string.Join(", ", workingDirs) : workingDirs.First();
+            var cliAuditCommand = $"audit --format=\"json\" --server-id=\"{CliServerId}\" --licenses --fail=\"false\" --working-dirs=\"{workingDirsString}\"";
 
             switch (Policy)
             {
@@ -56,7 +57,7 @@ namespace JFrogVSExtension.Utils.ScanManager
                     cliAuditCommand += $" --watches=\"{watches}\"";
                     break;
             }
-            return await  Util.GetCLIOutputAsync(cliAuditCommand, workingDir, false, cliEnv);
+            return await  Util.GetCLIOutputAsync(cliAuditCommand, workingDirs.First(), false, cliEnv);
         }
     }
 }

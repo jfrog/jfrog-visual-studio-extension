@@ -11,6 +11,7 @@ using JFrogVSExtension.Xray;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell;
+using System.Linq;
 
 namespace JFrogVSExtension.Tree
 {
@@ -87,9 +88,15 @@ namespace JFrogVSExtension.Tree
                 String returnedText = await Task.Run(() => Util.GetCLIOutputAsync("rt nuget-deps-tree",solutionDir));
                 
                 // Load projects from output.
-                Projects projects = Util.LoadNugetProjects(returnedText);
+                Project[] nugetProjects = Util.LoadNugetProjects(returnedText);
+                Project[] npmProjects = Util.LoadNpmProjects();
 
-                if (projects.projects == null || projects.projects.Length == 0)
+                Projects projects = new Projects
+                {
+                    NugetProjects = nugetProjects,
+                    NpmProjects = npmProjects,
+                };
+                if (projects.All.FirstOrDefault() == null)
                 {
                     await OutputLog.ShowMessageAsync("No projects were found.");
                     return;

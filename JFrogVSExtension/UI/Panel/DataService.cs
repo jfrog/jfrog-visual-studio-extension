@@ -46,7 +46,7 @@ namespace JFrogVSExtension.Data
         public void PopulateRootElements(Projects projects)
         {
             List<String> names = new List<String>();
-            foreach (NugetProject project in projects.projects)
+            foreach (Project project in projects.All)
             {
                 List<string> projectDependencies = new List<string>();
                 Component comp = new Component()
@@ -127,19 +127,23 @@ namespace JFrogVSExtension.Data
             return topSeverity;
         }
 
-        public async Task<Artifacts> GetSecurityIssuesAsync(bool reScan, Projects projects, string wd)
+        public async Task<Artifacts> GetSecurityIssuesAsync(bool reScan, Projects projects, string solutionDir)
         {
+            var componentsSet = new HashSet<Components>();
+            var workingDirs = new List<string>();
+            workingDirs.Add(solutionDir);
             if (!reScan)
             {
-                var componentsSet = new HashSet<Components>();
-                foreach (NugetProject nugetProject in projects.projects)
+                foreach (Project project in projects.All)
                 {
-                    if (nugetProject.dependencies != null && nugetProject.dependencies.Length > 0)
+                    if (project.dependencies != null && project.dependencies.Length > 0)
                     {
+                        if (!string.IsNullOrEmpty(project.directoryPath))
+                        {
+                            workingDirs.Add(project.directoryPath);
+                        }
                         // Get project's components which are not included in the cache.
-                        componentsSet.UnionWith(Util.GetNoCachedComponents(nugetProject.dependencies, GetComponentsCache()));
-                        // Update cache with new components.
-                        GetComponentsCache().UnionWith(componentsSet);
+                        componentsSet.UnionWith(Util.GetNoCachedComponents(project.dependencies, GetComponentsCache()));
                     }
                 }
                 // No change to the project dependencies, and a re-scan was not requested - returns the cached results.
@@ -149,11 +153,13 @@ namespace JFrogVSExtension.Data
                 }
             }
             ClearAllComponents();
-            var scanResuls = await ScanManager.Instance.PreformScanAsync(wd);
-            var artifacts = ParseCliAuditJson(scanResuls);
-            // The return value of this function is never used, the data is saved due tothe intenal artifacts refrence.
-            // Should be refactored to more maintanable and clear flow.
+            var scanResults = await ScanManager.Instance.PreformScanAsync(workingDirs);
+            var artifacts = ParseCliAuditJson(scanResults);
+            // The return value of this function is never used, the data is saved due to the intenal artifacts reference.
+            // Should be refactored to more maintainable and clear flow.
             GetArtifacts().artifacts.AddRange(artifacts);
+            // Update cache with new components.
+            GetComponentsCache().UnionWith(componentsSet);
             return GetArtifacts();
         }
 
@@ -190,7 +196,7 @@ namespace JFrogVSExtension.Data
             var artifacts = new  Dictionary<string,Artifact>();
             var auditResults = JsonConvert.DeserializeObject<List<AuditResults>>(scanResults);
             foreach (var auditResult in auditResults) {
-                // Handle security issuses (violations and vulnerabilities)
+                // Handle security issues (violations and vulnerabilities)
                 foreach (var securityIssue in auditResult.AllSecurityIssues)
                 {
                     foreach (var entry in securityIssue.Components) {
@@ -198,8 +204,8 @@ namespace JFrogVSExtension.Data
                         var directDependencyId = GetIdWithoutPackagePrefix(entry.Value.ImpactPaths[0][0].ComponentId);
                         var artifact = GetOrCreateArtifact(artifacts, artifactId);
                         var issueType = string.IsNullOrEmpty(securityIssue.IssueType) ? "security" : securityIssue.IssueType;
-                        var fixedVerions = entry.Value.FixedVersions != null ? string.Join(" ", entry.Value.FixedVersions) : "";
-                        var issue = new Issue(securityIssue.Severity, securityIssue.Summary, issueType, directDependencyId, fixedVerions);
+                        var fixedVersions = entry.Value.FixedVersions != null ? string.Join(" ", entry.Value.FixedVersions) : "";
+                        var issue = new Issue(securityIssue.Severity, securityIssue.Summary, issueType, directDependencyId, fixedVersions);
                         if (!artifact.Issues.Contains(issue))
                         {
                             artifact.Issues.Add(issue);

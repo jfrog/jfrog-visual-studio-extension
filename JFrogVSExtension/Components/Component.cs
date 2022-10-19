@@ -15,14 +15,14 @@ namespace JFrogVSExtension.Data
         public string Artifact { get; set; } = "";
         public string Name { get; set; } = "";
         public string Version { get; set; } = "";
-        public string Type { get; set; } = "Nuget";
+        public string Type { get; set; } = "";
         public List<License> Licenses { get; set; } = new List<License>();
         public Severity TopSeverity { get; set; } = Severity.Normal;
         public List<string> Dependencies { get; set; }
         public List<Issue> Issues { get; set; } = new List<Issue>();
 
         public Component() { }
-        public Component(string artifactId)
+        public Component(string artifactId, string packageType)
         {
             string[] elements = artifactId.Split(':');
             if (elements.Length == 2)
@@ -32,6 +32,7 @@ namespace JFrogVSExtension.Data
                 Key = artifactId;
                 Group = elements[0];
             }
+            Type = packageType;
         }
         public override bool Equals(object obj)
         {

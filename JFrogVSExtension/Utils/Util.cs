@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,29 +15,105 @@ namespace JFrogVSExtension.Utils
 {
     class Util
     {
-        public readonly static string PREFIX = "nuget://";
-        
         // This method will load the json to a List of objects. 
         // The Json retrieved from the output itself
-        public static Projects LoadNugetProjects(String output)
+        public static Project[] LoadNugetProjects(String output)
         {
             // Reading the file as stream and changing to list of items.
             // The items are configured in another class
             Projects projects = JsonConvert.DeserializeObject<Projects>(output);
-            return projects;
+            return projects.NugetProjects;
         }
 
-        public static async Task<string> GetCLIOutputAsync(string command,string workingDir = "",bool configCommand=false, Dictionary<string,string> envVars= null)
+        public static Project[] LoadNpmProjects()
+        {
+            var npmProjects = new List<Project>();
+            var packageJsonPaths = Directory.GetFiles(Directory.GetCurrentDirectory(), "package.json", SearchOption.AllDirectories);
+            foreach (var packageJsonPath in packageJsonPaths)
+            {
+                // We should ignore package.json file inside node_modules directory
+                if (ContainsNodeModulesDir(packageJsonPath))
+                {
+                    continue;
+                }
+                var project = LoadNpmProject(packageJsonPath);
+                if (project != null)
+                {
+                    npmProjects.Add(project);
+                }
+            }
+            return npmProjects.ToArray();
+        }
+
+        private static Project LoadNpmProject(string packageJsonPath)
+        {
+            try
+            {
+                var fileInfo = new FileInfo(packageJsonPath);
+                // Run npm ls to get the dependencies tree. The /C for the process to quit without waiting for a user's interruption.
+                var npmProjectTree = GetProcessOutputAsync("cmd.exe", "/C npm ls --json --all --long --package-lock-only", fileInfo.DirectoryName);
+
+                var npmProj = JsonConvert.DeserializeObject<NpmLsNode>(npmProjectTree.Result);
+                var project = new Project()
+                {
+                    name = $"{npmProj.name}:{npmProj.version}",
+                    directoryPath = fileInfo.DirectoryName,
+                    dependencies = new Dependency[] { },
+                };
+                project.dependencies = populateNpmDependencies(npmProj);
+                return project;
+            }
+            catch (Exception e)
+            {
+                _ = OutputLog.ShowMessageAsync($"Failed to load project {packageJsonPath}\r\n {e.Message}");
+                return null;
+            }
+        }
+
+        private static Dependency[] populateNpmDependencies(NpmLsNode npmProj)
+        {
+            // Exit condition - no deeper dependencies, C# for each statement throws Exception on null iteration.
+            if (npmProj.dependencies == null)
+            {
+                return new Dependency[] { };
+            }
+            var dependencies = new Dependency[npmProj.dependencies.Count];
+            var i = 0;
+            foreach (var npmDep in npmProj.dependencies)
+            {
+                var child = new Dependency()
+                {
+                    id = $"{npmDep.Key}:{npmDep.Value.version}",
+                    packageType = PackageType.npm,
+                };
+                child.dependencies = populateNpmDependencies(npmDep.Value);
+                dependencies[i++] = child;
+            }
+            return dependencies;
+        }
+
+        private static bool ContainsNodeModulesDir(string path)
+        {
+            var directories = path.Split(Path.DirectorySeparatorChar);
+            return directories.ToLookup(i => i.ToLower()).Contains("node_modules");
+        }
+
+        public static async Task<string> GetCLIOutputAsync(string command, string workingDir = "", bool configCommand = false, Dictionary<string, string> envVars = null)
         {
             var strAppPath = GetAssemblyLocalPathFrom(typeof(MainPanelCommand));
             var strFilePath = Path.Combine(strAppPath, "Resources");
             var pathToCli = Path.Combine(strFilePath, "jfrog.exe");
             await OutputLog.ShowMessageAsync("Path for the JFrog CLI: " + pathToCli);
+            return await GetProcessOutputAsync(pathToCli, command, workingDir, configCommand, envVars);
+        }
+
+        public static async Task<string> GetProcessOutputAsync(string pathToExe, string command, string workingDir = "", bool configCommand = false, Dictionary<string, string> envVars = null)
+        {
             //Create process
-            Process pProcess = new System.Diagnostics.Process();
+            Process pProcess = new Process();
 
             // strCommand is path and file name of command to run
-            pProcess.StartInfo.FileName = pathToCli;
+            pProcess.StartInfo.FileName = pathToExe;
 
             // strCommandParameters are parameters to pass to program
             // Here we will run the nuget command for the cli
@@ -53,7 +130,7 @@ namespace JFrogVSExtension.Utils
             pProcess.StartInfo.WorkingDirectory = workingDir;
             if (envVars != null)
             {
-                foreach (var envVar in envVars) 
+                foreach (var envVar in envVars)
                 {
                     pProcess.StartInfo.EnvironmentVariables[envVar.Key] = envVar.Value;
                 }
@@ -94,7 +171,8 @@ namespace JFrogVSExtension.Utils
                 pProcess.Start();
                 pProcess.BeginOutputReadLine();
                 pProcess.BeginErrorReadLine();
-                pProcess.WaitForExit();
+                // Waits for maximal 100 seconds.
+                pProcess.WaitForExit(100000);
 
                 // Wait for the entire output to be written
                 if (outputWaitHandle.WaitOne(1) &&
@@ -103,22 +181,22 @@ namespace JFrogVSExtension.Utils
                     // Process completed. Check process.ExitCode here.
                     if (pProcess.ExitCode != 0)
                     {
-                        string message = $"Failed to get CLI output for {commandString}. Exit code: {pProcess.ExitCode} Returned error:{error}";
+                        string message = $"Failed to get {pathToExe} output for {commandString}. Exit code: {pProcess.ExitCode} Returned error:{error}";
                         throw new IOException(message);
                     }
                     if (!string.IsNullOrEmpty(error.ToString()))
                     {
                         await OutputLog.ShowMessageAsync(error.ToString());
                     }
-                    // Returning the output from the CLI that is the json itself.
-                    await OutputLog.ShowMessageAsync($"JFrog CLI {commandString} finished successfully");
+                    // Returning the output
+                    await OutputLog.ShowMessageAsync($"{pathToExe} {commandString} finished successfully");
                     return strOutput.ToString();
                 }
                 else
                 {
                     // Timed out.
                     await OutputLog.ShowMessageAsync("Process timeout");
-                    throw new IOException($"Process timeout,  {pathToCli} {commandString}");
+                    throw new IOException($"Process timeout,  {pathToExe} {commandString}");
                 }
             }
         }
@@ -133,7 +211,7 @@ namespace JFrogVSExtension.Utils
 
         public static Component ParseDependencies(Dependency dep, Dictionary<string, Artifact> artifactsMap, DataService dataService)
         {
-            Component comp = new Component(dep.id);
+            Component comp = new Component(dep.id,dep.packageType.ToString());
             Severity topSeverity = Severity.Normal;
             if (artifactsMap.ContainsKey(dep.id))
             {
@@ -193,7 +271,7 @@ namespace JFrogVSExtension.Utils
             }
             comp.Dependencies = projectDependencies;
             comp.TopSeverity = topSeverity;
-           
+
             return comp;
         }
 
@@ -244,7 +322,7 @@ namespace JFrogVSExtension.Utils
             {
                 Components comp = new Components()
                 {
-                    component_id = PREFIX + dependency.id
+                    component_id = dependency.id
                 };
 
                 if (!componentsCache.Contains(comp))
@@ -295,9 +373,17 @@ namespace JFrogVSExtension.Utils
         public List<Artifact> artifacts { get; set; } = new List<Artifact>();
     }
 
-    public class NugetProject
+    public class NpmLsNode
     {
         public string name;
+        public string version;
+        public IDictionary<string, NpmLsNode> dependencies;
+    }
+
+    public class Project
+    {
+        public string name;
+        public string directoryPath;
         public Dependency[] dependencies;
     }
 
@@ -306,12 +392,23 @@ namespace JFrogVSExtension.Utils
         public string id;
         public string sha1;
         public string md5;
+        public PackageType packageType;
         public Dependency[] dependencies;
     }
 
+    public enum PackageType
+    {
+        NuGet,
+        npm
+    }
+
+
     public class Projects
     {
-        public NugetProject[] projects;
+        [JsonProperty(PropertyName = "projects")]
+        public Project[] NugetProjects = new Project[] { };
+        public Project[] NpmProjects = new Project[] { };
+        public IEnumerable<Project> All { get => NugetProjects.Concat(NpmProjects); }
     }
 
     public class Components
