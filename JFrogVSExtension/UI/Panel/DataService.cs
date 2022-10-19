@@ -1,7 +1,7 @@
-﻿using JFrogVSExtension.HttpClient;
-using JFrogVSExtension.Logger;
-using JFrogVSExtension.Utils;
+﻿using JFrogVSExtension.Utils;
+using JFrogVSExtension.Utils.ScanManager;
 using JFrogVSExtension.Xray;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,12 +43,12 @@ namespace JFrogVSExtension.Data
             return artifacts;
         }
 
-        public void populateRootElements(Projects projects)
+        public void PopulateRootElements(Projects projects)
         {
             List<String> names = new List<String>();
-            foreach (NugetProject project in projects.projects)
+            foreach (Project project in projects.All)
             {
-                List<String> projectDependencies = new List<string>();
+                List<string> projectDependencies = new List<string>();
                 Component comp = new Component()
                 {
                     Key = project.name,
@@ -60,17 +60,20 @@ namespace JFrogVSExtension.Data
                 {
                     foreach (Dependency dep in project.dependencies)
                     {
-                        Component depComponent = getComponent(dep);
+                        Component depComponent = GetComponent(dep);
                         if (Severities.Contains(depComponent.TopSeverity))
                         {
                             projectDependencies.Add(depComponent.Key);
                         } 
-                        topSeverity = getTopComponentSeverity(topSeverity, depComponent);
-                        foreach (Issue issue in depComponent.Issues)
+                        topSeverity = GetTopComponentSeverity(topSeverity, depComponent);
+                        if (depComponent.Issues != null)
                         {
-                            if (!comp.Issues.Contains(issue))
+                            foreach (Issue issue in depComponent.Issues)
                             {
-                                comp.Issues.Add(issue);
+                                if (!comp.Issues.Contains(issue))
+                                {
+                                    comp.Issues.Add(issue);
+                                }
                             }
                         }
                     }
@@ -102,15 +105,15 @@ namespace JFrogVSExtension.Data
             }
         }
 
-        private Component getComponent(Dependency dep)
+        private Component GetComponent(Dependency dep)
         {
-            var artifactsMap = artifacts.artifacts.ToDictionary(x => x.general.ComponentId, x => x);
+            var artifactsMap = artifacts.artifacts.ToDictionary(x => x.ArtifactId, x => x);
             return Util.ParseDependencies(dep, artifactsMap, this);
         }
 
         // Parsing the dependencies and returning the top severity from all the dependency. 
-        // This top severity that is returned, is the project serverity
-        private Severity getTopComponentSeverity(Severity topSeverity, Component depComponent)
+        // This top severity that is returned, is the project severity.
+        private Severity GetTopComponentSeverity(Severity topSeverity, Component depComponent)
         {
             if (depComponent != null)
             {
@@ -124,50 +127,47 @@ namespace JFrogVSExtension.Data
             return topSeverity;
         }
 
-        public async Task<Artifacts> RefreshArtifactsAsync(bool hard, Projects projects)
+        public async Task<Artifacts> GetSecurityIssuesAsync(bool reScan, Projects projects, string solutionDir)
         {
-            List<Components> components = new List<Components>();
-
-            if (hard)
+            var componentsSet = new HashSet<Components>();
+            var workingDirs = new List<string>();
+            workingDirs.Add(solutionDir);
+            if (!reScan)
             {
-                // Removes all components so Xray will later on scan for ALL the dependencies. 
-                ClearAllComponents();
-            }
-
-            HashSet<Components> componentsSet = new HashSet<Components>();
-            foreach (NugetProject nugetProject in projects.projects)
-            {
-                if (nugetProject.dependencies != null && nugetProject.dependencies.Length > 0)
+                foreach (Project project in projects.All)
                 {
-                    // Get project's components which are not included in the cache.
-                    componentsSet.UnionWith(Util.GetComponents(nugetProject.dependencies, GetComponentsCache()));
-                    // Update cache with new components.
-                    GetComponentsCache().UnionWith(componentsSet);
+                    if (project.dependencies != null && project.dependencies.Length > 0)
+                    {
+                        if (!string.IsNullOrEmpty(project.directoryPath))
+                        {
+                            workingDirs.Add(project.directoryPath);
+                        }
+                        // Get project's components which are not included in the cache.
+                        componentsSet.UnionWith(Util.GetNoCachedComponents(project.dependencies, GetComponentsCache()));
+                    }
+                }
+                // No change to the project dependencies, and a re-scan was not requested - returns the cached results.
+                if (!componentsSet.Any())
+                {
+                    return GetArtifacts();
                 }
             }
-            components = componentsSet.ToList();
-
-            int BULK = 100;
-            int i = 0;
-            Artifacts artifacts = GetArtifacts();
-            while (i + BULK < components.Count)
-            {
-                Artifacts buldArtifacts = await HttpUtils.GetCopmonentsFromXrayAsync(components.GetRange(i, BULK));
-                artifacts.artifacts.AddRange(buldArtifacts.artifacts);
-                i += BULK;
-            }
-            if (components.Count - i > 0)
-            {
-                Artifacts artifactsToAdd = await HttpUtils.GetCopmonentsFromXrayAsync(components.GetRange(i, components.Count - i));
-                artifacts.artifacts.AddRange(artifactsToAdd.artifacts);
-            }
-            return artifacts;
+            ClearAllComponents();
+            var scanResults = await ScanManager.Instance.PreformScanAsync(workingDirs);
+            var artifacts = ParseCliAuditJson(scanResults);
+            // The return value of this function is never used, the data is saved due to the intenal artifacts reference.
+            // Should be refactored to more maintainable and clear flow.
+            GetArtifacts().artifacts.AddRange(artifacts);
+            // Update cache with new components.
+            GetComponentsCache().UnionWith(componentsSet);
+            return GetArtifacts();
         }
 
         public void ClearAllComponents()
         {
             GetComponentsCache().Clear();
             GetArtifacts().artifacts.Clear();
+            components.Clear();
         }
 
         public Component getComponent(string key)
@@ -190,11 +190,71 @@ namespace JFrogVSExtension.Data
             this.components = new Dictionary<string, Component>();
             this.componentsCache = new HashSet<Components>();
         }
+
+        private IEnumerable<Artifact> ParseCliAuditJson(string scanResults)
+        {
+            var artifacts = new  Dictionary<string,Artifact>();
+            var auditResults = JsonConvert.DeserializeObject<List<AuditResults>>(scanResults);
+            foreach (var auditResult in auditResults) {
+                // Handle security issues (violations and vulnerabilities)
+                foreach (var securityIssue in auditResult.AllSecurityIssues)
+                {
+                    foreach (var entry in securityIssue.Components) {
+                        var artifactId = GetIdWithoutPackagePrefix(entry.Key);
+                        var directDependencyId = GetIdWithoutPackagePrefix(entry.Value.ImpactPaths[0][0].ComponentId);
+                        var artifact = GetOrCreateArtifact(artifacts, artifactId);
+                        var issueType = string.IsNullOrEmpty(securityIssue.IssueType) ? "security" : securityIssue.IssueType;
+                        var fixedVersions = entry.Value.FixedVersions != null ? string.Join(" ", entry.Value.FixedVersions) : "";
+                        var issue = new Issue(securityIssue.Severity, securityIssue.Summary, issueType, directDependencyId, fixedVersions);
+                        if (!artifact.Issues.Contains(issue))
+                        {
+                            artifact.Issues.Add(issue);
+                        }
+                    }
+                    // Handle licenses information
+                    foreach (var license in auditResult.Licenses)
+                    {
+                        foreach (var entry in license.Components)
+                        {
+                            var artifactId = GetIdWithoutPackagePrefix(entry.Key);
+                            var artifact = GetOrCreateArtifact(artifacts, artifactId);
+                            artifact.Licenses = new List<License>() { new License(license.Name) };
+                        }
+                    }
+                }
+            }
+            return (artifacts.Values.ToList());
+        }
+
+        private Artifact GetOrCreateArtifact(Dictionary<string, Artifact> artifacts, string artifactId )
+        {
+            if (!artifacts.ContainsKey(artifactId))
+            {
+                var artifact = new Artifact
+                {
+                    ArtifactId = artifactId,
+                };
+                artifacts.Add(artifactId, artifact);
+                return artifact;
+            }
+            return artifacts[artifactId];
+        }
+
+        private string GetIdWithoutPackagePrefix(string raw)
+        {
+            var separator = "://";
+            var separatorIndex = raw.IndexOf(separator);
+            if (separatorIndex != -1)
+            {
+                return raw.Substring(separatorIndex + separator.Length);
+            }
+            return raw;
+        }
     }
 
     public enum RefreshType
     {
         Hard, Soft, None
     }
-}
 
+}

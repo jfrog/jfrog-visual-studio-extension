@@ -1,7 +1,9 @@
 ﻿using JFrogVSExtension.HttpClient;
+using JFrogVSExtension.Utils.ScanManager;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace JFrogVSExtension.OptionsMenu
@@ -28,43 +30,26 @@ namespace JFrogVSExtension.OptionsMenu
 
         public JFrogXrayOptions()
         {
-            url = "";
+            platformUrl = "";
+            xrayUrl = "";
+            artifctoryUrl = "";
             Password = "";
             User = "";
+            AccessToken = "";
         }
 
-        public string Server { get => getUrl(); set => setUrl(value); }
-        protected String url;
-
-        public String getUrl()
-        {
-            return url;
-        }
-
-        public void setUrl(String url)
-        {
-            if (!url.EndsWith("/"))
-            {
-                url += "/";
-            }
-            this.url = url;
-        }
-        public string User { get; set; } = "";
-
-        public string Password { get; set; } = "";
-
-        /// <summary>
-        /// Handles "activate" messages from the Visual Studio environment.
-        /// </summary>
-        /// <devdoc>
-        /// This method is called when Visual Studio wants to activate this page.  
-        /// </devdoc>
-        /// <remarks>If this handler sets e.Cancel to true, the activation will not occur.</remarks>
-        protected override void OnActivate(CancelEventArgs e)
-        {
-            base.OnActivate(e);
-        }
-
+        public string PlatformUrl { get => platformUrl; set => platformUrl = AddSlashIfNeeded(value); }
+        protected string platformUrl;
+        public string XrayUrl { get => xrayUrl; set => xrayUrl = AddSlashIfNeeded(value); }
+        protected string xrayUrl;
+        public string ArtifactoryUrl { get => artifctoryUrl; set => artifctoryUrl = AddSlashIfNeeded(value); }
+        protected string artifctoryUrl;
+        public string Project { get; set; }
+        public string Watches { get; set; }
+        public ScanPolicy Policy { get; set; }
+        public string User { get; set; } 
+        public string Password { get; set; }
+        public string AccessToken { get; set; }
         /// <summary>
         /// Handles "apply" messages from the Visual Studio environment.
         /// </summary>
@@ -76,12 +61,51 @@ namespace JFrogVSExtension.OptionsMenu
         {
             if (e.ApplyBehavior == ApplyKind.Apply)
             {
-                Server = _optionsControl.ServerTextBoxValue;
-                Password = _optionsControl.PasswordTextBoxValue;
-                User = _optionsControl.UserTextBoxValue;
+                PlatformUrl = _optionsControl.PlatformUrlTextBoxValue;
+                XrayUrl = _optionsControl.XrayServerTextBoxValue;
+                artifctoryUrl = _optionsControl.ArtifactoryServerTextBoxValue;
+                if (_optionsControl.UseAccessToken)
+                {
+                    AccessToken = _optionsControl.AccessTokenTextBoxValue;
+                    Password = "";
+                    User = "";
+                }
+                else
+                {
+                    Password = _optionsControl.PasswordTextBoxValue;
+                    User = _optionsControl.UserTextBoxValue;
+                    AccessToken = "";
+                }
+                Policy = _optionsControl.Policy;
+                switch(Policy)
+                {
+                    case ScanPolicy.Project:
+                        Project = _optionsControl.ProjectTextBoxValue.Trim();
+                        break;
+                    case ScanPolicy.Watches:
+                        Watches = _optionsControl.WatchesTextBoxValue.Trim();
+                        break;
+                }
             }
             base.OnApply(e);
-            HttpUtils.InitClient(url, User, Password);
+            HttpUtils.InitClient(XrayUrl,ArtifactoryUrl, User, Password, AccessToken);
+            _ = ScanManager.Instance.InitializeAsync(XrayUrl, ArtifactoryUrl, User, Password, AccessToken, Policy, Project, Watches);
+        }
+
+        private string AddSlashIfNeeded(string url)
+        {
+            if (!url.EndsWith("/"))
+            {
+                url += "/";
+            }
+            return url;
+        }
+
+        public enum ScanPolicy
+        {
+            AllVunerabilities,
+            Project,
+            Watches
         }
     }
 }

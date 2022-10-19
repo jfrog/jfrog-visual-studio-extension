@@ -76,6 +76,7 @@
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
                     <DataGridTextColumn Header="Issue Type" Binding="{Binding IssueType}" MinWidth="75" MaxWidth="500" CanUserSort="True"/>
+                    <DataGridTextColumn Header="Fixed Versions" Binding="{Binding FixedVersions}" MinWidth="75" MaxWidth="500" CanUserSort="True"/>
                     <DataGridTextColumn Header="Component" Binding="{Binding Component}" MinWidth="100" Width="*" MaxWidth="500" CanUserSort="True">
                         <DataGridTextColumn.ElementStyle>
                             <Style>

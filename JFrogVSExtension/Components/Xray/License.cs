@@ -6,15 +6,20 @@ namespace JFrogVSExtension.Xray
     public class License
     {
         [JsonProperty(PropertyName = "components")]
-        public List<string> Components { get; set; }
+        public Dictionary<string, AuditComponent> Components { get; set; }
 
-        [JsonProperty(PropertyName = "full_name")]
-        public string FullName { get; set; }
+        [JsonProperty(PropertyName = "license_key")]
+        public string Name { get; set; }
 
-        [JsonProperty(PropertyName = "name")]
-        public string name { get; set; }
+        public License()
+        {
+            Name = "Unknown";
+            Components = new Dictionary<string, AuditComponent>();
+        }
 
-        [JsonProperty(PropertyName = "modern_info_url")]
-        public List<string> MoreInfoUrl { get; set; }
+        public License(string name)
+        {
+            Name = string.IsNullOrEmpty(name) ? "Unknown": name;
+        }
     }
 }

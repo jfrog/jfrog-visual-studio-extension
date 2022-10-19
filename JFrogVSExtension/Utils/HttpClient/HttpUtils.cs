@@ -13,15 +13,15 @@ namespace JFrogVSExtension.HttpClient
 {
     class HttpUtils
     {
-        private static XrayHttpClient xray = new XrayHttpClient();
+        private static JfrogHttpClient jfrog = new JfrogHttpClient();
 
-        public static async Task<XrayStatus> GetPingAsync()
+        public static async Task<ServerStatus> GetXrayPingAsync()
         {
             try
             {
-                HttpResponseMessage responseFromXray = await xray.PerformGetRequestAsync("system/ping");
-                string resultFromXray = await parseXrayResponseAsync(responseFromXray);
-                return XrayUtil.LoadXrayStatus(resultFromXray);
+                HttpResponseMessage responseFromXray = await jfrog.PerformXrayGetRequestAsync("api/v1/system/ping");
+                string resultFromXray = await ParseResponseAsync(responseFromXray);
+                return XrayUtil.LoadServerStatus(resultFromXray);
             }
             catch (Exception e)
             {
@@ -29,12 +29,25 @@ namespace JFrogVSExtension.HttpClient
             }
         }
 
-        public static async Task<XrayVersion> GetVersionAsync()
+        public static async Task GetArtifactoryPingAsync()
         {
             try
             {
-                HttpResponseMessage responseFromXray = await xray.PerformGetRequestAsync("system/version");
-                string resultFromXray = await parseXrayResponseAsync(responseFromXray);
+                HttpResponseMessage responseFromArtifactory = await jfrog.PerformArtifactoryGetRequestAsync("api/system/ping");
+                string resultFromXray = await ParseResponseAsync(responseFromArtifactory);
+            }
+            catch (Exception e)
+            {
+                throw new IOException(e.Message, e);
+            }
+        }
+
+        public static async Task<XrayVersion> GetXrayVersionAsync()
+        {
+            try
+            {
+                HttpResponseMessage responseFromXray = await jfrog.PerformXrayGetRequestAsync("api/v1/system/version");
+                string resultFromXray = await ParseResponseAsync(responseFromXray);
                 return XrayUtil.LoadXrayVersion(resultFromXray);
             }
             catch (Exception e)
@@ -43,19 +56,16 @@ namespace JFrogVSExtension.HttpClient
             }
         }
 
-        public static async Task<Artifacts> GetCopmonentsFromXrayAsync(List<Components> collection)
+        public static async Task<ArtifactoryVersion> GetArtifactoryVersionAsync()
         {
-            HttpResponseMessage componentResponse = await getResponseFromXrayAsync(collection);
-            string componentResult = await parseXrayResponseAsync(componentResponse);
-            await OutputLog.ShowMessageAsync(componentResult);
             try
             {
-                Artifacts artifacts = JsonConvert.DeserializeObject<Artifacts>(componentResult);
-                return artifacts;
+                HttpResponseMessage responseFromArtifactory = await jfrog.PerformArtifactoryGetRequestAsync("api/system/version");
+                string resultFromXray = await ParseResponseAsync(responseFromArtifactory);
+                return XrayUtil.LoadArtifactoryVersion(resultFromXray);
             }
             catch (Exception e)
             {
-                await OutputLog.ShowMessageAsync("Failed deserializing component result in Xray response.");
                 throw new IOException(e.Message, e);
             }
         }
@@ -68,10 +78,10 @@ namespace JFrogVSExtension.HttpClient
             };
 
             string json = JsonConvert.SerializeObject(collectionWrapper);
-            return await xray.PerformPostRequestAsync("summary/component ", json);            
+            return await jfrog.PerformXrayPostRequestAsync("api/v1/summary/component ", json);            
         }
 
-        private static async Task<string> parseXrayResponseAsync(HttpResponseMessage result)
+        private static async Task<string> ParseResponseAsync(HttpResponseMessage result)
         {
             if (result.StatusCode == HttpStatusCode.OK)
             {
@@ -84,25 +94,22 @@ namespace JFrogVSExtension.HttpClient
             throw new HttpRequestException(message);
         }
 
-        public static async Task<String> PostComponentToXrayAsync(Components component)
+        public static async Task<HttpResponseMessage> TestConnectionAndPermissionsAsync()
         {
-            var collection = new List<Components>();
-            HttpResponseMessage xrayComponentResponse = await getResponseFromXrayAsync(collection);
-            if (xrayComponentResponse.StatusCode == HttpStatusCode.Unauthorized)
-            {
-                return "Received " + HttpStatusCode.Unauthorized + " from Xray. Please check your credentials.";
-            }
-
-            if (xrayComponentResponse.StatusCode == HttpStatusCode.Forbidden)
-            {
-                return "Received " + HttpStatusCode.Forbidden + " from Xray. Please make sure that the user has 'View Components' permission in Xray.";
-            }
-            return "";
+            return await getResponseFromXrayAsync(new List<Components>());
         }
 
-        public static void InitClient(String url, String username, String password)
+        public static void InitClient(string xrayUrl,string artifactoryUrl, string username, string password, string accessToken="")
         {
-            xray.InitClient(url, username, password);
+            if (!string.IsNullOrEmpty(accessToken)) 
+            {
+                jfrog.InitClient(xrayUrl, artifactoryUrl,accessToken);
+
+            }
+            else
+            {
+                jfrog.InitClient(xrayUrl, artifactoryUrl, username, password);
+            }
         }
     }
 }

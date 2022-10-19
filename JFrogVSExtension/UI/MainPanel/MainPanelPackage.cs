@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.Threading;
 using Task = System.Threading.Tasks.Task;
+using JFrogVSExtension.Utils.ScanManager;
 
 namespace JFrogVSExtension
 {
@@ -107,7 +108,8 @@ namespace JFrogVSExtension
             await OutputLog.InitOutputWindowPaneAsync();
             dte = (EnvDTE.DTE) await GetServiceAsync(typeof(EnvDTE.DTE));
             JFrogXrayOptions jfrogOptions = (JFrogXrayOptions)GetDialogPage(typeof(JFrogXrayOptions));
-            HttpUtils.InitClient(jfrogOptions.getUrl(), jfrogOptions.User, jfrogOptions.Password);
+            HttpUtils.InitClient(jfrogOptions.XrayUrl,jfrogOptions.ArtifactoryUrl, jfrogOptions.User, jfrogOptions.Password,jfrogOptions.AccessToken);
+            await ScanManager.Instance.InitializeAsync(jfrogOptions.XrayUrl, jfrogOptions.ArtifactoryUrl, jfrogOptions.User, jfrogOptions.Password, jfrogOptions.AccessToken,jfrogOptions.Policy, jfrogOptions.Project, jfrogOptions.Watches);
         }
 
         public static EnvDTE.DTE getDTE()
@@ -119,16 +121,12 @@ namespace JFrogVSExtension
 
     internal class SolutionEventsHandler : IVsSolutionEvents
     {
-        internal SolutionEventsHandler()
-        {
-        }
-
         public int OnAfterCloseSolution(object pUnkReserved)
         {
             MainPanel mainPanel = MainPanel.GetInstance();
             if (mainPanel != null)
             {
-                mainPanel.CloseAsync();
+                _ = mainPanel.CloseAsync();
             }
             return VSConstants.S_OK;
         }
@@ -148,7 +146,7 @@ namespace JFrogVSExtension
             MainPanel mainPanel = MainPanel.GetInstance();
             if (mainPanel != null)
             {
-                mainPanel.LoadAsync();
+                _ = mainPanel.LoadAsync();
             }
             return VSConstants.S_OK;
         }

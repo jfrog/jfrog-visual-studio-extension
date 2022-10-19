@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,33 +15,111 @@ namespace JFrogVSExtension.Utils
 {
     class Util
     {
-        public readonly static string PREFIX = "nuget://";
-        
         // This method will load the json to a List of objects. 
         // The Json retrieved from the output itself
-        public static Projects LoadNugetProjects(String output)
+        public static Project[] LoadNugetProjects(String output)
         {
             // Reading the file as stream and changing to list of items.
             // The items are configured in another class
             Projects projects = JsonConvert.DeserializeObject<Projects>(output);
-            return projects;
+            return projects.NugetProjects;
         }
 
-        public static async Task<String> GetCLIOutputAsync(string solutionDir)
+        public static Project[] LoadNpmProjects()
         {
-            String strAppPath = GetAssemblyLocalPathFrom(typeof(MainPanelCommand));
-            String strFilePath = Path.Combine(strAppPath, "Resources");
-            String pathToCli = Path.Combine(strFilePath, "jfrog.exe");
+            var npmProjects = new List<Project>();
+            var packageJsonPaths = Directory.GetFiles(Directory.GetCurrentDirectory(), "package.json", SearchOption.AllDirectories);
+            foreach (var packageJsonPath in packageJsonPaths)
+            {
+                // We should ignore package.json file inside node_modules directory
+                if (ContainsNodeModulesDir(packageJsonPath))
+                {
+                    continue;
+                }
+                var project = LoadNpmProject(packageJsonPath);
+                if (project != null)
+                {
+                    npmProjects.Add(project);
+                }
+            }
+            return npmProjects.ToArray();
+        }
+
+        private static Project LoadNpmProject(string packageJsonPath)
+        {
+            try
+            {
+                var fileInfo = new FileInfo(packageJsonPath);
+                // Run npm ls to get the dependencies tree. The /C for the process to quit without waiting for a user's interruption.
+                var npmProjectTree = GetProcessOutputAsync("cmd.exe", "/C npm ls --json --all --long --package-lock-only", fileInfo.DirectoryName);
+
+                var npmProj = JsonConvert.DeserializeObject<NpmLsNode>(npmProjectTree.Result);
+                var project = new Project()
+                {
+                    name = $"{npmProj.name}:{npmProj.version}",
+                    directoryPath = fileInfo.DirectoryName,
+                    dependencies = new Dependency[] { },
+                };
+                project.dependencies = populateNpmDependencies(npmProj);
+                return project;
+            }
+            catch (Exception e)
+            {
+                _ = OutputLog.ShowMessageAsync($"Failed to load project {packageJsonPath}\r\n {e.Message}");
+                return null;
+            }
+        }
+
+        private static Dependency[] populateNpmDependencies(NpmLsNode npmProj)
+        {
+            // Exit condition - no deeper dependencies, C# for each statement throws Exception on null iteration.
+            if (npmProj.dependencies == null)
+            {
+                return new Dependency[] { };
+            }
+            var dependencies = new Dependency[npmProj.dependencies.Count];
+            var i = 0;
+            foreach (var npmDep in npmProj.dependencies)
+            {
+                var child = new Dependency()
+                {
+                    id = $"{npmDep.Key}:{npmDep.Value.version}",
+                    packageType = PackageType.npm,
+                };
+                child.dependencies = populateNpmDependencies(npmDep.Value);
+                dependencies[i++] = child;
+            }
+            return dependencies;
+        }
+
+        private static bool ContainsNodeModulesDir(string path)
+        {
+            var directories = path.Split(Path.DirectorySeparatorChar);
+            return directories.ToLookup(i => i.ToLower()).Contains("node_modules");
+        }
+
+        public static async Task<string> GetCLIOutputAsync(string command, string workingDir = "", bool configCommand = false, Dictionary<string, string> envVars = null)
+        {
+            var strAppPath = GetAssemblyLocalPathFrom(typeof(MainPanelCommand));
+            var strFilePath = Path.Combine(strAppPath, "Resources");
+            var pathToCli = Path.Combine(strFilePath, "jfrog.exe");
             await OutputLog.ShowMessageAsync("Path for the JFrog CLI: " + pathToCli);
+            return await GetProcessOutputAsync(pathToCli, command, workingDir, configCommand, envVars);
+        }
+
+        public static async Task<string> GetProcessOutputAsync(string pathToExe, string command, string workingDir = "", bool configCommand = false, Dictionary<string, string> envVars = null)
+        {
             //Create process
-            Process pProcess = new System.Diagnostics.Process();
+            Process pProcess = new Process();
 
             // strCommand is path and file name of command to run
-            pProcess.StartInfo.FileName = pathToCli;
+            pProcess.StartInfo.FileName = pathToExe;
 
             // strCommandParameters are parameters to pass to program
             // Here we will run the nuget command for the cli
-            pProcess.StartInfo.Arguments = "rt nuget-deps-tree";
+            pProcess.StartInfo.Arguments = command;
+            // Avoid printing commands with credentials
+            var commandString = configCommand ? "config command" : command;
 
             pProcess.StartInfo.UseShellExecute = false;
             pProcess.StartInfo.CreateNoWindow = true;
@@ -48,8 +127,14 @@ namespace JFrogVSExtension.Utils
             pProcess.StartInfo.RedirectStandardOutput = true;
             pProcess.StartInfo.RedirectStandardError = true;
             pProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            pProcess.StartInfo.WorkingDirectory = solutionDir;
-
+            pProcess.StartInfo.WorkingDirectory = workingDir;
+            if (envVars != null)
+            {
+                foreach (var envVar in envVars)
+                {
+                    pProcess.StartInfo.EnvironmentVariables[envVar.Key] = envVar.Value;
+                }
+            }
             StringBuilder strOutput = new StringBuilder();
             StringBuilder error = new StringBuilder();
 
@@ -86,30 +171,32 @@ namespace JFrogVSExtension.Utils
                 pProcess.Start();
                 pProcess.BeginOutputReadLine();
                 pProcess.BeginErrorReadLine();
-                pProcess.WaitForExit();
+                // Waits for maximal 100 seconds.
+                pProcess.WaitForExit(100000);
 
                 // Wait for the entire output to be written
-                if (outputWaitHandle.WaitOne(2) &&
-                       errorWaitHandle.WaitOne(2))
+                if (outputWaitHandle.WaitOne(1) &&
+                       errorWaitHandle.WaitOne(1))
                 {
                     // Process completed. Check process.ExitCode here.
                     if (pProcess.ExitCode != 0)
                     {
-                        string message = "Failed to get CLI output. Exit code: " + pProcess.ExitCode + " Returned error:" + error.ToString();
+                        string message = $"Failed to get {pathToExe} output for {commandString}. Exit code: {pProcess.ExitCode} Returned error:{error}";
                         throw new IOException(message);
                     }
                     if (!string.IsNullOrEmpty(error.ToString()))
                     {
                         await OutputLog.ShowMessageAsync(error.ToString());
                     }
-                    // Returning the output from the CLI that is the json itself.
+                    // Returning the output
+                    await OutputLog.ShowMessageAsync($"{pathToExe} {commandString} finished successfully");
                     return strOutput.ToString();
                 }
                 else
                 {
                     // Timed out.
                     await OutputLog.ShowMessageAsync("Process timeout");
-                    throw new IOException("Process timeout, please run the following command from the solution directory and send us the output:" + pathToCli + " rt ndt");
+                    throw new IOException($"Process timeout,  {pathToExe} {commandString}");
                 }
             }
         }
@@ -124,71 +211,67 @@ namespace JFrogVSExtension.Utils
 
         public static Component ParseDependencies(Dependency dep, Dictionary<string, Artifact> artifactsMap, DataService dataService)
         {
-            Component comp = new Component();
+            Component comp = new Component(dep.id,dep.packageType.ToString());
+            Severity topSeverity = Severity.Normal;
             if (artifactsMap.ContainsKey(dep.id))
             {
-                List<String> projectDependencies = new List<string>();
-
                 Artifact artifact = artifactsMap[dep.id];
-                setComponentDetails(comp, artifact);
+                SetComponentIssuesAndLicenses(comp, artifact);
 
-                Severity topSeverity;
                 if (artifact.Issues != null && artifact.Issues.Count > 0)
                 {
                     topSeverity = GetTopSeverityFromIssues(artifact.Issues);
                 }
-                else
-                {
-                    topSeverity = Severity.Normal;
-                }
-
-                if (dep.dependencies != null && dep.dependencies.Length > 0)
-                {
-                    foreach (Dependency dependency in dep.dependencies)
-                    {
-                        // Let's get the component information of the dependency. 
-                        Component component = ParseDependencies(dependency, artifactsMap, dataService);
-                        if (!dataService.Severities.Contains(component.TopSeverity))
-                        {
-                            continue;
-                        }
-
-                        topSeverity = GetTopSeverity(topSeverity, component.TopSeverity);
-                        if (component.Issues != null && component.Issues.Count > 0 && comp.Issues != null && comp.Issues.Count > 0)
-                        {
-                            // Means that the component already has some issues. 
-                            // Need to check that this is a new issue that we are adding.
-                            foreach (Issue issue in component.Issues)
-                            {
-                                if (!comp.Issues.Contains(issue))
-                                {
-                                    comp.Issues.Add(issue);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (component.Issues != null)
-                            {
-                                comp.Issues.AddRange(component.Issues);
-                            }
-                        }
-
-                        if (!dataService.getComponents().ContainsKey(component.Key))
-                        {
-                            dataService.getComponents().Add(component.Key, component);
-                        }
-                        else
-                        {
-                            updateDataServiceWithMissingDependencies(component, dataService);
-                        }
-
-                        projectDependencies.Add(dependency.id);
-                    }
-                }
-                comp.Dependencies = projectDependencies;
-                comp.TopSeverity = topSeverity;
             }
+
+            var projectDependencies = new List<string>();
+            if (dep.dependencies != null && dep.dependencies.Length > 0)
+            {
+                foreach (Dependency dependency in dep.dependencies)
+                {
+                    // Let's get the component information of the dependency. 
+                    Component depComponent = ParseDependencies(dependency, artifactsMap, dataService);
+                    if (!dataService.Severities.Contains(depComponent.TopSeverity))
+                    {
+                        continue;
+                    }
+
+                    topSeverity = GetTopSeverity(topSeverity, depComponent.TopSeverity);
+                    if (depComponent.Issues != null && depComponent.Issues.Count > 0 && comp.Issues != null && comp.Issues.Count > 0)
+                    {
+                        // Means that the component already has some issues. 
+                        // Need to check that this is a new issue that we are adding.
+                        foreach (Issue issue in depComponent.Issues)
+                        {
+                            if (!comp.Issues.Contains(issue))
+                            {
+                                comp.Issues.Add(issue);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (depComponent.Issues != null)
+                        {
+                            comp.Issues.AddRange(depComponent.Issues);
+                        }
+                    }
+
+                    if (!dataService.getComponents().ContainsKey(depComponent.Key))
+                    {
+                        dataService.getComponents().Add(depComponent.Key, depComponent);
+                    }
+                    else
+                    {
+                        updateDataServiceWithMissingDependencies(depComponent, dataService);
+                    }
+
+                    projectDependencies.Add(dependency.id);
+                }
+            }
+            comp.Dependencies = projectDependencies;
+            comp.TopSeverity = topSeverity;
+
             return comp;
         }
 
@@ -218,40 +301,28 @@ namespace JFrogVSExtension.Utils
             }
         }
 
-        private static void setComponentDetails(Component comp, Artifact artifact)
+        private static void SetComponentIssuesAndLicenses(Component comp, Artifact artifact)
         {
             if (artifact.Issues != null && artifact.Issues.Count > 0)
             {
                 foreach (Issue issue in artifact.Issues)
                 {
-                    issue.Component = artifact.general.ComponentId;
+                    issue.Component = artifact.ArtifactId;
                 }
             }
-            string name = artifact.general.ComponentId;
-            string[] elements = name.Split(':');
-            string version = "";
-            if (elements.Length == 2)
-            {
-                name = elements[0];
-                version = elements[1];
-            }
-            comp.Name = name;
-            comp.Key = artifact.general.ComponentId;
-            comp.Version = version;
-            comp.Group = name;
             comp.Issues = artifact.Issues;
-            comp.Licenses = artifact.licenses;
+            comp.Licenses = artifact.Licenses;
         }
 
         // Return Set of Components which are not contained in componentsCache.
-        public static HashSet<Components> GetComponents(Dependency[] dependencies, HashSet<Components> componentsCache)
+        public static HashSet<Components> GetNoCachedComponents(Dependency[] dependencies, HashSet<Components> componentsCache)
         {
             HashSet<Components> ids = new HashSet<Components>();
             foreach (Dependency dependency in dependencies)
             {
                 Components comp = new Components()
                 {
-                    component_id = PREFIX + dependency.id
+                    component_id = dependency.id
                 };
 
                 if (!componentsCache.Contains(comp))
@@ -265,7 +336,7 @@ namespace JFrogVSExtension.Utils
                 // In such case, the CLI outputs a dependencies-tree in which each project shows different dependencies for the package.
                 if (dependency.dependencies != null && dependency.dependencies.Length > 0)
                 {
-                    HashSet<Components> internalIdS = GetComponents(dependency.dependencies, componentsCache);
+                    HashSet<Components> internalIdS = GetNoCachedComponents(dependency.dependencies, componentsCache);
                     ids.UnionWith(internalIdS);
                 }
             }
@@ -302,9 +373,17 @@ namespace JFrogVSExtension.Utils
         public List<Artifact> artifacts { get; set; } = new List<Artifact>();
     }
 
-    public class NugetProject
+    public class NpmLsNode
     {
         public string name;
+        public string version;
+        public IDictionary<string, NpmLsNode> dependencies;
+    }
+
+    public class Project
+    {
+        public string name;
+        public string directoryPath;
         public Dependency[] dependencies;
     }
 
@@ -313,12 +392,23 @@ namespace JFrogVSExtension.Utils
         public string id;
         public string sha1;
         public string md5;
+        public PackageType packageType;
         public Dependency[] dependencies;
     }
 
+    public enum PackageType
+    {
+        NuGet,
+        npm
+    }
+
+
     public class Projects
     {
-        public NugetProject[] projects;
+        [JsonProperty(PropertyName = "projects")]
+        public Project[] NugetProjects = new Project[] { };
+        public Project[] NpmProjects = new Project[] { };
+        public IEnumerable<Project> All { get => NugetProjects.Concat(NpmProjects); }
     }
 
     public class Components
@@ -343,21 +433,13 @@ namespace JFrogVSExtension.Utils
 
         public override bool Equals(object obj)
         {
-            Components comp = new Components();
-            if (obj is Components)
-            {
-                comp = (Components)obj;
-            }
-            else
+            if (!(obj is Components))
             {
                 return false;
             }
+            var comp = (Components)obj;
 
-            if (this.sha1.Equals(comp.sha1) && this.component_id.Equals(comp.component_id))
-            {
-                return true;
-            }
-            return false;
+            return (this.sha1.Equals(comp.sha1) && this.component_id.Equals(comp.component_id));
         }
     }
 }

@@ -11,6 +11,7 @@ using JFrogVSExtension.Xray;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell;
+using System.Linq;
 
 namespace JFrogVSExtension.Tree
 {
@@ -70,7 +71,7 @@ namespace JFrogVSExtension.Tree
                     return;
                 }
 
-                XrayVersion xrayVersion = await HttpUtils.GetVersionAsync();
+                XrayVersion xrayVersion = await HttpUtils.GetXrayVersionAsync();
                 if (!XrayUtil.IsXrayVersionCompatible(xrayVersion.xray_version))
                 {
                     String errorMessage = XrayUtil.GetMinimumXrayVersionErrorMessage(xrayVersion.xray_version);
@@ -84,12 +85,18 @@ namespace JFrogVSExtension.Tree
                 // 4. Get response and build the dependencies tree.
 
                 // Running CLI - this is the returned output.
-                String returnedText = await Task.Run(() => Util.GetCLIOutputAsync(solutionDir));
+                String returnedText = await Task.Run(() => Util.GetCLIOutputAsync("rt nuget-deps-tree",solutionDir));
                 
                 // Load projects from output.
-                Projects projects = Util.LoadNugetProjects(returnedText);
+                Project[] nugetProjects = Util.LoadNugetProjects(returnedText);
+                Project[] npmProjects = Util.LoadNpmProjects();
 
-                if (projects.projects == null || projects.projects.Length == 0)
+                Projects projects = new Projects
+                {
+                    NugetProjects = nugetProjects,
+                    NpmProjects = npmProjects,
+                };
+                if (projects.All.FirstOrDefault() == null)
                 {
                     await OutputLog.ShowMessageAsync("No projects were found.");
                     return;
@@ -100,19 +107,19 @@ namespace JFrogVSExtension.Tree
                     case RefreshType.Hard:
                         {
                             // Get information for all dependencies. Ignore the cache.
-                            artifacts = await dataService.RefreshArtifactsAsync(true, projects);
+                            artifacts = await dataService.GetSecurityIssuesAsync(true, projects, solutionDir);
                             break;
                         }
 
                     case RefreshType.Soft:
                         {
                             // Get information only for the delta. Means only new dependencies will be added.
-                            artifacts = await dataService.RefreshArtifactsAsync(false, projects);
+                            artifacts = await dataService.GetSecurityIssuesAsync(false, projects, solutionDir);
                             break;
                         }
                 }
                 dataService.Severities = severities;
-                dataService.populateRootElements(projects);
+                dataService.PopulateRootElements(projects);
                
                 this.Artifacts = new ObservableCollection<ArtifactViewModel>();
                 

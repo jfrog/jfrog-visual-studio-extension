@@ -1,6 +1,6 @@
 ﻿namespace JFrogVSExtension.Xray
 {
-    class XrayStatus
+    class ServerStatus
     {
         public string status;
     }

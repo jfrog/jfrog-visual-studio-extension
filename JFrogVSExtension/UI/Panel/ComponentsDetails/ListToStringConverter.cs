@@ -23,11 +23,11 @@ namespace JFrogVSExtension.ComponentsDetails
                 String licenseNames = "";
                 foreach (License license in copyOfList)
                 {
-                    licenseNames += license.FullName + " ";
+                    licenseNames += license.Name + " ";
                 }
                 return licenseNames;
             }
-            return "";
+            return "Unknown";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
