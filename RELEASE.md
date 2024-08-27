@@ -1,4 +1,5 @@
 # Release Notes
+
 ## 2.0.1 (Aug 27, 2024)
 - Change Scan Timeout
 
