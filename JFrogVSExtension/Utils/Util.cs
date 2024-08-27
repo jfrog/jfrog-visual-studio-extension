@@ -171,8 +171,8 @@ namespace JFrogVSExtension.Utils
                 pProcess.Start();
                 pProcess.BeginOutputReadLine();
                 pProcess.BeginErrorReadLine();
-                // Waits for maximal 100 seconds.
-                pProcess.WaitForExit(100000);
+                // Waits for maximal 1 hour
+                pProcess.WaitForExit(60*60*1000);
 
                 // Wait for the entire output to be written
                 if (outputWaitHandle.WaitOne(1) &&

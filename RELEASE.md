@@ -1,4 +1,8 @@
 # Release Notes
+
+## 2.0.1 (Aug 27, 2024)
+- Change Scan Timeout
+
 ## 2.0.0 (October 19, 2022)
 - Add support for Xray's Watches.
 - Add support for npm projects.
