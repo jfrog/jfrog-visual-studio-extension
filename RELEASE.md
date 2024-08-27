@@ -1,4 +1,9 @@
 # Release Notes
+## 2.0.0 (October 19, 2022)
+- Add support for Xray's Watches.
+- Add support for npm projects.
+- Add support for connection to JFrog Platform with AccessToken.
+- Add Fixed versions field display.
 
 ## 1.0.8 (July 18, 2021)
 - Fix marketplace icon.
