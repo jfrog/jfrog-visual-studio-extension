@@ -3,29 +3,42 @@ name: Run Tests
 on:
   push:
     branches:
-      - main
+      - add-tests-workflow
   pull_request:
     branches:
-      - main
+      - add-tests-workflow
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
       
-    - name: Setup .NET
+    - name: Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '4.7.2' 
+        dotnet-version: '6.0'   
 
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+      with:
+        vs-version: 'latest'
+          
     - name: Restore dependencies
-      run: dotnet restore
+      run: |
+        dotnet restore
+        nuget restore
+    
+    - name: Download JFrog CLI executable
+      run: |
+        powershell -Command "Start-Process -Wait -Verb RunAs powershell '-NoProfile iwr https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/[RELEASE]/jfrog-cli-windows-amd64/jf.exe -OutFile ./JFrogVSExtension/Resources/jfrog.exe'"
 
-    - name: Build
-      run: dotnet build --no-restore
-
+    - name: Build VSIX Project
+      run: |
+        msbuild ./JFrogVSExtension /p:Configuration=Release /p:Platform="AnyCPU"
+    
     - name: Run tests
-      run: dotnet test --no-build --verbosity normal
+      run: |
+        dotnet test --no-build --verbosity normal
