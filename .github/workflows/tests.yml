@@ -2,15 +2,15 @@ name: Run Tests
 
 on:
   push:
-    branches:
-      - add-tests-workflow
   pull_request:
-    branches:
-      - add-tests-workflow
+    type: [ labeled ]
 
 jobs:
   build:
     runs-on: windows-latest
+
+    env:
+      JFROG_CLI_VERSION: '2.67.0'
     
     steps:
     - name: Checkout code
@@ -25,6 +25,15 @@ jobs:
       uses: microsoft/setup-msbuild@v1
       with:
         vs-version: 'latest'
+
+    - name: Cache NuGet packages # optimizing the build process
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.nuget/packages
+        key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          nuget-${{ runner.os }}-
           
     - name: Restore dependencies
       run: |
@@ -33,12 +42,12 @@ jobs:
     
     - name: Download JFrog CLI executable
       run: |
-        powershell -Command "Start-Process -Wait -Verb RunAs powershell '-NoProfile iwr https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/[RELEASE]/jfrog-cli-windows-amd64/jf.exe -OutFile ./JFrogVSExtension/Resources/jfrog.exe'"
+        powershell -Command "Start-Process -Wait -Verb RunAs powershell '-NoProfile iwr https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/${{ env.JFROG_CLI_VERSION }}/jfrog-cli-windows-amd64/jf.exe -OutFile ./JFrogVSExtension/Resources/jfrog.exe'"
 
     - name: Build VSIX Project
-      run: |
-        msbuild ./JFrogVSExtension /p:Configuration=Release /p:Platform="AnyCPU"
+    # build the vsix project using multi-core compilation and parallel builds
+      run: msbuild ./JFrogVSExtension/ /p:Configuration=Release /p:Platform="AnyCPU" /p:BuildInParallel=true /m 
+
     
     - name: Run tests
-      run: |
-        dotnet test --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity normal
