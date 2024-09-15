@@ -1,0 +1,3 @@
+- [ ] All [tests](https://github.com/jfrog/jfrog-visual-studio-extension/actions/workflows/tests.yml) passed. If this feature is not already covered by the tests, I added new tests.
+- [ ] Open pull request for dev branch.
+-----
