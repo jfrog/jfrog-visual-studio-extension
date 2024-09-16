@@ -36,14 +36,13 @@ jobs:
           nuget-${{ runner.os }}-
           
     - name: Restore dependencies
-      run: |
-        dotnet restore
-        nuget restore
+      run: dotnet restore
     
     - name: Download JFrog CLI executable
-      run: |
-        powershell -Command "Start-Process -Wait -Verb RunAs powershell '-NoProfile iwr https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/${{ env.JFROG_CLI_VERSION }}/jfrog-cli-windows-amd64/jf.exe -OutFile ./JFrogVSExtension/Resources/jfrog.exe'"
-
+    - uses: jfrog/setup-jfrog-cli@v4
+        with:
+            version: ${{ env.JFROG_CLI_VERSION }}
+   
     - name: Build VSIX Project
     # build the vsix project using multi-core compilation and parallel builds
       run: msbuild ./JFrogVSExtension/ /p:Configuration=Release /p:Platform="AnyCPU" /p:BuildInParallel=true /m 
