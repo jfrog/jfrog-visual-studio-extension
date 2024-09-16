@@ -40,19 +40,11 @@ body:
       required: false
 
   - type: input
-    id: cli-security-version
+    id: vs-extension-version
     attributes:
-      label: JFrog CLI-Security version
+      label: JFrog Visual Studio Extension version
     validations:
       required: true
-      
-  - type: input
-    id: cli-version
-    attributes:
-      label: JFrog CLI version (if applicable)
-      description: using "jf --version"
-    validations:
-      required: false
 
   - type: input
     id: os-version
