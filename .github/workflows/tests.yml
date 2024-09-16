@@ -8,9 +8,6 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-
-    env:
-      JFROG_CLI_VERSION: '2.67.0'
     
     steps:
     - name: Checkout code
@@ -36,17 +33,19 @@ jobs:
           nuget-${{ runner.os }}-
           
     - name: Restore dependencies
-      run: dotnet restore
+      run: |
+        dotnet restore
+        nuget restore
     
     - name: Download JFrog CLI executable
-    - uses: jfrog/setup-jfrog-cli@v4
-        with:
-            version: ${{ env.JFROG_CLI_VERSION }}
+      env:
+        JFROG_CLI_VERSION: ${{ env.JFROG_CLI_VERSION }}
+      run: |
+        .\JFrogVSExtension\Resources\DownloadJfrogCli.ps1
+      shell: pwsh
    
-    - name: Build VSIX Project
-    # build the vsix project using multi-core compilation and parallel builds
+    - name: Build VSIX Project # build the vsix project using multi-core compilation and parallel builds
       run: msbuild ./JFrogVSExtension/ /p:Configuration=Release /p:Platform="AnyCPU" /p:BuildInParallel=true /m 
 
-    
     - name: Run tests
       run: dotnet test --no-build --verbosity normal
