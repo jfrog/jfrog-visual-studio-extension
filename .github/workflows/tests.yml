@@ -3,7 +3,7 @@ name: Build and Run Tests
 on:
   push:
   pull_request:
-    type: [ labeled ]
+   type: [ labeled ]
 
 jobs:
   call-build-workflow:
@@ -37,3 +37,4 @@ jobs:
     # run tests in release mode with logs presentation
     - name: Run MSTest Project 
       run: dotnet test --no-build --configuration Release --logger "console;verbosity=detailed" ./UnitTestJfrogVSExtension/bin/Release/UnitTestJfrogVSExtension.dll
+
