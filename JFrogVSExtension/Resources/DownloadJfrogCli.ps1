@@ -1,7 +1,9 @@
 # Check if the JFROG_CLI_VERSION environment variable is set, if not using latest version
-if (-not $env:JFROG_CLI_VERSION) {
-    Write-Output "Environment variable 'JFROG_CLI_VERSION' is not set. Using latest version as default."
-    $env:JFROG_CLI_VERSION = "[RELEASE]"
+if ($env:JFROG_CLI_VERSION) {
+    Write-Output "Downloading Jfrog CLI version: $env:JFROG_CLI_VERSION"
+} else {
+    Write-Error "Error: JFROG_CLI_VERSION environment variable is not set."
+    exit 1
 }
 
 # Define the URL for the JFrog CLI executable
@@ -17,6 +19,15 @@ Invoke-WebRequest -Uri $jfrogCliUrl -OutFile $destinationPath -Verbose
 # Verify the file was downloaded successfully 
 if (Test-Path -Path $destinationPath) {
     Write-Output "JFrog CLI v$env:JFROG_CLI_VERSION successfully downloaded to: $destinationPath"
+    $downloadedVersion = & $destinationPath --version
+
+    if ($downloadedVersion -eq "jf version $env:JFROG_CLI_VERSION"){
+        Write-Output "Successfully downloaded Jfrog CLI version $env:JFROG_CLI_VERSION."
+    } else {
+        Write-Error "Version does not match the environment variable. Expected: $env:JFROG_CLI_VERSION, Got: $downloadedVersion"
+        exit 1
+    }
+
 } else {
-    Write-Output "Failed to download JFrog CLI to: $destinationPath"
+    Write-Error "Failed to download JFrog CLI to: $destinationPath"
 }
