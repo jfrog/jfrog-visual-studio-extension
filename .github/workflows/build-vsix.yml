@@ -1,0 +1,43 @@
+name: Build VSIX
+
+on:
+  workflow_call:  
+    inputs:
+        configuration:
+            description: 'Build configuration (e.g., Release, Debug)'
+            required: true
+            default: 'Release'
+ 
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+      with:
+        vs-version: 'latest'
+
+    - name: Cache NuGet packages # optimizing the build process
+      uses: actions/cache@v3
+      with:
+        path: ~/.nuget/packages
+        key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+        restore-keys: nuget-${{ runner.os }}-
+          
+    - name: Restore dependencies
+      run: |
+        dotnet restore
+        nuget restore
+    
+    - name: Download JFrog CLI executable 
+      env:
+        JFROG_CLI_VERSION: '2.67.0' # jfrog cli version can be changed here
+      run: .\scripts\DownloadJfrogCli.ps1
+      shell: pwsh
+   
+    - name: Build VSIX Project # build the vsix project using multi-core compilation and parallel builds
+      run: msbuild JFrogVSExtension.sln /p:Configuration=Release /p:Platform="Any CPU" /p:BuildInParallel=true /m 
