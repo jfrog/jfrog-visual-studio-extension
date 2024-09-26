@@ -2,12 +2,6 @@ name: Build VSIX
 
 on:
   workflow_call:  
-    inputs:
-      configuration:
-        description: 'Build configuration (e.g., Release, Debug)'
-        type: string
-        required: true
-        default: 'Release'
  
 jobs:
   build:
@@ -42,3 +36,10 @@ jobs:
    
     - name: Build VSIX Project # build the vsix project using multi-core compilation and parallel builds
       run: msbuild JFrogVSExtension.sln /p:Configuration=Release /p:Platform="Any CPU" /p:BuildInParallel=true /m 
+
+    # Upload .vsix and unit test .dll as artifacts
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: vsix-file
+        path: "**/bin/Release/"

@@ -8,14 +8,24 @@ on:
 jobs:
   call-build-workflow:
       uses: ./.github/workflows/build-vsix.yml
-      with:
-        configuration: 'Release'
 
   test:
     runs-on: windows-latest
     needs: call-build-workflow
     
     steps:
+    - name: Download VSIX artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: vsix-file
+        path: ./JFrogVSExtension/bin/Release
+
+    - name: Download Unit Test DLL artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: unit-test-dll
+        path: ./UnitTestJfrogVSExtension/bin/Release
+
     - name: Run MSTest Project # run tests in release mode with logs presentation
       run: dotnet test --no-build --configuration Release --logger "console;verbosity=detailed" ./UnitTestJfrogVSExtension/bin/Release/UnitTestJfrogVSExtension.dll
 
