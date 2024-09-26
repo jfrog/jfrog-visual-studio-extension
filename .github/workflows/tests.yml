@@ -8,6 +8,8 @@ on:
 jobs:
   call-build-workflow:
       uses: ./.github/workflows/build-vsix.yml
+      with:
+        configuration: 'Release'
 
   test:
     runs-on: windows-latest
