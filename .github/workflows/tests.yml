@@ -6,11 +6,12 @@ on:
     type: [ labeled ]
 
 jobs:
-  build:
-      uses: jfrog/jfrog-visual-studio-extension/.github/workflows/build-vsix.yml@add-release-workflow
+  call-build-workflow:
+      uses: ./.github/workflows/build-vsix.yml
 
   test:
     runs-on: windows-latest
+    needs: call-build-workflow
     
     steps:
     - name: Run MSTest Project # run tests in release mode with logs presentation

@@ -3,10 +3,11 @@ name: Build VSIX
 on:
   workflow_call:  
     inputs:
-        configuration:
-            description: 'Build configuration (e.g., Release, Debug)'
-            required: true
-            default: 'Release'
+      configuration:
+        description: 'Build configuration (e.g., Release, Debug)'
+        type: string
+        required: true
+        default: 'Release'
  
 jobs:
   build:
