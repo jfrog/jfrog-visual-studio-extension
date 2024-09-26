@@ -17,22 +17,14 @@ jobs:
     - name: Download VSIX artifact
       uses: actions/download-artifact@v3
       with:
-        name: vsix-file
+        name: vsix-artifacts
         path: ./JFrogVSExtension/bin/Release
 
     - name: Download Unit Test DLL artifact
       uses: actions/download-artifact@v3
       with:
-        name: unit-test-dll
+        name: tests-artifacts
         path: ./UnitTestJfrogVSExtension/bin/Release
 
     - name: Run MSTest Project # run tests in release mode with logs presentation
       run: dotnet test --no-build --configuration Release --logger "console;verbosity=detailed" ./UnitTestJfrogVSExtension/bin/Release/UnitTestJfrogVSExtension.dll
-
-    - name: Save Build Artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: build-artifacts
-        path: |
-            JFrogVSExtension/bin/Release/
-            JFrogVSExtension/bin/Release/*.vsix
