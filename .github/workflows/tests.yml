@@ -11,7 +11,7 @@ jobs:
     
     steps:
     - name: Call Build VSIX Workflow
-      uses: ./.github/workflows/build-vsix.yml
+      uses: ./build-vsix.yml
 
     - name: Run MSTest Project # run tests in release mode with logs presentation
       run: dotnet test --no-build --configuration Release --logger "console;verbosity=detailed" ./UnitTestJfrogVSExtension/bin/Release/UnitTestJfrogVSExtension.dll
