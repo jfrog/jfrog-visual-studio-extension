@@ -7,15 +7,12 @@ on:
 
 jobs:
   build:
+      uses: jfrog/jfrog-visual-studio-extension/.github/workflows/build-vsix.yml@main
+
+  test:
     runs-on: windows-latest
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Call Build VSIX Workflow
-      uses: jfrog/jfrog-visual-studio-extension/.github/workflows/build-vsix.yml@main
-
     - name: Run MSTest Project # run tests in release mode with logs presentation
       run: dotnet test --no-build --configuration Release --logger "console;verbosity=detailed" ./UnitTestJfrogVSExtension/bin/Release/UnitTestJfrogVSExtension.dll
 
