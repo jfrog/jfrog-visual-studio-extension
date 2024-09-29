@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+
+  pre-build:
+    name: Update version in source code
+    runs-on: windows-latest
+    env:
+        NEW_VERSION: '${{ github.ref_name }}' 
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Update VSIX Version in manifest file
+        run: .\scripts\UpdateVsixVersion.ps1
+        shell: pwsh
+        
+      - name: Commit and push changes
+        run: |
+            git config --local user.name "GitHub Actions"
+            git config --local user.email "actions@github.com"
+            git add .
+            git commit -m "Updated VSIX version to ${{ env.NEW_VERSION }}"
+            git push
+
+  call-build-workflow:
+      uses: ./.github/workflows/build-vsix.yml
+  
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Download VSIX artifact
+        uses: actions/download-artifact@v3
+        with:
+            name: vsix-artifacts
+            path: ./JFrogVSExtension/bin/Release
+
+      #- name: Upload the .VSIX file to the release note in github
+        # run: # run a javascript script
+
+        # deploy to marketplace
+     # - name: Publish to Visual Studio marketplace
+        # run: 
