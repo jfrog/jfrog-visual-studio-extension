@@ -11,6 +11,10 @@ jobs:
   build:
     runs-on: windows-latest
     
+    env:
+        # jfrog cli version can be changed here
+        JFROG_CLI_VERSION: '2.67.0'
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -36,9 +40,6 @@ jobs:
         nuget restore
     
     - name: Download JFrog CLI executable 
-      env:
-        # jfrog cli version can be changed here
-        JFROG_CLI_VERSION: '2.67.0' 
       run: .\scripts\DownloadJfrogCli.ps1
       shell: pwsh
 
