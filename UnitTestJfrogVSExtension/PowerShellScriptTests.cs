@@ -13,7 +13,9 @@ namespace UnitTestJfrogVSExtension
 
         // use relative path (from base dir) in order to be able to run in other environments
         public static string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        public static string scriptPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\scripts\UpdateVsixVersion.ps1"));
+        public static string updateVersionScriptPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\scripts\UpdateVsixVersion.ps1"));
+        public static string downloadCliScriptPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\scripts\DownloadJfrogCli.ps1"));
+        public static string vsixManifestMockPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\scripts\vsixmanifestMock"));
 
         [TestMethod]
         public void Test_UpdateVsixVersion_ValidVersion()
@@ -21,10 +23,11 @@ namespace UnitTestJfrogVSExtension
             var envVars = new Dictionary<string, string>
             {
                 { "NEW_VERSION", "vs22-1.2.3" }, // Valid version
+                { "MANIFEST_FILE_LOCATION", vsixManifestMockPath},
             };
 
             // script should succeed and return exit code 0
-            int exitCode = RunPowerShellScript(scriptPath, envVars);
+            int exitCode = RunPowerShellScript(updateVersionScriptPath, envVars);
             Assert.AreEqual(0, exitCode);
         }
 
@@ -37,8 +40,22 @@ namespace UnitTestJfrogVSExtension
             };
 
             // script should fail and return exit code 1
-            int exitCode = RunPowerShellScript(scriptPath, envVars);
+            int exitCode = RunPowerShellScript(updateVersionScriptPath, envVars);
             Assert.AreEqual(1, exitCode);
+        }
+
+
+        [TestMethod]
+        public void Test_DownloadJfrogCli()
+        {
+            var envVars = new Dictionary<string, string>
+            {
+                { "JFROG_CLI_VERSION", "2.67.0" } 
+            };
+
+            //  script should succeed and return exit code 0
+            int exitCode = RunPowerShellScript(downloadCliScriptPath, envVars);
+            Assert.AreEqual(0, exitCode);
         }
 
         private int RunPowerShellScript(string scriptPath, Dictionary<string, string> envVars)
