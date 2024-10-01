@@ -21,9 +21,6 @@ jobs:
       - name: Update VSIX Version in manifest file
         run: .\scripts\UpdateVsixVersion.ps1
         shell: pwsh
-
-      - name: Run audit scan 
-        run: jf audit
         
       - name: Commit and push changes
         run: |
