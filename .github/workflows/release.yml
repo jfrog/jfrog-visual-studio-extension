@@ -65,7 +65,9 @@ jobs:
         # vsix publisher executable is already installed in the github windows runner at the following path
           VSIX_PUBLISHER_PATH: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VSSDK/VisualStudioIntegration/Tools/Bin/VsixPublisher.exe"
           VSIX_PATH: "./JFrogVSExtension/bin/Release/JFrogVSExtension.vsix"
+          PUBLISH_MANIFEST_PATH: "./JFrogVSExtension/PublishManifest.json"
         run: |
           $Env:VSIX_PUBLISHER_PATH publish `
             -payload $Env:VSIX_PATH `
+            -publishManifest $Env:PUBLISH_MANIFEST_PATH `
             -personalAccessToken ${{ secrets.VS_MARKETPLACE_PAT }}
