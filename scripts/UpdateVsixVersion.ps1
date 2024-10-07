@@ -1,5 +1,5 @@
 $newVersion = $env:NEW_VERSION
-$manifestFileLocation = Join-Path (Get-Location).Path $env:MANIFEST_FILE_LOCATION
+$manifestFileLocation = $env:MANIFEST_FILE_LOCATION
 
 # Validate the NEW_VERSION format: "vs22-x.x.x"
 if ($newVersion -match "^vs22-(\d+\.\d+\.\d+)$") {

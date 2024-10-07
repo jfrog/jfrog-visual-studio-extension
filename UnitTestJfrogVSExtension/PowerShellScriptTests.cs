@@ -12,10 +12,10 @@ namespace UnitTestJfrogVSExtension
         public TestContext TestContext { get; set; }
 
         // use relative path (from base dir) in order to be able to run in other environments
-        public static string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        public static string updateVersionScriptPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\scripts\UpdateVsixVersion.ps1"));
-        public static string downloadCliScriptPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\scripts\DownloadJfrogCli.ps1"));
-        public static string vsixManifestMockPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\scripts\vsixmanifestMock"));
+        public static string rootDir = GetProjectRoot(AppDomain.CurrentDomain.BaseDirectory);
+        public static string updateVersionScriptPath = Path.Combine(rootDir, @"scripts\UpdateVsixVersion.ps1");
+        public static string downloadCliScriptPath = Path.Combine(rootDir, @"scripts\DownloadJfrogCli.ps1");
+        public static string vsixManifestMockPath = Path.Combine(rootDir, @"scripts\vsixmanifestMock");
 
         [TestMethod]
         public void Test_UpdateVsixVersion_ValidVersion()
@@ -36,7 +36,8 @@ namespace UnitTestJfrogVSExtension
         {
             var envVars = new Dictionary<string, string>
             {
-                { "NEW_VERSION", "vs-1.5.56" } // Invalid version
+                { "NEW_VERSION", "vs-1.5.56" }, // Invalid version
+                { "MANIFEST_FILE_LOCATION", vsixManifestMockPath},
             };
 
             // script should fail and return exit code 1
@@ -50,12 +51,27 @@ namespace UnitTestJfrogVSExtension
         {
             var envVars = new Dictionary<string, string>
             {
-                { "JFROG_CLI_VERSION", "2.67.0" } 
+                { "JFROG_CLI_VERSION", "2.67.0" },
+                {"PROJECT_ROOT", rootDir }
             };
 
             //  script should succeed and return exit code 0
             int exitCode = RunPowerShellScript(downloadCliScriptPath, envVars);
             Assert.AreEqual(0, exitCode);
+        }
+
+        private static string GetProjectRoot(string currentDir)
+        {
+            while (Directory.GetFiles(currentDir, "*.sln").Length == 0)
+            {
+                if (Directory.GetParent(currentDir) == null)
+                {
+                    Console.WriteLine("ERROR: Root directory not found.");
+                } else {
+                    currentDir = Directory.GetParent(currentDir).FullName;
+                }
+            }
+            return currentDir;
         }
 
         private int RunPowerShellScript(string scriptPath, Dictionary<string, string> envVars)

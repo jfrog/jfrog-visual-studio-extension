@@ -40,7 +40,10 @@ jobs:
         nuget restore
     
     - name: Download JFrog CLI executable 
-      run: .\scripts\DownloadJfrogCli.ps1
+      run: |
+        # set the env var for project root dir
+        echo "PROJECT_ROOT=$(pwd)" >> $GITHUB_ENV
+        .\scripts\DownloadJfrogCli.ps1
       shell: pwsh
 
     # build the vsix project using multi-core compilation and parallel builds
