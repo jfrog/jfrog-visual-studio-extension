@@ -7,9 +7,11 @@ on:
 jobs:
 
   pre-build:
+    name: Update version in source code
     runs-on: windows-latest
     env:
         NEW_VERSION: '${{ github.ref_name }}' 
+        MANIFEST_FILE_PATH: "JfrogVSExtension/source.extension.vsixmanifest"
 
     steps:
       - name: Config Github
@@ -34,6 +36,8 @@ jobs:
         
       - name: Commit and push changes
         run: |
+            git config --local user.name "${{ github.actor }}"
+            git config --local user.email "${{ github.actor }}@users.noreply.github.com"
             git add .
             git commit -m "Updated VSIX version to ${{ env.NEW_VERSION }}"
             git push
