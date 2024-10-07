@@ -45,8 +45,6 @@ jobs:
 
     - name: Download JFrog CLI executable 
       run: |
-        # set the env var for project root dir
-        echo "PROJECT_ROOT=$(pwd)" >> $GITHUB_ENV
         .\scripts\DownloadJfrogCli.ps1
       shell: pwsh
 
