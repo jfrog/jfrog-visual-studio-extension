@@ -39,10 +39,6 @@ jobs:
         dotnet restore
         nuget restore
 
-    - name: Set PROJECT_ROOT
-      run: echo "PROJECT_ROOT=$(Get-Location)" >> $GITHUB_ENV
-      shell: pwsh
-
     - name: Download JFrog CLI executable 
       run: |
         .\scripts\DownloadJfrogCli.ps1

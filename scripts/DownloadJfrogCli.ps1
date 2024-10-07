@@ -6,11 +6,6 @@ if ($env:JFROG_CLI_VERSION) {
     exit 1
 }
 
-if (-not $env:PROJECT_ROOT) {
-    Write-Error "Error: PROJECT_ROOT environment variable is not set."
-    exit 1
-}
-
 # Define the URL for the JFrog CLI executable
 $jfrogCliUrl = "https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/$($env:JFROG_CLI_VERSION)/jfrog-cli-windows-amd64/jf.exe"
 
