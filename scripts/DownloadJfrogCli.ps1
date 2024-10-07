@@ -6,6 +6,11 @@ if ($env:JFROG_CLI_VERSION) {
     exit 1
 }
 
+# if root was not defined - use current location
+if (-not $env:PROJECT_ROOT) {
+    $env:PROJECT_ROOT="$(pwd)"
+}
+
 # Define the URL for the JFrog CLI executable
 $jfrogCliUrl = "https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/$($env:JFROG_CLI_VERSION)/jfrog-cli-windows-amd64/jf.exe"
 
