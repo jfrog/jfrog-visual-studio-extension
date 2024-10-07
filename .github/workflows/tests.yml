@@ -1,44 +1,39 @@
-name: Run Tests
+name: Build and Run Tests
 
 on:
   push:
   pull_request:
-   type: [ labeled ]
+    type: [ labeled ]
 
 jobs:
-  build:
+  call-build-workflow:
+      uses: ./.github/workflows/build-vsix.yml
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+
+  test:
     runs-on: windows-latest
+    needs: call-build-workflow
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+      with: 
+        ref: ${{ github.event.pull_request.head.sha }}
 
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1
+    # download build workflow artifacts
+    - name: Download VSIX artifact
+      uses: actions/download-artifact@v3
       with:
-        vs-version: 'latest'
+        name: vsix-artifacts
+        path: ./JFrogVSExtension/bin/Release
 
-    - name: Cache NuGet packages # optimizing the build process
-      uses: actions/cache@v3
+    - name: Download Unit Test artifacts
+      uses: actions/download-artifact@v3
       with:
-        path: ~/.nuget/packages
-        key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
-        restore-keys: nuget-${{ runner.os }}-
-          
-    - name: Restore dependencies
-      run: |
-        dotnet restore
-        nuget restore
-    
-    - name: Download JFrog CLI executable 
-      env:
-        JFROG_CLI_VERSION: '2.67.0' # jfrog cli version can be changed here
-      run: .\JFrogVSExtension\Resources\DownloadJfrogCli.ps1
-      shell: pwsh
-   
-    - name: Build VSIX Project # build the vsix project using multi-core compilation and parallel builds
-      run: msbuild JFrogVSExtension.sln /p:Configuration=Release /p:Platform="Any CPU" /p:BuildInParallel=true /m 
+        name: tests-artifacts
+        path: ./UnitTestJfrogVSExtension/bin/Release
 
-    - name: Run MSTest Project # run tests in release mode with logs presentation
+    # run tests in release mode with logs presentation
+    - name: Run MSTest Project 
       run: dotnet test --no-build --configuration Release --logger "console;verbosity=detailed" ./UnitTestJfrogVSExtension/bin/Release/UnitTestJfrogVSExtension.dll
-
