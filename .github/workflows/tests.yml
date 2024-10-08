@@ -1,0 +1,39 @@
+name: Build and Run Tests
+
+on:
+  push:
+  pull_request:
+    type: [ labeled ]
+
+jobs:
+  call-build-workflow:
+      uses: ./.github/workflows/build-vsix.yml
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+
+  test:
+    runs-on: windows-latest
+    needs: call-build-workflow
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with: 
+        ref: ${{ github.event.pull_request.head.sha }}
+
+    # download build workflow artifacts
+    - name: Download VSIX artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: vsix-artifacts
+        path: ./JFrogVSExtension/bin/Release
+
+    - name: Download Unit Test artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: tests-artifacts
+        path: ./UnitTestJfrogVSExtension/bin/Release
+
+    # run tests in release mode with logs presentation
+    - name: Run MSTest Project 
+      run: dotnet test --no-build --configuration Release --logger "console;verbosity=detailed" ./UnitTestJfrogVSExtension/bin/Release/UnitTestJfrogVSExtension.dll
