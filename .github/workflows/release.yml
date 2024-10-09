@@ -10,6 +10,7 @@ jobs:
     runs-on: windows-latest
     env:
         NEW_VERSION: '${{ github.ref_name }}' 
+        MANIFEST_FILE_LOCATION: "JfrogVSExtension/source.extension.vsixmanifest"
 
     steps:
       - name: Config Github
