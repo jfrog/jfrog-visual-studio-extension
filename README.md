@@ -11,8 +11,6 @@
 - [About this Extension](#about-this-extension)
   - [Component Tree Icons](#component-tree-icons)
 - [Installing the Extension](#installing-the-extension)
-- [Building the Sources](#building-the-sources)
-- [Troublshooting Issues](#troublshooting-issues)
 - [Release Notes](#release-notes)
 - [Code Contributions](#code-contributions)
 
@@ -45,5 +43,5 @@ The icon demonstrates the top severity issue of a selected component and its tra
 ## Release Notes
 The release notes are available [here](https://github.com/jfrog/jfrog-visual-studio-extension/releases).
 
-## Code Contributions
-We welcome community contribution through pull requests.
+## Contributions
+We welcome community contribution through pull requests. To help us improve this project, please read our [Contribution](./CONTRIBUTING.md) guide.
