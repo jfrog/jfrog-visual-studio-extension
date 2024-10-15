@@ -21,23 +21,25 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-            ref: master
-
-      - name: Merge dev into master
-        run: |
-          git pull origin master
-          git fetch --all
-          git merge origin/dev 
+            ref: dev
 
       - name: Update VSIX Version in manifest file
         run: .\scripts\UpdateVsixVersion.ps1
         shell: pwsh
+
         
-      - name: Commit and push changes
+      - name: Commit changes
         run: |
             git add .
             git commit -m "Updated VSIX version to ${{ env.NEW_VERSION }}"
-            git push
+
+      - name: Merge dev into master
+        run: |
+          git checkout master
+          git pull origin master
+          git fetch --all
+          git merge origin/dev 
+          git push
 
   call-build-workflow:
     # build and package the vsix project
@@ -69,13 +71,10 @@ jobs:
 
       # upload the vsix and manifest files to Visual Studio Marketplace using VsixPublisher
       - name: Publish to Visual Studio Marketplace
-        env:
-        # vsix publisher executable is already installed in the github windows runner at the following path
-          VSIX_PUBLISHER_PATH: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VSSDK/VisualStudioIntegration/Tools/Bin/VsixPublisher.exe"
-          VSIX_PATH: "./JFrogVSExtension/bin/Release/JFrogVSExtension.vsix"
-          PUBLISH_MANIFEST_PATH: "./JFrogVSExtension/PublishManifest.json"
+         # vsix publisher executable is already installed in the github windows runner at the following path
         run: |
-          $Env:VSIX_PUBLISHER_PATH publish `
-            -payload $Env:VSIX_PATH `
-            -publishManifest $Env:PUBLISH_MANIFEST_PATH `
-            -personalAccessToken ${{ secrets.VS_MARKETPLACE_PAT }}
+          $VSIX_PUBLISHER_PATH = "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VSSDK/VisualStudioIntegration/Tools/Bin/VsixPublisher.exe"
+          $VSIX_PATH = "./JFrogVSExtension/bin/Release/JFrogVSExtension.vsix"
+          $PUBLISH_MANIFEST_PATH = "./JFrogVSExtension/PublishManifest.json"
+          & $VSIX_PUBLISHER_PATH publish -payload $VSIX_PATH -publishManifest $PUBLISH_MANIFEST_PATH -personalAccessToken ${{ secrets.VS_MARKETPLACE_PAT }}
+        shell: pwsh
