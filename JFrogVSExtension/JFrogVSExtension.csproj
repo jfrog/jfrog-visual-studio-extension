@@ -59,7 +59,9 @@
     </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>2</WarningLevel>
-    <DebugSymbols>true</DebugSymbols>
+	<IncludeDebugSymbolsInVSIXContainer>false</IncludeDebugSymbolsInVSIXContainer>
+	<IncludeDebugSymbolsInLocalVSIXDeployment>false</IncludeDebugSymbolsInLocalVSIXDeployment>
+    <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Components\Component.cs" />
