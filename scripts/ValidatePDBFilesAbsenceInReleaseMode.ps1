@@ -5,7 +5,10 @@ if (-not $env:VSIX_PATH) {
 
 $pdbExists = $false
 $fileName = ""
-        
+ 
+# Validate that the necessary assembly for unzipping the .vsix file exists
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+
 # Check if the .vsix file contains the PDB file
 if (Test-Path $env:VSIX_PATH) {
     $zipContent = [System.IO.Compression.ZipFile]::OpenRead($env:VSIX_PATH)
