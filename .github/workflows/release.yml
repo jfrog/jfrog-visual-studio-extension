@@ -32,12 +32,13 @@ jobs:
         run: |
             git add .
             git commit -m "Updated VSIX version to ${{ env.NEW_VERSION }}"
+            git push
 
       - name: Merge dev into master
         run: |
+          git fetch --all
           git checkout master
           git pull origin master
-          git fetch --all
           git merge origin/dev 
           git push
 
