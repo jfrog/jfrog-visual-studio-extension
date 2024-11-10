@@ -15,7 +15,10 @@ namespace UnitTestJfrogVSExtension
         public static string rootDir = GetProjectRoot(AppDomain.CurrentDomain.BaseDirectory);
         public static string updateVersionScriptPath = Path.Combine(rootDir, @"scripts\UpdateVsixVersion.ps1");
         public static string downloadCliScriptPath = Path.Combine(rootDir, @"scripts\DownloadJfrogCli.ps1");
-        public static string vsixManifestMockPath = Path.Combine(rootDir, @"scripts\vsixmanifestMock");
+        public static string validatePDBScriptPath = Path.Combine(rootDir, @"scripts\ValidatePDBFilesAbsenceInReleaseMode.ps1");
+        public static string vsixManifestMockPath = Path.Combine(rootDir, @"UnitTestJfrogVSExtension\Resources\vsixmanifestMock");
+        public static string vsixWithPDBFilePath = Path.Combine(rootDir, @"UnitTestJfrogVSExtension\Resources\includePdbFile.vsix");
+        public static string vsixWithoutPDBFilePath = Path.Combine(rootDir, @"UnitTestJfrogVSExtension\Resources\excludePdbFile.vsix");
 
         [TestMethod]
         public void Test_UpdateVsixVersion_ValidVersion()
@@ -58,6 +61,32 @@ namespace UnitTestJfrogVSExtension
             //  script should succeed and return exit code 0
             int exitCode = RunPowerShellScript(downloadCliScriptPath, envVars);
             Assert.AreEqual(0, exitCode);
+        }
+
+        [TestMethod]
+        public void Test_VsixContainsPdbFile()
+        {
+            var envVars = new Dictionary<string, string>
+            {
+                { "VSIX_PATH", vsixWithPDBFilePath },
+            };
+
+            // script should fail and return exit code 1
+            int exitCode = RunPowerShellScript(validatePDBScriptPath, envVars);
+            Assert.AreEqual(1, exitCode, "The PDB file should be found in the VSIX.");
+        }
+
+        [TestMethod]
+        public void Test_VsixDoesNotContainPdbFile()
+        {
+            var envVars = new Dictionary<string, string>
+            {
+                { "VSIX_PATH", vsixWithoutPDBFilePath },
+            };
+
+            // script should succeed and return exit code 0
+            int exitCode = RunPowerShellScript(validatePDBScriptPath, envVars);
+            Assert.AreEqual(0, exitCode, "The PDB file should not be found in the VSIX.");
         }
 
         private static string GetProjectRoot(string currentDir)
