@@ -48,6 +48,12 @@ jobs:
     - name: Build VSIX Project 
       run: msbuild JFrogVSExtension.sln /p:Configuration=Release /p:Platform="Any CPU" /p:BuildInParallel=true /m 
 
+    # Verify that the PDB file is not included in the .vsix file, this will expose unwanted debug information about the development env
+    - name: Check for PDB in VSIX
+      run: |
+        .\scripts\ValidatePDBFilesAbsenceInReleaseMode.ps1
+      shell: pwsh
+
     # Upload vsix and unit test as artifacts for other workflows usage
     - name: Upload vsix artifacts
       uses: actions/upload-artifact@v3
