@@ -13,7 +13,7 @@ jobs:
     
     env:
         # jfrog cli version can be changed here
-        JFROG_CLI_VERSION: '2.67.0'
+        JFROG_CLI_VERSION: '2.71.3'
 
     steps:
     - name: Checkout code
