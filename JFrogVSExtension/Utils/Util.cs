@@ -1,6 +1,8 @@
 ﻿using JFrogVSExtension.Data;
 using JFrogVSExtension.Logger;
 using JFrogVSExtension.Xray;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -53,14 +55,21 @@ namespace JFrogVSExtension.Utils
                 // Run npm ls to get the dependencies tree. The /C for the process to quit without waiting for a user's interruption.
                 var npmProjectTree = GetProcessOutputAsync("cmd.exe", "/C npm ls --json --all --long --package-lock-only", fileInfo.DirectoryName);
 
-                var npmProj = JsonConvert.DeserializeObject<NpmLsNode>(npmProjectTree.Result);
+                JoinableTaskFactory joinableTaskFactory = new JoinableTaskFactory(ThreadHelper.JoinableTaskContext);
+
+                var npmProj = joinableTaskFactory.Run(async () =>
+                {
+                    return await GetProcessOutputAsync("cmd.exe", "/C npm ls --json --all --long --package-lock-only", fileInfo.DirectoryName);
+                });
+
+                
                 var project = new Project()
                 {
-                    name = $"{npmProj.name}:{npmProj.version}",
+                    //name = $"{npmProj.name}:{npmProj.version}", 
                     directoryPath = fileInfo.DirectoryName,
                     dependencies = new Dependency[] { },
                 };
-                project.dependencies = populateNpmDependencies(npmProj);
+                //project.dependencies = populateNpmDependencies(npmProj);
                 return project;
             }
             catch (Exception e)

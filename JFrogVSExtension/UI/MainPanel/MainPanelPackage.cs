@@ -92,6 +92,7 @@ namespace JFrogVSExtension
 
         protected override void Dispose(bool disposing)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             if (_solutionEventsCookie != 0)
             {
                 _solution.UnadviseSolutionEvents(_solutionEventsCookie);
