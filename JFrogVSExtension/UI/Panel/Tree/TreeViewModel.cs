@@ -85,7 +85,7 @@ namespace JFrogVSExtension.Tree
                 // 4. Get response and build the dependencies tree.
 
                 // Running CLI - this is the returned output.
-                String returnedText = await Task.Run(() => Util.GetCLIOutputAsync("rt nuget-deps-tree",solutionDir));
+                String returnedText = await Util.GetCLIOutputAsync("rt nuget-deps-tree",solutionDir);
                 
                 // Load projects from output.
                 Project[] nugetProjects = Util.LoadNugetProjects(returnedText);

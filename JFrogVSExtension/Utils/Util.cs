@@ -55,21 +55,23 @@ namespace JFrogVSExtension.Utils
                 // Run npm ls to get the dependencies tree. The /C for the process to quit without waiting for a user's interruption.
                 var npmProjectTree = GetProcessOutputAsync("cmd.exe", "/C npm ls --json --all --long --package-lock-only", fileInfo.DirectoryName);
 
-                JoinableTaskFactory joinableTaskFactory = new JoinableTaskFactory(ThreadHelper.JoinableTaskContext);
+                var npmProj = JsonConvert.DeserializeObject<NpmLsNode>(npmProjectTree.Result);
 
-                var npmProj = joinableTaskFactory.Run(async () =>
-                {
-                    return await GetProcessOutputAsync("cmd.exe", "/C npm ls --json --all --long --package-lock-only", fileInfo.DirectoryName);
-                });
+                //JoinableTaskFactory joinableTaskFactory = new JoinableTaskFactory(ThreadHelper.JoinableTaskContext);
 
-                
+                //var npmProj = joinableTaskFactory.Run(async () =>
+                //{
+                //    return await GetProcessOutputAsync("cmd.exe", "/C npm ls --json --all --long --package-lock-only", fileInfo.DirectoryName);
+                //});
+
+
                 var project = new Project()
                 {
-                    //name = $"{npmProj.name}:{npmProj.version}", 
+                    name = $"{npmProj.name}:{npmProj.version}", 
                     directoryPath = fileInfo.DirectoryName,
                     dependencies = new Dependency[] { },
                 };
-                //project.dependencies = populateNpmDependencies(npmProj);
+                project.dependencies = populateNpmDependencies(npmProj);
                 return project;
             }
             catch (Exception e)
@@ -113,13 +115,13 @@ namespace JFrogVSExtension.Utils
             var strFilePath = Path.Combine(strAppPath, "Resources");
             var pathToCli = Path.Combine(strFilePath, "jfrog.exe");
             await OutputLog.ShowMessageAsync("Path for the JFrog CLI: " + pathToCli);
-            return await GetProcessOutputAsync(pathToCli, command, workingDir, configCommand, envVars);
+            return await Task.Run(async () => await GetProcessOutputAsync(pathToCli, command, workingDir, configCommand, envVars));
         }
 
         public static async Task<string> GetProcessOutputAsync(string pathToExe, string command, string workingDir = "", bool configCommand = false, Dictionary<string, string> envVars = null)
         {
-            return await Task.Run(async () =>
-            {
+            //return await Task.Run(async () =>
+            //{
                 //Create process
                 Process pProcess = new Process
                 {
@@ -191,8 +193,9 @@ namespace JFrogVSExtension.Utils
                 // Waits for maximal 1 hour
                 pProcess.WaitForExit(60 * 60 * 1000);
 
-                // Wait for the entire output to be written
-                if (tcsOutput.Task.IsCompleted && tcsError.Task.IsCompleted)
+
+            // Wait for the entire output to be written
+            if (tcsOutput.Task.IsCompleted && tcsError.Task.IsCompleted)
                 {
                     // Process completed. Check process.ExitCode here.
                     if (pProcess.ExitCode != 0)
@@ -214,7 +217,7 @@ namespace JFrogVSExtension.Utils
                     await OutputLog.ShowMessageAsync("Process timeout");
                     throw new IOException($"Process timeout,  {pathToExe} {commandString}");
                 }
-            });
+            //});
         }
 
         private static string GetAssemblyLocalPathFrom(Type type)

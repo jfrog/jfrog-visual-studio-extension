@@ -133,7 +133,7 @@
             {
                 InitCheckbox();
             }
-            await ((MainViewModel)this.DataContext).LoadAsync();
+            //await ((MainViewModel)this.DataContext).LoadAsync(); TODO: remove if works
         }
 
         private void InitCheckbox()
@@ -153,7 +153,7 @@
             {
                 InitCheckbox();
             }
-            await ((MainViewModel)this.DataContext).LoadAsync();
+            //await ((MainViewModel)this.DataContext).LoadAsync(); TODO: uncomment this line if needed
         }
 
         public async Task CloseAsync()
