@@ -2,7 +2,6 @@
 using JFrogVSExtension.Logger;
 using JFrogVSExtension.Xray;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Threading;
 using Newtonsoft.Json;
 using System;
@@ -119,14 +118,6 @@ namespace JFrogVSExtension.Utils
 
         public static async Task<string> GetProcessOutputAsync(string pathToExe, string command, string workingDir = "", bool configCommand = false, Dictionary<string, string> envVars = null)
         {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-            IVsStatusbar statusBar = (IVsStatusbar)Package.GetGlobalService(typeof(SVsStatusbar));
-            uint cookie = 0;
-
-            // Display "Scan in progress" message
-            statusBar.SetText("Scan in progress...");
-            statusBar.Progress(ref cookie, 1, "", 0, 0);
-
             return await Task.Run(async () =>
             {
                 //Create process
