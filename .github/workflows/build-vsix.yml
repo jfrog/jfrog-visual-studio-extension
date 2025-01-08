@@ -22,9 +22,9 @@ jobs:
         ref: ${{ inputs.ref }}
 
     - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1
+      uses: microsoft/setup-msbuild@v2
       with:
-        vs-version: '17.12.12.57101'
+        vs-version: 'latest'
 
     # caching NuGet packages for optimizing the build process
     - name: Cache NuGet packages 
