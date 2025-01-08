@@ -4,16 +4,17 @@ on:
   workflow_call:  
     inputs:
        ref:
+       # the commit sha to checkout the code
+        required: true
+        type: string
+       vs-version:
+       # the Visual Studio version to build the project with
         required: true
         type: string
  
 jobs:
   build:
     runs-on: windows-latest
-    strategy: 
-        matrix: 
-            # verify compatibility with the desired Visual Studio versions
-            vs-version: [17.10, 17.11, 17.12, 'latest']
     
     env:
         # jfrog cli version can be changed here
@@ -28,7 +29,7 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
       with:
-        vs-version: ${{ matrix.vs-version }}
+        vs-version: ${{ inputs.vs-version }}
 
     # caching NuGet packages for optimizing the build process
     - name: Cache NuGet packages 
@@ -60,13 +61,13 @@ jobs:
 
     # Upload vsix and unit test as artifacts for other workflows usage
     - name: Upload vsix artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: vsix-artifacts
         path: "JFrogVSExtension/bin/Release/"
 
     - name: Upload tests artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: tests-artifacts
         path: "UnitTestJfrogVSExtension/bin/Release/"
