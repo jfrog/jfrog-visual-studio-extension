@@ -10,6 +10,10 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    strategy: 
+        matrix: 
+            # verify compatibility with the desired Visual Studio versions
+            vs-version: [17.10, 17.11, 17.12, 'latest']
     
     env:
         # jfrog cli version can be changed here
@@ -24,7 +28,7 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
       with:
-        vs-version: 'latest'
+        vs-version: ${{ matrix.vs-version }}
 
     # caching NuGet packages for optimizing the build process
     - name: Cache NuGet packages 
