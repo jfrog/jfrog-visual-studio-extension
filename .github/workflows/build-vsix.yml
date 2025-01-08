@@ -22,7 +22,7 @@ jobs:
         ref: ${{ inputs.ref }}
 
     - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1
+      uses: microsoft/setup-msbuild@v2
       with:
         vs-version: 'latest'
 
