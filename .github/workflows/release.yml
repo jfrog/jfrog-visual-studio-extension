@@ -6,48 +6,11 @@ on:
 
 jobs:
 
-  pre-build:
-    runs-on: windows-latest
-    env:
-        NEW_VERSION: '${{ github.ref_name }}' 
-        MANIFEST_FILE_LOCATION: "JfrogVSExtension/source.extension.vsixmanifest"
-
-    steps:
-      - name: Config Github
-        run: |
-            git config --global user.name "${{ github.actor }}"
-            git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-            ref: dev
-            fetch-depth: 0
-
-      - name: Update VSIX Version in manifest file
-        run: .\scripts\UpdateVsixVersion.ps1
-        shell: pwsh
-
-        
-      - name: Commit changes
-        run: |
-            git add .
-            git commit -m "Updated VSIX version to ${{ env.NEW_VERSION }}"
-            git push
-
-      - name: Merge dev into master
-        run: |
-          git checkout master
-          git pull origin master
-          git merge origin/dev 
-          git push
-
   call-build-workflow:
     # build and package the vsix project
       uses: ./.github/workflows/build-vsix.yml
       with: 
          ref: master
-      needs: pre-build
   
   release:
     runs-on: windows-latest
