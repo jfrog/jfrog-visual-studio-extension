@@ -8,12 +8,13 @@ on:
 jobs:
   call-build-workflow:
       uses: ./.github/workflows/build-vsix.yml
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
       strategy: 
         matrix: 
         # verify compatibility with the desired Visual Studio versions
             vs-version: [17.10, 17.11, 17.12, latest]
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        vs-version: ${{ matrix.vs-version }}
 
   test:
     runs-on: windows-latest
