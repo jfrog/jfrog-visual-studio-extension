@@ -3,27 +3,34 @@ name: Build and Run Tests
 on:
   push:
   pull_request:
-    type: [ labeled ]
+    types: [ labeled ]
 
 jobs:
-  call-build-workflow:
-      uses: ./.github/workflows/build-vsix.yml
-      strategy: 
+  # call-build-workflow: TODO: delete if works
+  #     uses: ./.github/workflows/build-vsix.yml
+  #     strategy: 
+  #       matrix: 
+  #       verify compatibility with the desired Visual Studio versions
+  #           vs-version: [17.10, 17.11, 17.12, latest]
+  #     with:
+  #       ref: ${{ github.event.pull_request.head.sha }}
+  #       vs-version: ${{ matrix.vs-version }}
+
+  test:
+    runs-on: windows-latest
+    # needs: call-build-workflow TODO: remove if works
+    strategy: 
         matrix: 
-        # verify compatibility with the desired Visual Studio versions
+            # verify compatibility with the desired Visual Studio versions
             vs-version: [17.10, 17.11, 17.12, latest]
+    
+    steps:
+    - name: Call Build Workflow
+      uses: ./.github/workflows/build-vsix.yml
       with:
         ref: ${{ github.event.pull_request.head.sha }}
         vs-version: ${{ matrix.vs-version }}
 
-  test:
-    runs-on: windows-latest
-    needs: call-build-workflow
-    strategy: 
-        matrix: 
-            vs-version: ${{ fromJson(needs.call-build-workflow.outputs['matrix'])}}
-    
-    steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with: 
