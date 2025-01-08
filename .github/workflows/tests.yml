@@ -25,16 +25,16 @@ jobs:
             vs-version: [17.10, 17.11, 17.12, latest]
     
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with: 
+        ref: ${{ github.event.pull_request.head.sha }}
+
     - name: Call Build Workflow
       uses: ./.github/workflows/build-vsix.yml
       with:
         ref: ${{ github.event.pull_request.head.sha }}
         vs-version: ${{ matrix.vs-version }}
-
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with: 
-        ref: ${{ github.event.pull_request.head.sha }}
 
     # download build workflow artifacts
     - name: Download VSIX artifact
