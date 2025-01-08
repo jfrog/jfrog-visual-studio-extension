@@ -10,6 +10,7 @@ inputs:
     required: true
 runs:
   using: 'composite'
+
   steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -36,6 +37,9 @@ runs:
 
     - name: Download JFrog CLI executable 
       shell: powershell
+      env:
+        # jfrog cli version can be changed here
+        JFROG_CLI_VERSION: '2.71.3'
       run: |
         .\scripts\DownloadJfrogCli.ps1
 
