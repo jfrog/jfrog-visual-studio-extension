@@ -125,15 +125,12 @@
         {
         }
 
-#pragma warning disable VSTHRD100 // Avoid async void methods - Signature expected by event handler.
-        private async void Tree_Loaded(object sender, RoutedEventArgs e)
-#pragma warning restore VSTHRD100 // Avoid async void methods
+        private void Tree_Loaded(object sender, RoutedEventArgs e)
         {
             if (isAllFilterChecked)
             {
                 InitCheckbox();
             }
-            //await ((MainViewModel)this.DataContext).LoadAsync(); TODO: remove if works
         }
 
         private void InitCheckbox()
@@ -151,9 +148,8 @@
         {
             if (isAllFilterChecked)
             {
-                InitCheckbox();
+                InitCheckbox(); 
             }
-            //await ((MainViewModel)this.DataContext).LoadAsync(); TODO: uncomment this line if needed
         }
 
         public async Task CloseAsync()
