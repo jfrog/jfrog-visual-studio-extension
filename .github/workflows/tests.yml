@@ -29,13 +29,13 @@ jobs:
     - name: Download VSIX artifact
       uses: actions/download-artifact@v4
       with:
-        name: vsix-artifacts
+        name: vsix-artifacts-${{ matrix.vs-version }}-${{ github.run_id }}
         path: ./JFrogVSExtension/bin/Release
 
     - name: Download Unit Test artifacts
       uses: actions/download-artifact@v4
       with:
-        name: tests-artifacts
+        name: tests-artifacts-${{ matrix.vs-version }}-${{ github.run_id }}
         path: ./UnitTestJfrogVSExtension/bin/Release
 
     # run tests in release mode with logs presentation
