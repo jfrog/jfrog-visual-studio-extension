@@ -56,11 +56,11 @@ runs:
     - name: Upload vsix artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: vsix-artifacts
+        name: vsix-artifacts-${{ inputs.vs-version }}-${{ github.run_id }}
         path: "JFrogVSExtension/bin/Release/"
 
     - name: Upload tests artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: tests-artifacts
+        name: tests-artifacts-${{ inputs.vs-version }}-${{ github.run_id }}
         path: "UnitTestJfrogVSExtension/bin/Release/"
