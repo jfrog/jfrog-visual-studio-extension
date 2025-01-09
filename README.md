@@ -25,6 +25,3 @@ Please help us improve by reporting issues you encounter [here](https://github.c
 
 ## 💻 Contributions
 We welcome community contribution through pull requests. To help us improve this project, please read our [Contribution](https://github.com/jfrog/jfrog-visual-studio-extension/blob/master/CONTRIBUTING.md) guide.
-
-
-
