@@ -27,13 +27,13 @@ jobs:
 
     # download build workflow artifacts
     - name: Download VSIX artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: vsix-artifacts
         path: ./JFrogVSExtension/bin/Release
 
     - name: Download Unit Test artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: tests-artifacts
         path: ./UnitTestJfrogVSExtension/bin/Release
