@@ -57,17 +57,9 @@ namespace JFrogVSExtension.Utils
 
                 var npmProj = JsonConvert.DeserializeObject<NpmLsNode>(npmProjectTree.Result);
 
-                //JoinableTaskFactory joinableTaskFactory = new JoinableTaskFactory(ThreadHelper.JoinableTaskContext);
-
-                //var npmProj = joinableTaskFactory.Run(async () =>
-                //{
-                //    return await GetProcessOutputAsync("cmd.exe", "/C npm ls --json --all --long --package-lock-only", fileInfo.DirectoryName);
-                //});
-
-
                 var project = new Project()
                 {
-                    name = $"{npmProj.name}:{npmProj.version}", 
+                    name = $"{npmProj.name}:{npmProj.version}",
                     directoryPath = fileInfo.DirectoryName,
                     dependencies = new Dependency[] { },
                 };
@@ -115,13 +107,13 @@ namespace JFrogVSExtension.Utils
             var strFilePath = Path.Combine(strAppPath, "Resources");
             var pathToCli = Path.Combine(strFilePath, "jfrog.exe");
             await OutputLog.ShowMessageAsync("Path for the JFrog CLI: " + pathToCli);
-            return await Task.Run(async () => await GetProcessOutputAsync(pathToCli, command, workingDir, configCommand, envVars));
+            return await GetProcessOutputAsync(pathToCli, command, workingDir, configCommand, envVars);
         }
 
         public static async Task<string> GetProcessOutputAsync(string pathToExe, string command, string workingDir = "", bool configCommand = false, Dictionary<string, string> envVars = null)
         {
-            //return await Task.Run(async () =>
-            //{
+            return await Task.Run(async () =>
+            {
                 //Create process
                 Process pProcess = new Process
                 {
@@ -217,7 +209,7 @@ namespace JFrogVSExtension.Utils
                     await OutputLog.ShowMessageAsync("Process timeout");
                     throw new IOException($"Process timeout,  {pathToExe} {commandString}");
                 }
-            //});
+            });
         }
 
         private static string GetAssemblyLocalPathFrom(Type type)

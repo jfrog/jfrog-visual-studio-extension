@@ -148,7 +148,7 @@
         {
             if (isAllFilterChecked)
             {
-                InitCheckbox(); 
+                InitCheckbox();
             }
         }
 

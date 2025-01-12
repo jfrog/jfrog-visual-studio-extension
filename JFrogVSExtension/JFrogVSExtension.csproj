@@ -248,10 +248,6 @@
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0">
       <Version>17.1.32210.191</Version>
     </PackageReference>
-    <!-- 
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.10.0">
-      <Version>17.12.40391</Version>
-    </PackageReference>  -->
     <PackageReference Include="Microsoft.VSSDK.BuildTools">
       <Version>17.12.2069</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
