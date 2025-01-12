@@ -25,13 +25,17 @@ namespace JFrogVSExtension
         {
             Severities = new HashSet<Severity>();
             ResetSeverities();
-            SeveritiesFromFilter = Severities;      
+            SeveritiesFromFilter = Severities;
         }
 
         public async Task RefreshAsync()
         {
-            Tree = new TreeViewModel();
+            Tree = new TreeViewModel
+            {
+                ScanStatus = "Xray scan in progress..."
+            };
             await Tree.LoadAsync(RefreshType.Hard, SeveritiesFromFilter);
+            Tree.ScanStatus = "";
         }
 
         public void ExpandAll()

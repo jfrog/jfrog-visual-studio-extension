@@ -29,6 +29,8 @@ namespace JFrogVSExtension.Tree
         public ObservableCollection<Issue> IssueDetails { get; set; }
         public Component SelectedComponent { get; set; }
         public Boolean EnableRefreshButton { get; set; }
+
+        public string ScanStatus { get; set; }
         public string SelectedKey
         {
             get { return selectedKey; }
@@ -53,6 +55,7 @@ namespace JFrogVSExtension.Tree
         public TreeViewModel()
         {
             this.EnableRefreshButton = true;
+            ScanStatus = ""; // Default value
         }
 
         #endregion
