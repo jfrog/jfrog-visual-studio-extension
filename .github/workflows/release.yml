@@ -6,21 +6,24 @@ on:
 
 jobs:
 
-  call-build-workflow:
-    # build and package the vsix project
-      uses: ./.github/workflows/build-vsix.yml
-      with: 
-         ref: master
-  
   release:
     runs-on: windows-latest
     needs: call-build-workflow
     steps:
+
+      # build and package the vsix project
+      - name: Build VSIX Project
+        uses: ./.github/actions/build-vsix
+        with: 
+           ref: master
+           vs-version: latest
+
       # download build workflow artifacts
       - name: Download VSIX artifacts
         uses: actions/download-artifact@v3
         with:
-            name: vsix-artifacts
+        # use the unique artifact name from the build action
+            name: vsix-artifacts-latest-${{ github.run_id }}
             path: ./JFrogVSExtension/bin/Release
 
       - name: Upload VSIX and attach it to the Release page

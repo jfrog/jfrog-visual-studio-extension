@@ -3,35 +3,39 @@ name: Build and Run Tests
 on:
   push:
   pull_request:
-    type: [ labeled ]
+    types: [ labeled ]
 
 jobs:
-  call-build-workflow:
-      uses: ./.github/workflows/build-vsix.yml
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
-
-  test:
+  build-and-test: 
     runs-on: windows-latest
-    needs: call-build-workflow
-    
+    strategy: 
+        matrix: 
+        # verify compatibility with the desired Visual Studio versions
+            vs-version: [17.10, 17.11, 17.12, latest]
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with: 
         ref: ${{ github.event.pull_request.head.sha }}
 
+    - name: Build VSIX Project
+      uses: ./.github/actions/build-vsix
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        vs-version: ${{ matrix.vs-version }}
+
     # download build workflow artifacts
     - name: Download VSIX artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
-        name: vsix-artifacts
+        name: vsix-artifacts-${{ matrix.vs-version }}-${{ github.run_id }}
         path: ./JFrogVSExtension/bin/Release
 
     - name: Download Unit Test artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
-        name: tests-artifacts
+        name: tests-artifacts-${{ matrix.vs-version }}-${{ github.run_id }}
         path: ./UnitTestJfrogVSExtension/bin/Release
 
     # run tests in release mode with logs presentation

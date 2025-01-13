@@ -1,0 +1,68 @@
+name: 'Build VSIX and save artifacts'
+description: 'A custom action to build the Visual Studio extension project and save the build artifacts for later use (tests, deploy etc..)'
+
+inputs:
+  ref:
+    description: 'The commit SHA to checkout the code'
+    required: true
+  vs-version:
+    description: 'The Visual Studio version to build the project with'
+    required: true
+runs:
+  using: 'composite'
+
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.ref }}
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+      with:
+        vs-version: ${{ inputs.vs-version }}
+
+    - name: Cache NuGet packages 
+      uses: actions/cache@v3
+      with:
+        path: ~/.nuget/packages
+        key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+        restore-keys: nuget-${{ runner.os }}-
+
+    - name: Restore dependencies
+      shell: powershell
+      run: |
+        dotnet restore
+        nuget restore
+
+    - name: Download JFrog CLI executable 
+      shell: powershell
+      env:
+        # jfrog cli version can be changed here
+        JFROG_CLI_VERSION: '2.71.3'
+      run: |
+        .\scripts\DownloadJfrogCli.ps1
+
+    - name: Build VSIX Project 
+      shell: powershell
+      run: |
+        msbuild JFrogVSExtension.sln /p:Configuration=Release /p:Platform="Any CPU" /p:BuildInParallel=true /m
+
+    - name: Check for PDB in VSIX
+      run: |
+        .\scripts\ValidatePDBFilesAbsenceInReleaseMode.ps1
+      shell: pwsh
+
+    - name: Upload vsix artifacts
+      uses: actions/upload-artifact@v4
+      with:
+      # artifact name should be unique for each run
+        name: vsix-artifacts-${{ inputs.vs-version }}-${{ github.run_id }}
+        path: "JFrogVSExtension/bin/Release/"
+
+    - name: Upload tests artifacts
+      uses: actions/upload-artifact@v4
+      with:
+      # artifact name should be unique for each run
+        name: tests-artifacts-${{ inputs.vs-version }}-${{ github.run_id }}
+        path: "UnitTestJfrogVSExtension/bin/Release/"
