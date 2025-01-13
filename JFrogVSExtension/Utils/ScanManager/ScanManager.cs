@@ -46,7 +46,7 @@ namespace JFrogVSExtension.Utils.ScanManager
         public async Task<string> PreformScanAsync(List<string> workingDirs)
         {
             var workingDirsString = workingDirs.Count() > 1 ? string.Join(", ", workingDirs) : workingDirs.First();
-            var cliAuditCommand = $"audit --format=\"json\" --server-id=\"{CliServerId}\" --licenses --fail=\"false\" --working-dirs=\"{workingDirsString}\"";
+            var cliAuditCommand = $"audit --sca --format=\"json\" --server-id=\"{CliServerId}\" --licenses --fail=\"false\" --working-dirs=\"{workingDirsString}\"";
 
             switch (Policy)
             {
@@ -57,7 +57,7 @@ namespace JFrogVSExtension.Utils.ScanManager
                     cliAuditCommand += $" --watches=\"{watches}\"";
                     break;
             }
-            return await  Util.GetCLIOutputAsync(cliAuditCommand, workingDirs.First(), false, cliEnv);
+            return await Util.GetCLIOutputAsync(cliAuditCommand, workingDirs.First(), false, cliEnv);
         }
     }
 }

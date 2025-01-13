@@ -1,6 +1,8 @@
 ﻿using JFrogVSExtension.Data;
 using JFrogVSExtension.Logger;
 using JFrogVSExtension.Xray;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -54,6 +56,7 @@ namespace JFrogVSExtension.Utils
                 var npmProjectTree = GetProcessOutputAsync("cmd.exe", "/C npm ls --json --all --long --package-lock-only", fileInfo.DirectoryName);
 
                 var npmProj = JsonConvert.DeserializeObject<NpmLsNode>(npmProjectTree.Result);
+
                 var project = new Project()
                 {
                     name = $"{npmProj.name}:{npmProj.version}",
@@ -109,46 +112,54 @@ namespace JFrogVSExtension.Utils
 
         public static async Task<string> GetProcessOutputAsync(string pathToExe, string command, string workingDir = "", bool configCommand = false, Dictionary<string, string> envVars = null)
         {
-            //Create process
-            Process pProcess = new Process();
-
-            // strCommand is path and file name of command to run
-            pProcess.StartInfo.FileName = pathToExe;
-
-            // strCommandParameters are parameters to pass to program
-            // Here we will run the nuget command for the cli
-            pProcess.StartInfo.Arguments = command;
-            // Avoid printing commands with credentials
-            var commandString = configCommand ? "config command" : command;
-
-            pProcess.StartInfo.UseShellExecute = false;
-            pProcess.StartInfo.CreateNoWindow = true;
-            // Set output of program to be written to process output stream
-            pProcess.StartInfo.RedirectStandardOutput = true;
-            pProcess.StartInfo.RedirectStandardError = true;
-            pProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            pProcess.StartInfo.WorkingDirectory = workingDir;
-            if (envVars != null)
+            return await Task.Run(async () =>
             {
-                foreach (var envVar in envVars)
+                //Create process
+                Process pProcess = new Process
                 {
-                    pProcess.StartInfo.EnvironmentVariables[envVar.Key] = envVar.Value;
-                }
-            }
-            StringBuilder strOutput = new StringBuilder();
-            StringBuilder error = new StringBuilder();
+                    StartInfo = new ProcessStartInfo
+                    {
+                        // strCommand is path and file name of command to run
+                        FileName = pathToExe,
+                        // strCommandParameters are parameters to pass to program
+                        // Here we will run the nuget command for the cli
+                        Arguments = command,
+                        UseShellExecute = false,
+                        // Set output of program to be written to process output stream
+                        CreateNoWindow = true,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        WorkingDirectory = workingDir
+                    }
+                };
 
-            // Saving the response from the CLI to a StringBuilder.
-            using (AutoResetEvent outputWaitHandle = new AutoResetEvent(false))
-            using (AutoResetEvent errorWaitHandle = new AutoResetEvent(false))
-            {
+                // Avoid printing commands with credentials
+                var commandString = configCommand ? "config command" : command;
+
+                if (envVars != null)
+                {
+                    foreach (var envVar in envVars)
+                    {
+                        pProcess.StartInfo.EnvironmentVariables[envVar.Key] = envVar.Value;
+                    }
+                }
+                StringBuilder strOutput = new StringBuilder();
+                StringBuilder error = new StringBuilder();
+
+                // Saving the response from the CLI to a StringBuilder.
+
+                var tcsOutput = new TaskCompletionSource<bool>();
+                var tcsError = new TaskCompletionSource<bool>();
+
+
                 // Get program output
                 // The json returned from the CLI
                 pProcess.OutputDataReceived += (sender, e) =>
                 {
                     if (e.Data == null)
                     {
-                        outputWaitHandle.Set();
+                        tcsOutput.SetResult(true);
                     }
                     else
                     {
@@ -159,7 +170,7 @@ namespace JFrogVSExtension.Utils
                 {
                     if (e.Data == null)
                     {
-                        errorWaitHandle.Set();
+                        tcsError.SetResult(true);
                     }
                     else
                     {
@@ -172,11 +183,11 @@ namespace JFrogVSExtension.Utils
                 pProcess.BeginOutputReadLine();
                 pProcess.BeginErrorReadLine();
                 // Waits for maximal 1 hour
-                pProcess.WaitForExit(60*60*1000);
+                pProcess.WaitForExit(60 * 60 * 1000);
 
-                // Wait for the entire output to be written
-                if (outputWaitHandle.WaitOne(1) &&
-                       errorWaitHandle.WaitOne(1))
+
+            // Wait for the entire output to be written
+            if (tcsOutput.Task.IsCompleted && tcsError.Task.IsCompleted)
                 {
                     // Process completed. Check process.ExitCode here.
                     if (pProcess.ExitCode != 0)
@@ -198,7 +209,7 @@ namespace JFrogVSExtension.Utils
                     await OutputLog.ShowMessageAsync("Process timeout");
                     throw new IOException($"Process timeout,  {pathToExe} {commandString}");
                 }
-            }
+            });
         }
 
         private static string GetAssemblyLocalPathFrom(Type type)

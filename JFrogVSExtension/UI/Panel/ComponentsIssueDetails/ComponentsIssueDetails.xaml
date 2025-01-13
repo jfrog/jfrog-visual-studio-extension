@@ -28,11 +28,11 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 MinWidth="75"
-                MaxWidth="1000"
+                MaxWidth="2000"
                 HorizontalScrollBarVisibility="Auto"
+                VerticalScrollBarVisibility="Auto"
                 Background="Transparent"
-                BorderThickness="0"
-                Margin="0" 
+                BorderThickness="0" 
                 HorizontalGridLinesBrush="Transparent" 
                 VerticalGridLinesBrush="Transparent"
                 RowHeaderWidth="0">
@@ -55,7 +55,7 @@
                         <Setter Property="Background" Value="Transparent"/>
                     </Style>
                 </DataGrid.Resources>
-                
+
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Header="Severity" MinWidth="75" MaxWidth="500" CanUserSort="True" SortMemberPath="Severity">
                         <DataGridTemplateColumn.CellTemplate >
@@ -77,7 +77,7 @@
                     </DataGridTextColumn>
                     <DataGridTextColumn Header="Issue Type" Binding="{Binding IssueType}" MinWidth="75" MaxWidth="500" CanUserSort="True"/>
                     <DataGridTextColumn Header="Fixed Versions" Binding="{Binding FixedVersions}" MinWidth="75" MaxWidth="500" CanUserSort="True"/>
-                    <DataGridTextColumn Header="Component" Binding="{Binding Component}" MinWidth="100" Width="*" MaxWidth="500" CanUserSort="True">
+                    <DataGridTextColumn Header="Component" Binding="{Binding Component}" MinWidth="100" Width="*" CanUserSort="True">
                         <DataGridTextColumn.ElementStyle>
                             <Style>
                                 <Setter Property="TextBlock.TextWrapping" Value="Wrap" />

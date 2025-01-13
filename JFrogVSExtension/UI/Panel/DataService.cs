@@ -130,8 +130,10 @@ namespace JFrogVSExtension.Data
         public async Task<Artifacts> GetSecurityIssuesAsync(bool reScan, Projects projects, string solutionDir)
         {
             var componentsSet = new HashSet<Components>();
-            var workingDirs = new List<string>();
-            workingDirs.Add(solutionDir);
+            var workingDirs = new List<string>
+            {
+                solutionDir
+            };
             if (!reScan)
             {
                 foreach (Project project in projects.All)

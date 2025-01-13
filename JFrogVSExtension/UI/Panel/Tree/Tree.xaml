@@ -10,7 +10,7 @@
              d:DesignHeight="250" d:DesignWidth="300"
              Background="{DynamicResource {x:Static vsp:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
              Foreground="{DynamicResource {x:Static vsp:EnvironmentColors.ToolWindowTextBrushKey}}">
-    
+
     <UserControl.Resources>
         <Style TargetType="{x:Type TreeView}">
             <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsp:TreeViewColors.BackgroundBrushKey}}"/>
@@ -22,19 +22,22 @@
             <Setter Property="Foreground" Value="{DynamicResource {x:Static vsp:EnvironmentColors.ToolWindowTextBrushKey}}"/>
         </Style>
     </UserControl.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        
+
         <Grid  Grid.Row="0">
             <Border BorderThickness="0,0,0,1" BorderBrush="{DynamicResource {x:Static vsp:EnvironmentColors.BrandedUIBorderBrushKey}}">
-                <TextBlock Text="Components Tree" Padding="3"/>
+                <Grid>
+                    <TextBlock x:Name="componentsTreeHeader" Text="Components Tree" Padding="3" HorizontalAlignment="Left"/>
+                    <TextBlock Text="{Binding ScanStatus}" Padding="3" HorizontalAlignment="Right" TextAlignment="Right" Foreground="{DynamicResource {x:Static vsp:EnvironmentColors.ControlLinkTextBrushKey}}"/>
+                </Grid>
             </Border>
         </Grid>
-        
+
         <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <TreeView Grid.Row="1"                   
                 ItemsSource="{Binding Artifacts}"                       
@@ -55,7 +58,7 @@
                         <Setter Property="Margin" Value="0,3,0,0"/>
                         <Setter Property="Foreground" Value="{DynamicResource {x:Static vsp:TreeViewColors.GlyphBrushKey}}"/>
                         <Setter Property="Background" Value="{DynamicResource {x:Static vsp:TreeViewColors.BackgroundBrushKey}}"/>
-                        
+
                     </Style>
                 </TreeView.ItemContainerStyle>
 

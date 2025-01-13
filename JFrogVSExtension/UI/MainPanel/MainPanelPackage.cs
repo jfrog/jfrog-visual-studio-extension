@@ -92,6 +92,7 @@ namespace JFrogVSExtension
 
         protected override void Dispose(bool disposing)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             if (_solutionEventsCookie != 0)
             {
                 _solution.UnadviseSolutionEvents(_solutionEventsCookie);
@@ -143,11 +144,6 @@ namespace JFrogVSExtension
 
         public int OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
         {
-            MainPanel mainPanel = MainPanel.GetInstance();
-            if (mainPanel != null)
-            {
-                _ = mainPanel.LoadAsync();
-            }
             return VSConstants.S_OK;
         }
 
