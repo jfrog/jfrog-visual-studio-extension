@@ -33,7 +33,7 @@
             <Border BorderThickness="0,0,0,1" BorderBrush="{DynamicResource {x:Static vsp:EnvironmentColors.BrandedUIBorderBrushKey}}">
                 <Grid>
                     <TextBlock x:Name="componentsTreeHeader" Text="Components Tree" Padding="3" HorizontalAlignment="Left"/>
-                    <TextBlock Text="{Binding ScanStatus}" Padding="3" HorizontalAlignment="Right" TextAlignment="Right"/>
+                    <TextBlock Text="{Binding ScanStatus}" Padding="3" HorizontalAlignment="Right" TextAlignment="Right" Foreground="{DynamicResource {x:Static vsp:EnvironmentColors.ControlLinkTextBrushKey}}"/>
                 </Grid>
             </Border>
         </Grid>
