@@ -15,7 +15,7 @@ namespace JFrogVSExtension
 
         public static int GetSeverityID(Severity severity)
         {
-            int id = 0;
+            int id;
             switch (severity)
             {
                 case Severity.Critical:
