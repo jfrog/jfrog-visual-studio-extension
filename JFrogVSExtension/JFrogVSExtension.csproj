@@ -153,9 +153,16 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Resources\critical.png" />
-    <Content Include="Resources\high.png" />
-    <Content Include="Resources\default.png" />
+    <!-- Severity Icons -->
+    <Resource Include="Resources\license.png"/>
+	<Resource Include="Resources\critical.png"/>
+	<Resource Include="Resources\high.png"/>
+	<Resource Include="Resources\default.png"/>
+	<Resource Include="Resources\medium.png"/>
+	<Resource Include="Resources\low.png"/>
+	<Resource Include="Resources\normal.png"/>
+	<Resource Include="Resources\unknown.png"/>
+	  
     <Content Include="Resources\Icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
