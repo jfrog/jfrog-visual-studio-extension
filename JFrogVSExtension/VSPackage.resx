@@ -124,91 +124,33 @@
     <value>JFrog Visual Studio Extension Detailed Info</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="high" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAQ
-        ZwAAEGcBrtDrmAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABySURBVChTYyAb
-        XDY0NAFhKBc3uKSvv/2KgcE2KBc7uGxgYHVZX/8/CF/S1bWDCmMCoIJ9cIX6+nuhwqjgqp6eE0wRDF/R
-        13eESiMA0NqD6AqB+ChUGgKA7vHEogiMgTZ5QJWB3bYSiO/iwCuhyogBDAwA/XJOfbNLzDwAAAAASUVO
-        RK5CYII=
-</value>
+  <data name="high" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\high.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="default" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        wwAADsMBx2+oZAAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4xNd1g/k8AAAA/SURBVChTY/j/
-        /z/DXgYGvxcMDD//MwC5QAxig8RAcmBJmAQ6BskxIOtExyA5BmwSyJiwAoJWEHQkfm/+ZwAAeQt6/cST
-        TeAAAAAASUVORK5CYII=
-</value>
+  <data name="default" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\default.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="license" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        WwAAC1sB2zHRFAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAEKSURBVChTZY89
-        SgRBEIXbREXcK4iIkYGRLoIb9N929QS7iewRvIGGmhgZKCIsuLjT1TMIymZ6AzNBETQQEQzMvIW+GVtG
-        8IPiFfVeV1PiL5LlrCn8qi3tQhr9x7Bf14EeDbszze4GmosvMZXsBph3suyuKaYjm9uOLt2xirSV7AYE
-        n+VQzkM/FXf3NNO2Yreb7AYd6VxHu+PZL8rcd3RwL4bJJ7sBm25VoEPoq4nu3kTaN8EVyf7BhGwFh1xX
-        Pb67Ql1UPR49yDEtV30NLhxi+F4FoE+oN/Rj6Ae2jupQdprN1MGC2jiAURMELqEnNtglHd3BZt5v1eFf
-        eqPeHI7Qku3GYDKYTmMgxDftomNpcxLxwwAAAABJRU5ErkJggg==
-</value>
+  <data name="license" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\license.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="medium" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAQ
-        ZwAAEGcBrtDrmAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAB2SURBVChTYyAb
-        3IhwMAFhKBc3uB5pv/1alP02KBc7uB5hZwVU+B+Er0XZ2UGFMQFQwT6YQiDeCxVGBTci7ZyQFIHxjSh7
-        R6g0AgAlDqIrBOKjUGkIuBlu74lFERjfiHTwgCpjYLgWab8SKHgXGwbJQZURAxgYAC2tWCrwi1A0AAAA
-        AElFTkSuQmCC
-</value>
+  <data name="medium" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\medium.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="low" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAQ
-        ZwAAEGcBrtDrmAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABzSURBVChTYyAb
-        fD1ibQLCUC5u8OmI7fZPR+y2QbnYwadjdlafj9j+B+OjdnZQYUzw+YjNPrjCI7Z7ocKoAGiCE5IiKLZ3
-        hEojAFDiIIbCw7ZHodIQAPSlJ4YiKP5y2MYDqgzstpVAwbvYsc1KqDJiAAMDAJAZbPOjgRHuAAAAAElF
-        TkSuQmCC
-</value>
+  <data name="low" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\low.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="normal" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        xAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAB6SURBVChTlY9R
-        CkZQEIXPQni2DT8Z/jWK+0zKxhA2wNx7T6lLyanvZc7XTIPPkVbi3MiQGdnJ+GuqhLWPlbSYlSNgsR01
-        gJtCiZQ9NUAH9tSD5NiovYorNSeOQXnRFh01wH6nw+UmGZnS+h9R8/Gfl72Wm0M33aT3ACfsA3afHtmh
-        NwAAAABJRU5ErkJggg==
-</value>
+  <data name="normal" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\normal.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="security" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        WwAAC1sB2zHRFAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACvSURBVChTY0AG
-        oatCmR3neqi7LHLRdGhwYIEKowLHBa7WTvPdzjjOd5sDwkD2Bcd5rvZQaQQAStx3XOCuDeUyOMxx03Ga
-        7/oAyoUAl3kuSkCF/x0XuBnDMdAJIDGQHFQZ2LT/zvPcZmLDIDmoMohCKBMM3Ba5KTovcM0GsbEqBLox
-        znmeawzQbVcd57mZI8uBAYzjPN/NFei+3cjuwlAINKUDO0ZSiOJbLJiBgYEBADwgZMpCgkFAAAAAAElF
-        TkSuQmCC
-</value>
+  <data name="security" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\security.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="unknown" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        xAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABwSURBVChTlY9L
-        CoAwDETnILr27IrQdaGfC2lRL6CJjiBRKA68RTqPlOB3vPdtCGGMMW7EpZQ61ldUkmIWdkPRjhrATVa6
-        GagBMuhXX5KyUquKC7VTdKZ80lMD9Dp5KEZQppxzQ+0KLx+ElfQvqR7gAOGNtjcruysDAAAAAElFTkSu
-        QmCC
-</value>
+  <data name="unknown" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\unknown.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="critical" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAPhJREFUOE+t
-        UzEOgkAQpLDljrvDwsQYKxM7n0AsjPa+wU4f42N8ACfakNhpY21nZUmBN4AK5x4Vk0yzM7Nk9xavUxwF
-        W8XCz9sIT2VvIo+inpb+jQo1KP0rvFXsB63YjgxQVGxbxUqchkxqwZ62MQ3DAXTz1Ue9Di8yRRgwc+3r
-        hg9dDUBkivBZqakpZLYB1KE/KRuwF6FnyHpasgMhFkwkX+gRF5QGItvaQEu+SfrBjNLAokHrCILdjSml
-        NMNyBMC1xETx+WUcBJT2XSLgesZY8jUWadf/nhHAcdhGJ+1DAnCeOFMyUKfrlAH8KGSoRrPUZWXvAp73
-        BjPfQIhNDhUgAAAAAElFTkSuQmCC
-</value>
+  <data name="critical" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\critical.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="JFrogExtension" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\JFrogExtension.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
