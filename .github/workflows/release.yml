@@ -42,7 +42,7 @@ jobs:
 
       # download build workflow artifacts
       - name: Download VSIX artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
         # use the unique artifact name from the build action
             name: vsix-artifacts-latest-${{ github.run_id }}
