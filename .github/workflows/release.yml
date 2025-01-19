@@ -70,6 +70,7 @@ jobs:
 
       - name: Rebase dev onto master
         run: |
+            git fetch --all
             git checkout dev
             git rebase master
             git push origin dev --force
