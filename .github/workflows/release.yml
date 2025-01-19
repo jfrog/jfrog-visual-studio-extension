@@ -6,10 +6,32 @@ on:
 
 jobs:
 
-  release:
+  build_and_publish:
     runs-on: windows-latest
-    needs: call-build-workflow
+    env:
+        NEW_VERSION: '${{ github.ref_name }}' 
+        MANIFEST_FILE_LOCATION: "JfrogVSExtension/source.extension.vsixmanifest"
+
     steps:
+      - name: Config Github
+        run: |
+            git config --global user.name "${{ github.actor }}"
+            git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with: 
+            ref: ${{ github.event.release.target_commitish }}
+
+      - name: Update VSIX Version in manifest file
+        run: .\scripts\UpdateVsixVersion.ps1
+        shell: pwsh
+
+      - name: Commit and push changes
+        run: |
+            git add .
+            git commit -m "Updated VSIX version to ${{ env.NEW_VERSION }}"
+            git push
 
       # build and package the vsix project
       - name: Build VSIX Project
@@ -37,11 +59,17 @@ jobs:
           asset_content_type: application/octet-stream
 
       # upload the vsix and manifest files to Visual Studio Marketplace using VsixPublisher
-      - name: Publish to Visual Studio Marketplace
-         # vsix publisher executable is already installed in the github windows runner at the following path
+      # - name: Publish to Visual Studio Marketplace
+      #    vsix publisher executable is already installed in the github windows runner at the following path
+      #   run: |
+      #     $VSIX_PUBLISHER_PATH = "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VSSDK/VisualStudioIntegration/Tools/Bin/VsixPublisher.exe"
+      #     $VSIX_PATH = "./JFrogVSExtension/bin/Release/JFrogVSExtension.vsix"
+      #     $PUBLISH_MANIFEST_PATH = "./JFrogVSExtension/PublishManifest.json"
+      #     & $VSIX_PUBLISHER_PATH publish -payload $VSIX_PATH -publishManifest $PUBLISH_MANIFEST_PATH -personalAccessToken ${{ secrets.VS_MARKETPLACE_PAT }}
+      #   shell: pwsh
+
+      - name: Rebase dev onto master
         run: |
-          $VSIX_PUBLISHER_PATH = "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VSSDK/VisualStudioIntegration/Tools/Bin/VsixPublisher.exe"
-          $VSIX_PATH = "./JFrogVSExtension/bin/Release/JFrogVSExtension.vsix"
-          $PUBLISH_MANIFEST_PATH = "./JFrogVSExtension/PublishManifest.json"
-          & $VSIX_PUBLISHER_PATH publish -payload $VSIX_PATH -publishManifest $PUBLISH_MANIFEST_PATH -personalAccessToken ${{ secrets.VS_MARKETPLACE_PAT }}
-        shell: pwsh
+            git checkout dev
+            git rebase master
+            git push origin dev --force
