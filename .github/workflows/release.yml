@@ -37,7 +37,7 @@ jobs:
       - name: Build VSIX Project
         uses: ./.github/actions/build-vsix
         with: 
-           ref: master
+           ref: ${{ github.event.release.target_commitish }}
            vs-version: latest
 
       # download build workflow artifacts
