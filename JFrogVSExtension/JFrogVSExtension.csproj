@@ -162,7 +162,7 @@
 	<Resource Include="Resources\low.png"/>
 	<Resource Include="Resources\normal.png"/>
 	<Resource Include="Resources\unknown.png"/>
-	  
+	<!-- Extension Logo Icons -->
     <Content Include="Resources\Icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -176,11 +176,6 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Resource Include="Resources\JFrogLogoMenu.png" />
-    <Content Include="Resources\medium.png" />
-    <Content Include="Resources\low.png" />
-    <Content Include="Resources\normal.png" />
-    <Resource Include="Resources\security.png" />
-    <Content Include="Resources\unknown.png" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="UI\Panel\ComponentsDetails\ComponentsDetails.xaml">
