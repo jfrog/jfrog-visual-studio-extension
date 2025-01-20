@@ -60,7 +60,7 @@ jobs:
 
       # upload the vsix and manifest files to Visual Studio Marketplace using VsixPublisher
       - name: Publish to Visual Studio Marketplace
-         vsix publisher executable is already installed in the github windows runner at the following path
+         # vsix publisher executable is already installed in the github windows runner at the following path
         run: |
           $VSIX_PUBLISHER_PATH = "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VSSDK/VisualStudioIntegration/Tools/Bin/VsixPublisher.exe"
           $VSIX_PATH = "./JFrogVSExtension/bin/Release/JFrogVSExtension.vsix"
