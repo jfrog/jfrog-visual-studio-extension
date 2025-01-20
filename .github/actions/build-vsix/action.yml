@@ -39,7 +39,7 @@ runs:
       shell: powershell
       env:
         # jfrog cli version can be changed here
-        JFROG_CLI_VERSION: '2.71.3'
+        JFROG_CLI_VERSION: '2.73.0'
       run: |
         .\scripts\DownloadJfrogCli.ps1
 
