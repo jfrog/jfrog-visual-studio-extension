@@ -6,21 +6,43 @@ on:
 
 jobs:
 
-  release:
+  build_and_publish:
     runs-on: windows-latest
-    needs: call-build-workflow
+    env:
+        NEW_VERSION: '${{ github.ref_name }}' 
+        MANIFEST_FILE_LOCATION: "JfrogVSExtension/source.extension.vsixmanifest"
+
     steps:
+      - name: Config Github
+        run: |
+            git config --global user.name "${{ github.actor }}"
+            git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with: 
+            ref: ${{ github.event.release.target_commitish }}
+
+      - name: Update VSIX Version in manifest file
+        run: .\scripts\UpdateVsixVersion.ps1
+        shell: pwsh
+
+      - name: Commit and push changes
+        run: |
+            git add .
+            git commit -m "Updated VSIX version to ${{ env.NEW_VERSION }}"
+            git push
 
       # build and package the vsix project
       - name: Build VSIX Project
         uses: ./.github/actions/build-vsix
         with: 
-           ref: master
+           ref: ${{ github.event.release.target_commitish }}
            vs-version: latest
 
       # download build workflow artifacts
       - name: Download VSIX artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
         # use the unique artifact name from the build action
             name: vsix-artifacts-latest-${{ github.run_id }}
@@ -45,3 +67,10 @@ jobs:
           $PUBLISH_MANIFEST_PATH = "./JFrogVSExtension/PublishManifest.json"
           & $VSIX_PUBLISHER_PATH publish -payload $VSIX_PATH -publishManifest $PUBLISH_MANIFEST_PATH -personalAccessToken ${{ secrets.VS_MARKETPLACE_PAT }}
         shell: pwsh
+
+      - name: Rebase dev onto master
+        run: |
+            git fetch --all
+            git checkout dev
+            git rebase master
+            git push origin dev --force

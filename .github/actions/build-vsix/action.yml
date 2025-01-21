@@ -46,7 +46,7 @@ runs:
     - name: Build VSIX Project 
       shell: powershell
       run: |
-        msbuild JFrogVSExtension.sln /p:Configuration=Release /p:Platform="Any CPU" /p:BuildInParallel=true /m
+        msbuild JFrogVSExtension.sln /p:Configuration=Release /p:Platform="Any CPU"
 
     - name: Check for PDB in VSIX
       run: |
