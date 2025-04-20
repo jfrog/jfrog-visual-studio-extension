@@ -92,7 +92,7 @@ namespace JFrogVSExtension.Tree
                 
                 // Load projects from output.
                 Project[] nugetProjects = Util.LoadNugetProjects(returnedText);
-                Project[] npmProjects = Util.LoadNpmProjects();
+                Project[] npmProjects = await Util.LoadNpmProjectsAsync();
 
                 Projects projects = new Projects
                 {

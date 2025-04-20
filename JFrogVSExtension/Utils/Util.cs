@@ -27,7 +27,7 @@ namespace JFrogVSExtension.Utils
             return projects.NugetProjects;
         }
 
-        public static Project[] LoadNpmProjects()
+        public async static Task<Project[]> LoadNpmProjectsAsync()
         {
             var npmProjects = new List<Project>();
             var packageJsonPaths = Directory.GetFiles(Directory.GetCurrentDirectory(), "package.json", SearchOption.AllDirectories);
@@ -38,7 +38,7 @@ namespace JFrogVSExtension.Utils
                 {
                     continue;
                 }
-                var project = LoadNpmProject(packageJsonPath);
+                var project = await LoadNpmProjectAsync(packageJsonPath);
                 if (project != null)
                 {
                     npmProjects.Add(project);
@@ -47,15 +47,15 @@ namespace JFrogVSExtension.Utils
             return npmProjects.ToArray();
         }
 
-        private static Project LoadNpmProject(string packageJsonPath)
+        private async static Task<Project> LoadNpmProjectAsync(string packageJsonPath)
         {
             try
             {
                 var fileInfo = new FileInfo(packageJsonPath);
                 // Run npm ls to get the dependencies tree. The /C for the process to quit without waiting for a user's interruption.
-                var npmProjectTree = GetProcessOutputAsync("cmd.exe", "/C npm ls --json --all --long --package-lock-only", fileInfo.DirectoryName);
+                var npmProjectTree = await GetProcessOutputAsync("cmd.exe", "/C npm ls --json --all --long --package-lock-only", fileInfo.DirectoryName);
 
-                var npmProj = JsonConvert.DeserializeObject<NpmLsNode>(npmProjectTree.Result);
+                var npmProj = JsonConvert.DeserializeObject<NpmLsNode>(npmProjectTree); 
 
                 var project = new Project()
                 {
