@@ -132,9 +132,8 @@ namespace JFrogVSExtension.Data
             var componentsSet = new HashSet<Components>();
             var workingDirs = new List<string>
             {
-                solutionDir 
+                solutionDir
             };
-            
             if (!reScan)
             {
                 foreach (Project project in projects.All)

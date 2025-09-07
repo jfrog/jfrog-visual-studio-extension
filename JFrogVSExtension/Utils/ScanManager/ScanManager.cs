@@ -57,7 +57,6 @@ namespace JFrogVSExtension.Utils.ScanManager
                     cliAuditCommand += $" --watches=\"{watches}\"";
                     break;
             }
-            
             return await Util.GetCLIOutputAsync(cliAuditCommand, workingDirs.First(), false, cliEnv);
         }
     }

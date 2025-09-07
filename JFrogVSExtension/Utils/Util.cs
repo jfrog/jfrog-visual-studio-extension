@@ -2,7 +2,6 @@
 using JFrogVSExtension.Logger;
 using JFrogVSExtension.Xray;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Threading;
 using Newtonsoft.Json;
 using System;
@@ -30,11 +29,8 @@ namespace JFrogVSExtension.Utils
 
         public async static Task<Project[]> LoadNpmProjectsAsync(String solutionDir)
         {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             var npmProjects = new List<Project>();
-
             var packageJsonPaths = Directory.GetFiles(solutionDir, "package.json", SearchOption.AllDirectories);
-
             foreach (var packageJsonPath in packageJsonPaths)
             {
                 // We should ignore package.json file inside node_modules directory
