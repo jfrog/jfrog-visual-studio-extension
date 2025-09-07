@@ -28,21 +28,10 @@ namespace JFrogVSExtension.Utils
             return projects.NugetProjects;
         }
 
-        public async static Task<Project[]> LoadNpmProjectsAsync()
+        public async static Task<Project[]> LoadNpmProjectsAsync(String solutionDir)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             var npmProjects = new List<Project>();
-            //var packageJsonPaths = Directory.GetFiles(Directory.GetCurrentDirectory(), "package.json", SearchOption.AllDirectories);
-            var vsSolutionObj = await ServiceProvider.GetGlobalServiceAsync(typeof(SVsSolution));
-            var vsSolution = vsSolutionObj as IVsSolution;
-            if (vsSolution == null)
-            {
-                throw new InvalidOperationException("Could not get IVsSolution from ServiceProvider.");
-            }
-            vsSolution.GetSolutionInfo(
-              out string solutionDir,   // the folder you opened
-              out string solutionFile,  // empty when opened as Folder
-              out _);
 
             var packageJsonPaths = Directory.GetFiles(solutionDir, "package.json", SearchOption.AllDirectories);
 

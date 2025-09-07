@@ -132,18 +132,8 @@ namespace JFrogVSExtension.Data
             var componentsSet = new HashSet<Components>();
             var workingDirs = new List<string>
             {
-                solutionDir
+                solutionDir 
             };
-            
-            // Always add project directories to working dirs for scanning
-            // The CLI audit command will discover dependencies directly from the project files
-            foreach (Project project in projects.All)
-            {
-                if (!string.IsNullOrEmpty(project.directoryPath))
-                {
-                    workingDirs.Add(project.directoryPath);
-                }
-            }
             
             if (!reScan)
             {
@@ -151,6 +141,10 @@ namespace JFrogVSExtension.Data
                 {
                     if (project.dependencies != null && project.dependencies.Length > 0)
                     {
+                        if (!string.IsNullOrEmpty(project.directoryPath))
+                        {
+                            workingDirs.Add(project.directoryPath);
+                        }
                         // Get project's components which are not included in the cache.
                         componentsSet.UnionWith(Util.GetNoCachedComponents(project.dependencies, GetComponentsCache()));
                     }

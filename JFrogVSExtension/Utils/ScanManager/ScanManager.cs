@@ -58,49 +58,7 @@ namespace JFrogVSExtension.Utils.ScanManager
                     break;
             }
             
-            // Choose the optimal working directory for CLI execution
-            var cliWorkingDir = GetOptimalWorkingDirectory(workingDirs);
-            
-            return await Util.GetCLIOutputAsync(cliAuditCommand, cliWorkingDir, false, cliEnv);
-        }
-
-        private string GetOptimalWorkingDirectory(List<string> workingDirs)
-        {
-            // If only one directory, use it (typically solution directory)
-            if (workingDirs.Count <= 1)
-            {
-                return workingDirs.First();
-            }
-
-            // Multiple directories: first is solution dir, rest are project dirs
-            // For npm projects, we need to run from a directory that has package.json context
-            // Look for npm project directories (those containing package.json)
-            var projectDirs = workingDirs.Skip(1).ToList();
-            
-            foreach (var projectDir in projectDirs)
-            {
-                if (HasNpmContext(projectDir))
-                {
-                    return projectDir; // Prefer npm project directory
-                }
-            }
-            
-            // If no npm context found, use first project directory (could be nuget)
-            // This maintains backward compatibility for mixed or nuget-only scenarios
-            return projectDirs.First();
-        }
-
-        private bool HasNpmContext(string directory)
-        {
-            try
-            {
-                // Check if directory contains package.json (npm project indicator)
-                return System.IO.File.Exists(System.IO.Path.Combine(directory, "package.json"));
-            }
-            catch
-            {
-                return false;
-            }
+            return await Util.GetCLIOutputAsync(cliAuditCommand, workingDirs.First(), false, cliEnv);
         }
     }
 }

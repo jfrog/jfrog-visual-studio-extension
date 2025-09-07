@@ -92,7 +92,7 @@ namespace JFrogVSExtension.Tree
                 
                 // Load projects from output.
                 Project[] nugetProjects = Util.LoadNugetProjects(returnedText);
-                Project[] npmProjects = await Util.LoadNpmProjectsAsync();
+                Project[] npmProjects = await Util.LoadNpmProjectsAsync(solutionDir);
 
                 Projects projects = new Projects
                 {
@@ -160,10 +160,17 @@ namespace JFrogVSExtension.Tree
             string solutionFullName = dte.Solution.FullName;
             if (String.IsNullOrWhiteSpace(solutionFullName))
             {
-                await OutputLog.ShowMessageAsync("There is no solution yet available. The path is: " + solutionFullName);
+                await OutputLog.ShowMessageAsync("No solution or project directory available. The path is: " + solutionFullName);
                 return "";
             }
-           return System.IO.Path.GetDirectoryName(solutionFullName);
+
+            // For npm projects, solutionFullName might already be a directory
+            if (Directory.Exists(solutionFullName))
+                return solutionFullName;
+            
+            // For .sln files or file paths, extract directory
+            string directory = System.IO.Path.GetDirectoryName(solutionFullName);
+            return directory ?? "";
         }
     }
 }
