@@ -27,10 +27,10 @@ namespace JFrogVSExtension.Utils
             return projects.NugetProjects;
         }
 
-        public async static Task<Project[]> LoadNpmProjectsAsync()
+        public async static Task<Project[]> LoadNpmProjectsAsync(String solutionDir)
         {
             var npmProjects = new List<Project>();
-            var packageJsonPaths = Directory.GetFiles(Directory.GetCurrentDirectory(), "package.json", SearchOption.AllDirectories);
+            var packageJsonPaths = Directory.GetFiles(solutionDir, "package.json", SearchOption.AllDirectories);
             foreach (var packageJsonPath in packageJsonPaths)
             {
                 // We should ignore package.json file inside node_modules directory
