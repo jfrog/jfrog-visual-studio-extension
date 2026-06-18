@@ -58,15 +58,12 @@ jobs:
           asset_name: JFrogVSExtension.vsix
           asset_content_type: application/octet-stream
 
-      # upload the vsix and manifest files to Visual Studio Marketplace using VsixPublisher
       - name: Publish to Visual Studio Marketplace
-         # vsix publisher executable is already installed in the github windows runner at the following path
-        run: |
-          $VSIX_PUBLISHER_PATH = "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VSSDK/VisualStudioIntegration/Tools/Bin/VsixPublisher.exe"
-          $VSIX_PATH = "./JFrogVSExtension/bin/Release/JFrogVSExtension.vsix"
-          $PUBLISH_MANIFEST_PATH = "./JFrogVSExtension/PublishManifest.json"
-          & $VSIX_PUBLISHER_PATH publish -payload $VSIX_PATH -publishManifest $PUBLISH_MANIFEST_PATH -personalAccessToken ${{ secrets.VS_MARKETPLACE_PAT }}
-        shell: pwsh
+        uses: cezarypiatek/VsixPublisherAction@1.2
+        with:
+          extension-file: JFrogVSExtension/bin/Release/JFrogVSExtension.vsix
+          publish-manifest-file: JFrogVSExtension/PublishManifest.json
+          personal-access-code: ${{ secrets.VS_MARKETPLACE_PAT }}
 
       - name: Rebase dev onto master
         run: |
