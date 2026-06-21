@@ -58,18 +58,15 @@ jobs:
           asset_name: JFrogVSExtension.vsix
           asset_content_type: application/octet-stream
 
+      # VsixPublisher path is not fixed on windows-latest (VS 2026); resolve via vswhere.
       - name: Publish to Visual Studio Marketplace
         run: |
           $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-          if (-not (Test-Path $vswhere)) { throw "vswhere.exe not found at $vswhere" }
-          $installPath = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VSSDK -property installationPath
-          if (-not $installPath) { throw "No Visual Studio installation with VSSDK found on this runner." }
-          $publisher = Join-Path $installPath 'VSSDK\VisualStudioIntegration\Tools\Bin\VsixPublisher.exe'
-          if (-not (Test-Path $publisher)) { throw "VsixPublisher.exe not found at $publisher" }
-          & $publisher publish `
-            -payload ./JFrogVSExtension/bin/Release/JFrogVSExtension.vsix `
-            -publishManifest ./JFrogVSExtension/PublishManifest.json `
-            -personalAccessToken ${{ secrets.VS_MARKETPLACE_PAT }}
+          $vsInstall = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VSSDK -property installationPath
+          $VSIX_PUBLISHER_PATH = Join-Path $vsInstall "VSSDK\VisualStudioIntegration\Tools\Bin\VsixPublisher.exe"
+          $VSIX_PATH = "./JFrogVSExtension/bin/Release/JFrogVSExtension.vsix"
+          $PUBLISH_MANIFEST_PATH = "./JFrogVSExtension/PublishManifest.json"
+          & $VSIX_PUBLISHER_PATH publish -payload $VSIX_PATH -publishManifest $PUBLISH_MANIFEST_PATH -personalAccessToken ${{ secrets.VS_MARKETPLACE_PAT }}
         shell: pwsh
 
       - name: Rebase dev onto master
