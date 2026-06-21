@@ -26,6 +26,7 @@ jobs:
         with:
           ref: ${{ github.sha }}
           vs-version: latest
+          skip-checkout: 'true'
 
       - name: Download VSIX artifacts
         uses: actions/download-artifact@v4

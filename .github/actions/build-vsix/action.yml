@@ -8,11 +8,16 @@ inputs:
   vs-version:
     description: 'The Visual Studio version to build the project with'
     required: true
+  skip-checkout:
+    description: 'Skip checkout when the workspace already has the desired sources'
+    required: false
+    default: 'false'
 runs:
   using: 'composite'
 
   steps:
     - name: Checkout code
+      if: inputs.skip-checkout != 'true'
       uses: actions/checkout@v4
       with:
         ref: ${{ inputs.ref }}
