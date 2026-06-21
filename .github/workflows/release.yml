@@ -63,12 +63,12 @@ jobs:
           # Locate VsixPublisher.exe (install path is not fixed on windows-latest).
           $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
           $vsInstall = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VSSDK -property installationPath
-          $VSIX_PUBLISHER_PATH = Join-Path $vsInstall "VSSDK\VisualStudioIntegration\Tools\Bin\VsixPublisher.exe"
+          $VsixPublisherPath = Join-Path $vsInstall "VSSDK\VisualStudioIntegration\Tools\Bin\VsixPublisher.exe"
 
           # Publish the built VSIX to the Marketplace.
-          $VSIX_PATH = "./JFrogVSExtension/bin/Release/JFrogVSExtension.vsix"
-          $PUBLISH_MANIFEST_PATH = "./JFrogVSExtension/PublishManifest.json"
-          & $VSIX_PUBLISHER_PATH publish -payload $VSIX_PATH -publishManifest $PUBLISH_MANIFEST_PATH -personalAccessToken ${{ secrets.VS_MARKETPLACE_PAT }}
+          $VsixPath = "./JFrogVSExtension/bin/Release/JFrogVSExtension.vsix"
+          $PublishManifestPath = "./JFrogVSExtension/PublishManifest.json"
+          & $VsixPublisherPath publish -payload $VsixPath -publishManifest $PublishManifestPath -personalAccessToken ${{ secrets.VS_MARKETPLACE_PAT }}
         shell: pwsh
 
       - name: Rebase dev onto master
