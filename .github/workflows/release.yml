@@ -58,12 +58,14 @@ jobs:
           asset_name: JFrogVSExtension.vsix
           asset_content_type: application/octet-stream
 
-      # VsixPublisher path is not fixed on windows-latest (VS 2026); resolve via vswhere.
       - name: Publish to Visual Studio Marketplace
         run: |
+          # Locate VsixPublisher.exe (install path is not fixed on windows-latest).
           $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
           $vsInstall = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VSSDK -property installationPath
           $VSIX_PUBLISHER_PATH = Join-Path $vsInstall "VSSDK\VisualStudioIntegration\Tools\Bin\VsixPublisher.exe"
+
+          # Publish the built VSIX to the Marketplace.
           $VSIX_PATH = "./JFrogVSExtension/bin/Release/JFrogVSExtension.vsix"
           $PUBLISH_MANIFEST_PATH = "./JFrogVSExtension/PublishManifest.json"
           & $VSIX_PUBLISHER_PATH publish -payload $VSIX_PATH -publishManifest $PUBLISH_MANIFEST_PATH -personalAccessToken ${{ secrets.VS_MARKETPLACE_PAT }}
