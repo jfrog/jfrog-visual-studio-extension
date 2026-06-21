@@ -59,11 +59,18 @@ jobs:
           asset_content_type: application/octet-stream
 
       - name: Publish to Visual Studio Marketplace
-        uses: cezarypiatek/VsixPublisherAction@1.2
-        with:
-          extension-file: JFrogVSExtension/bin/Release/JFrogVSExtension.vsix
-          publish-manifest-file: JFrogVSExtension/PublishManifest.json
-          personal-access-code: ${{ secrets.VS_MARKETPLACE_PAT }}
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          if (-not (Test-Path $vswhere)) { throw "vswhere.exe not found at $vswhere" }
+          $installPath = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VSSDK -property installationPath
+          if (-not $installPath) { throw "No Visual Studio installation with VSSDK found on this runner." }
+          $publisher = Join-Path $installPath 'VSSDK\VisualStudioIntegration\Tools\Bin\VsixPublisher.exe'
+          if (-not (Test-Path $publisher)) { throw "VsixPublisher.exe not found at $publisher" }
+          & $publisher publish `
+            -payload ./JFrogVSExtension/bin/Release/JFrogVSExtension.vsix `
+            -publishManifest ./JFrogVSExtension/PublishManifest.json `
+            -personalAccessToken ${{ secrets.VS_MARKETPLACE_PAT }}
+        shell: pwsh
 
       - name: Rebase dev onto master
         run: |
