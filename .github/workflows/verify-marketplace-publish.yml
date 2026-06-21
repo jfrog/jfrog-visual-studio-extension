@@ -1,0 +1,40 @@
+# Temporary: verify inline VsixPublisher publish on this branch. Delete before merge.
+name: Verify Marketplace Publish
+
+on:
+  push:
+    branches:
+      - fix/vsixpublisher-action
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build VSIX Project
+        uses: ./.github/actions/build-vsix
+        with:
+          ref: ${{ github.sha }}
+          vs-version: latest
+
+      - name: Download VSIX artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: vsix-artifacts-latest-${{ github.run_id }}
+          path: ./JFrogVSExtension/bin/Release
+
+      - name: Publish to Visual Studio Marketplace
+        run: |
+          # Locate VsixPublisher.exe (install path is not fixed on windows-latest).
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vsInstall = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VSSDK -property installationPath
+          $VSIX_PUBLISHER_PATH = Join-Path $vsInstall "VSSDK\VisualStudioIntegration\Tools\Bin\VsixPublisher.exe"
+
+          # Publish the built VSIX to the Marketplace.
+          $VSIX_PATH = "./JFrogVSExtension/bin/Release/JFrogVSExtension.vsix"
+          $PUBLISH_MANIFEST_PATH = "./JFrogVSExtension/PublishManifest.json"
+          & $VSIX_PUBLISHER_PATH publish -payload $VSIX_PATH -publishManifest $PUBLISH_MANIFEST_PATH -personalAccessToken ${{ secrets.VS_MARKETPLACE_PAT }}
+        shell: pwsh
