@@ -10,9 +10,16 @@ on:
 jobs:
   verify:
     runs-on: windows-latest
+    env:
+      NEW_VERSION: vs22-2.1.6
+      MANIFEST_FILE_LOCATION: JFrogVSExtension/source.extension.vsixmanifest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set VSIX version for release verify
+        run: .\scripts\UpdateVsixVersion.ps1
+        shell: pwsh
 
       - name: Build VSIX Project
         uses: ./.github/actions/build-vsix
