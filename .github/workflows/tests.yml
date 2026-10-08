@@ -7,11 +7,20 @@ on:
 
 jobs:
   build-and-test: 
-    runs-on: windows-latest
+    runs-on: ${{ matrix.runner }}
     strategy: 
         matrix: 
         # verify compatibility with the desired Visual Studio versions
-            vs-version: [17.10, 17.11, 17.12, latest]
+        # windows-latest ships Visual Studio 2026, windows-2022 ships Visual Studio 2022
+            include:
+              - runner: windows-2022
+                vs-version: '17.10'
+              - runner: windows-2022
+                vs-version: '17.11'
+              - runner: windows-2022
+                vs-version: '17.12'
+              - runner: windows-latest
+                vs-version: 'latest'
 
     steps:
     - name: Checkout code
