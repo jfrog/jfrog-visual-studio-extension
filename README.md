@@ -4,7 +4,7 @@
 
 |          Target          |                                                                           Status                                                                            |                                                                                  Installs                                                                                   |
 |:------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-|    Visual Studio 2022    | [Visual Studio 2022](https://marketplace.visualstudio.com/items?itemName=JFrog.JFrogV2)  | ![Artifactory Extension Marketplace Installs](https://vsmarketplacebadges.dev/installs-short/JFrog.JFrogV2.svg?style=for-the-badge) |
+| Visual Studio 2022, 2026 | [Visual Studio 2022, 2026](https://marketplace.visualstudio.com/items?itemName=JFrog.JFrogV2)  | ![Visual Studio 2022, 2026](https://vsmarketplacebadges.dev/installs-short/JFrog.JFrogV2.svg?style=for-the-badge) |
 | Visual Studio 2017, 2019 | [Visual Studio 2017,2019](https://marketplace.visualstudio.com/items?itemName=JFrog.JFrog) |           ![Visual Studio 2017,2019](https://vsmarketplacebadges.dev/installs-short/JFrog.JFrog.svg?style=for-the-badge)            |
 
 
