@@ -19,7 +19,7 @@ jobs:
             git config --global user.email "${{ github.actor }}@users.noreply.github.com"
 
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with: 
             ref: ${{ github.event.release.target_commitish }}
 
